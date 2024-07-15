@@ -370,24 +370,115 @@
                 align-items: flex-start;
             }
         }
+
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+  }
+  
+  .logo-img {
+    max-height: 40px;
+  }
+  
+  .menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .mobile-menu {
+    display: flex;
+    align-items: center;
+  }
+  
+  .mobile-menu ul {
+    display: flex;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .mobile-menu li {
+    margin-right: 15px;
+  }
+  
+  .cta-buttons {
+    display: flex;
+  }
+  
+  @media (max-width: 768px) {
+    .menu-toggle {
+      display: block;
+    }
+    
+    .mobile-menu {
+      display: none;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      background-color: #fff;
+      flex-direction: column;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+    }
+    
+    .mobile-menu.active {
+      display: flex;
+    }
+    
+    .mobile-menu ul {
+      flex-direction: column;
+    }
+    
+    .mobile-menu li {
+      margin-right: 0;
+      margin-bottom: 10px;
+    }
+    
+    .cta-buttons {
+      flex-direction: column;
+      margin-top: 15px;
+    }
+    
+    .cta-buttons .button {
+      margin-bottom: 10px;
+    }
+  }
     </style>
 </head>
 <body>
     <button id="scroll-to-top"><i class="fas fa-chevron-up"></i></button>
     <header>
-        <a href="#"><img src="img/img.jpg" alt="Shiply Logo" class="logo"></a>
-        <nav>
-            <a href="#">Services</a>
-            <a href="#">Trouver des livraisons</a>
-            <a href="#">Comment ça marche</a>
-            <a href="#">Aide</a>
-            <a href="#">Se connecter</a>
-        </nav>
-        <div class="cta-buttons">
-            <a href="#" class="button primary">Obtenir des devis</a>
-            <a href="#" class="button secondary">Êtes-vous une société de transport ?</a>
+        <div class="header-container">
+          <a href="#" class="logo">
+            <img src="img/img.jpg" alt="Shiply Logo" class="logo-img">
+          </a>
+          
+          <button id="menuToggle" class="menu-toggle">
+            <span class="menu-icon">☰</span>
+            Menu
+          </button>
+          
+          <nav id="mobileMenu" class="mobile-menu">
+            <ul>
+              <li><a href="#">Services</a></li>
+              <li><a href="#">Trouver des livraisons</a></li>
+              <li><a href="#">Comment ça marche</a></li>
+              <li><a href="#">Aide</a></li>
+              <li><a href="#">Se connecter</a></li>
+            </ul>
+            <div class="cta-buttons">
+              <a href="#" class="button primary">Obtenir des devis</a>
+              <a href="#" class="button secondary">Êtes-vous une société de transport ?</a>
+            </div>
+          </nav>
         </div>
-    </header>
+      </header>
 
     <main class="hero">
         <div class="background-slideshow">
@@ -589,5 +680,15 @@
             }
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const menuToggle = document.getElementById('menuToggle');
+          const mobileMenu = document.getElementById('mobileMenu');
+          
+          menuToggle.addEventListener('click', function() {
+            mobileMenu.classList.toggle('active');
+          });
+        });
+      </script>
 </body>
 </html>

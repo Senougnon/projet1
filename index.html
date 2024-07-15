@@ -11,44 +11,82 @@
         body, html {
             margin: 0;
             padding: 0;
-            font-family: 'Arial', sans-serif;
-            height: 100%;
-            overflow-x: hidden; /* Supprime la barre de défilement horizontale */
+            font-family: Arial, sans-serif;
         }
-
-        header {
-            background-color: #1a1a1a;
+        .header-container {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px;
-            z-index: 10;
-            transition: background-color 0.3s ease;
+            z-index: 1000;
         }
-
-        .logo {
+        .logo-img {
             height: 40px;
         }
-
-        nav a {
-            color: white;
-            text-decoration: none;
+        .menu-icon {
+            display: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .nav-menu {
+            display: flex;
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-menu li {
             margin-left: 20px;
-            font-weight: bold;
-            transition: color 0.3s ease;
         }
-
-        nav a:hover {
-            color: #ff9900;
+        .nav-menu a {
+            text-decoration: none;
+            color: #333;
         }
-
         .cta-buttons {
             display: flex;
-            gap: 10px;
+        }
+        .button {
+            padding: 10px 15px;
+            margin-left: 10px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        @media (max-width: 768px) {
+            .menu-icon {
+                display: block;
+            }
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background-color: rgba(255, 255, 255, 0.9);
+                flex-direction: column;
+                padding: 20px;
+            }
+            .nav-menu.active {
+                display: flex;
+            }
+            .nav-menu li {
+                margin: 10px 0;
+            }
+            .cta-buttons {
+                display: none;
+            }
         }
 
         .button {

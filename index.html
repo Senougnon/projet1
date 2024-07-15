@@ -4,16 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IDEALER TRANSPORT - Suivi de livraison</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqk1wZxL+hO91q8fW20H3Thmlw51/s/NgITE7Q5vMI3y+l/9E+zIB0a1NehGVlU0bLVMQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body, html {
             margin: 0;
             padding: 0;
             font-family: Arial, sans-serif;
             height: 100%;
-            overflow-x: hidden; /* Supprime la barre de défilement horizontale */
         }
-
         header {
             position: absolute;
             top: 0;
@@ -24,52 +21,35 @@
             align-items: center;
             padding: 20px;
             z-index: 10;
-            background-color: #111; /* Fond foncé pour le header */
         }
-
         .logo {
             height: 40px;
         }
-
         nav a {
             color: white;
             text-decoration: none;
             margin-left: 20px;
             font-weight: bold;
         }
-
         .cta-buttons {
             display: flex;
             gap: 10px;
         }
-
         .button {
             padding: 10px 20px;
             border-radius: 5px;
             text-decoration: none;
             font-weight: bold;
-            transition: background-color 0.3s ease; /* Transition pour l'effet hover */
         }
-
         .primary {
             background-color: #ff9900;
             color: white;
         }
-
-        .primary:hover {
-            background-color: #f59900; /* Couleur de fond au survol */
-        }
-
         .secondary {
             background-color: transparent;
             border: 2px solid white;
             color: white;
         }
-
-        .secondary:hover {
-            background-color: rgba(255, 255, 255, 0.1); /* Couleur de fond transparente au survol */
-        }
-
         .hero {
             position: relative;
             height: 100vh;
@@ -81,24 +61,20 @@
             text-align: center;
             overflow: hidden;
         }
-
         .hero-content {
             position: relative;
             z-index: 2;
             max-width: 800px;
             padding: 20px;
         }
-
         h1 {
             font-size: 2.5em;
             margin-bottom: 20px;
         }
-
         .subheading {
             font-size: 1.2em;
             margin-bottom: 30px;
         }
-
         .quote-form {
             background: rgba(255, 255, 255, 0.1);
             padding: 20px;
@@ -108,21 +84,16 @@
             justify-content: space-between;
             gap: 10px;
         }
-
         .form-group {
             flex: 1 1 200px;
         }
-
         .form-group select,
         .form-group input {
             width: 100%;
             padding: 10px;
             border: none;
             border-radius: 5px;
-            background-color: #fff; /* Fond blanc pour les champs de formulaire */
-            color: #333; /* Couleur du texte du formulaire */
         }
-
         .quote-button {
             flex: 1 1 100%;
             background-color: #ff9900;
@@ -132,13 +103,7 @@
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            transition: background-color 0.3s ease; /* Transition pour l'effet hover */
         }
-
-        .quote-button:hover {
-            background-color: #f59900; /* Couleur de fond au survol */
-        }
-
         .background-slideshow {
             position: absolute;
             top: 0;
@@ -146,9 +111,7 @@
             width: 100%;
             height: 100%;
             z-index: 0;
-            overflow: hidden; /* Masquer le dépassement */
         }
-
         .background-slideshow img {
             position: absolute;
             top: 0;
@@ -159,11 +122,9 @@
             opacity: 0;
             transition: opacity 1s ease-in-out;
         }
-
         .background-slideshow img.active {
             opacity: 1;
         }
-
         footer {
             position: absolute;
             bottom: 0;
@@ -174,65 +135,53 @@
             padding: 10px;
             text-align: center;
         }
-
         .footer-logos img {
             height: 30px;
             margin: 0 10px;
         }
-
         /* Styles pour les sections suivantes */
         section {
             padding: 50px 0;
             text-align: center;
         }
-
         .section-title {
             font-size: 2em;
             margin-bottom: 20px;
         }
-
         .section-content {
             max-width: 800px;
             margin: 0 auto;
         }
-
         .section-image {
             max-width: 100%;
             height: auto;
             margin: 20px 0;
         }
-
         .features {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 20px;
         }
-
         .feature {
             flex: 1 1 300px;
             padding: 20px;
             background-color: #f5f5f5;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ajout d'une ombre portée */
         }
-
         .feature-icon {
             font-size: 3em;
             color: #ff9900;
             margin-bottom: 10px;
         }
-
         .feature-title {
             font-size: 1.5em;
             margin-bottom: 10px;
         }
-
         .testimonials {
             background-color: #f5f5f5;
             padding: 50px 0;
         }
-
         .testimonial {
             display: flex;
             align-items: center;
@@ -242,32 +191,26 @@
             padding: 20px;
             background-color: white;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Ajout d'une ombre portée */
         }
-
         .testimonial-image {
             width: 80px;
             height: 80px;
             border-radius: 50%;
             overflow: hidden;
         }
-
         .testimonial-text {
             font-style: italic;
         }
-
         .testimonial-author {
             font-weight: bold;
             margin-top: 10px;
         }
-
         .call-to-action {
             background-color: #ff9900;
             color: white;
             padding: 20px;
             text-align: center;
         }
-
         .cta-button {
             background-color: white;
             color: #ff9900;
@@ -276,13 +219,7 @@
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
-            transition: background-color 0.3s ease; /* Transition pour l'effet hover */
         }
-
-        .cta-button:hover {
-            background-color: #f59900; /* Couleur de fond au survol */
-        }
-
         .success-message, .error-message {
             position: fixed;
             top: 50%;
@@ -294,59 +231,14 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
             z-index: 100;
             display: none; /* Caché par défaut */
-            opacity: 0; /* Opacité initiale à 0 */
-            transition: opacity 0.5s ease-in-out; /* Transition pour l'effet d'opacité */
-            width: 350px; /* Largeur de la fenêtre */
-            animation: slideIn 0.5s ease-in-out forwards; /* Animation d'entrée */
         }
-
         .success-message {
             background-color: #4CAF50;
             color: white;
         }
-
         .error-message {
             background-color: #f44336;
             color: white;
-        }
-
-        .success-message .close-icon, .error-message .close-icon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-            font-size: 1.2em;
-            color: white;
-            transition: color 0.3s ease; /* Transition pour l'effet hover */
-        }
-
-        .success-message .close-icon:hover, .error-message .close-icon:hover {
-            color: #fff; /* Couleur de l'icône au survol */
-        }
-
-        .success-message p, .error-message p {
-            margin: 0; /* Supprime la marge par défaut */
-            padding: 10px 0; /* Ajoute un padding pour l'espacement */
-        }
-
-        .success-message .icon-sent {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-bottom: 10px; /* Espacement entre l'icône et le texte */
-            font-size: 2.5em;
-            color: white;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-50px); /* Déplacement initial */
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0); /* Déplacement final */
-            }
         }
     </style>
 </head>
@@ -463,15 +355,11 @@
     </footer>
 
     <div class="success-message" id="successMessage">
-        <i class="fas fa-check-circle icon-sent"></i>
         <p>Nous allons vérifier le statut de votre livraison. La confirmation après vérification de votre commande vous sera transmis dans votre email. Merci d'utiliser IDEALER TRANSPORT GROUPE</p>
-        <i class="fas fa-times close-icon"></i>
     </div>
 
     <div class="error-message" id="errorMessage">
-        <i class="fas fa-exclamation-triangle icon-sent"></i>
         <p>Erreur lors de l'envoi de la demande de suivi.</p>
-        <i class="fas fa-times close-icon"></i>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -516,50 +404,20 @@
             .then(() => {
                 // Afficher le message de succès
                 successMessage.style.display = 'block';
-                successMessage.style.opacity = 1;
-
                 // Masquer le message d'erreur si affiché
                 errorMessage.style.display = 'none';
-                errorMessage.style.opacity = 0;
 
                 // Rediriger vers une autre page si nécessaire
                 // window.location.href = '/confirmation';
-
-                // Fermeture automatique après 10 secondes
-                setTimeout(() => {
-                    closeSuccessMessage();
-                }, 10000); 
             })
             .catch(error => {
                 // Afficher le message d'erreur
                 errorMessage.style.display = 'block';
-                errorMessage.style.opacity = 1;
-
                 // Masquer le message de succès si affiché
                 successMessage.style.display = 'none';
-                successMessage.style.opacity = 0;
-
                 console.error('Erreur Firebase:', error);
             });
         });
-
-        // Fermeture de la fenêtre de message
-        const closeIcons = document.querySelectorAll('.close-icon');
-
-        closeIcons.forEach(icon => {
-            icon.addEventListener('click', () => {
-                closeSuccessMessage();
-            });
-        });
-
-        function closeSuccessMessage() {
-            successMessage.style.opacity = 0;
-            errorMessage.style.opacity = 0;
-            setTimeout(() => {
-                successMessage.style.display = 'none';
-                errorMessage.style.display = 'none';
-            }, 500); // Délai pour la transition d'opacité
-        }
 
         // Changement d'image de fond
         const backgroundImages = document.querySelectorAll('.background-slideshow img');

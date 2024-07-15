@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shiply - Suivi de livraison</title>
+    <title>IDEALER TRANSPORT - Suivi de livraison</title>
     <style>
         body, html {
             margin: 0;
@@ -220,6 +220,26 @@
             cursor: pointer;
             font-weight: bold;
         }
+        .success-message, .error-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            display: none; /* Caché par défaut */
+        }
+        .success-message {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .error-message {
+            background-color: #f44336;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -246,7 +266,7 @@
         <div class="hero-content">
             <h1>Des entreprises de livraison rivalisent pour remplir votre mission</h1>
             <p class="subheading">ÉCONOMISEZ DU TEMPS ET DE L'ARGENT - DES PRIX JUSQU'À 75 % INFÉRIEURS AUX TARIFS STANDARD</p>
-            <form class="quote-form">
+            <form class="quote-form" id="trackingForm">
                 <div class="form-group">
                     <select>
                         <option>Meubles et articles généraux</option>
@@ -267,7 +287,7 @@
 
     <section>
         <div class="section-content">
-            <h2 class="section-title">Pourquoi choisir Shiply ?</h2>
+            <h2 class="section-title">Pourquoi choisir IDEALER TRANSPORT ?</h2>
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sed diam eget risus varius blandit sit amet non magna. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.</p>
         </div>
     </section>
@@ -292,7 +312,7 @@
 
     <section class="testimonials">
         <div class="section-content">
-            <h2 class="section-title">Ce que nos clients disent</h2>
+            <h2 class="section-title">AVIS DES ClIENTS</h2>
         </div>
         <div class="testimonial">
             <div class="testimonial-image">
@@ -334,7 +354,72 @@
         <img src="img/img9.png" alt="Compatible avec l'application eBay">
     </footer>
 
+    <div class="success-message" id="successMessage">
+        <p>Nous allons vérifier le statut de votre livraison. La confirmation après vérification de votre commande vous sera transmis dans votre email. Merci d'utiliser IDEALER TRANSPORT GROUPE</p>
+    </div>
+
+    <div class="error-message" id="errorMessage">
+        <p>Erreur lors de l'envoi de la demande de suivi.</p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <script>
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAo74jMlzbIDL8ouNGAw3laaPTxRN8Nbuw",
+            authDomain: "idealer-6a95b.firebaseapp.com",
+            databaseURL: "https://idealer-6a95b-default-rtdb.firebaseio.com",
+            projectId: "idealer-6a95b",
+            storageBucket: "idealer-6a95b.appspot.com",
+            messagingSenderId: "232367342949",
+            appId: "1:232367342949:web:6a2206ac0f5b23a4df8d8c",
+            measurementId: "G-RPFZVV8MS2"
+        };
+
+        // Initialisation de l'application Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Gestion du formulaire de suivi
+        const trackingForm = document.getElementById('trackingForm');
+        const successMessage = document.getElementById('successMessage');
+        const errorMessage = document.getElementById('errorMessage');
+
+        trackingForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            // Récupérer les données du formulaire
+            const itemType = trackingForm.querySelector('select').value;
+            const trackingNumber = trackingForm.querySelector('input[placeholder="Numéro de suivi"]').value;
+            const email = trackingForm.querySelector('input[placeholder="Email"]').value;
+
+            // Envoyer les données à la base de données Firebase
+            database.ref('suivi-livraisons').push({
+                itemType: itemType,
+                trackingNumber: trackingNumber,
+                email: email
+            })
+            .then(() => {
+                // Afficher le message de succès
+                successMessage.style.display = 'block';
+                // Masquer le message d'erreur si affiché
+                errorMessage.style.display = 'none';
+
+                // Rediriger vers une autre page si nécessaire
+                // window.location.href = '/confirmation';
+            })
+            .catch(error => {
+                // Afficher le message d'erreur
+                errorMessage.style.display = 'block';
+                // Masquer le message de succès si affiché
+                successMessage.style.display = 'none';
+                console.error('Erreur Firebase:', error);
+            });
+        });
+
+        // Changement d'image de fond
         const backgroundImages = document.querySelectorAll('.background-slideshow img');
         let currentImageIndex = 0;
 

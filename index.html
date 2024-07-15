@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shiply - Suivi de livraison</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            height: 100%;
+        }
+        header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            z-index: 10;
+        }
+        .logo {
+            height: 40px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: bold;
+        }
+        .cta-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .primary {
+            background-color: #ff9900;
+            color: white;
+        }
+        .secondary {
+            background-color: transparent;
+            border: 2px solid white;
+            color: white;
+        }
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            overflow: hidden;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        .subheading {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        .quote-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .form-group {
+            flex: 1 1 200px;
+        }
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+        .quote-button {
+            flex: 1 1 100%;
+            background-color: #ff9900;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .background-slideshow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        .background-slideshow img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .background-slideshow img.active {
+            opacity: 1;
+        }
+        footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+        .footer-logos img {
+            height: 30px;
+            margin: 0 10px;
+        }
+        /* Styles pour les sections suivantes */
+        section {
+            padding: 50px 0;
+            text-align: center;
+        }
+        .section-title {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .section-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .section-image {
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0;
+        }
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .feature {
+            flex: 1 1 300px;
+            padding: 20px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+        }
+        .feature-icon {
+            font-size: 3em;
+            color: #ff9900;
+            margin-bottom: 10px;
+        }
+        .feature-title {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        .testimonials {
+            background-color: #f5f5f5;
+            padding: 50px 0;
+        }
+        .testimonial {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+        }
+        .testimonial-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        .testimonial-text {
+            font-style: italic;
+        }
+        .testimonial-author {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .call-to-action {
+            background-color: #ff9900;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .cta-button {
+            background-color: white;
+            color: #ff9900;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="img/img.jpg" alt="Shiply Logo" class="logo">
+        <nav>
+            <a href="#">Services</a>
+            <a href="#">Trouver des livraisons</a>
+            <a href="#">Comment ça marche</a>
+            <a href="#">Aide</a>
+            <a href="#">Se connecter</a>
+        </nav>
+        <div class="cta-buttons">
+            <a href="#" class="button primary">Obtenir des devis</a>
+            <a href="#" class="button secondary">Êtes-vous une société de transport ?</a>
+        </div>
+    </header>
+
+    <main class="hero">
+        <div class="background-slideshow">
+            <img src="img/img1.jpg" alt="Background 1" class="active">
+            <img src="img/img2.jpg" alt="Background 2">
+        </div>
+        <div class="hero-content">
+            <h1>Des entreprises de livraison rivalisent pour remplir votre mission</h1>
+            <p class="subheading">ÉCONOMISEZ DU TEMPS ET DE L'ARGENT - DES PRIX JUSQU'À 75 % INFÉRIEURS AUX TARIFS STANDARD</p>
+            <form class="quote-form">
+                <div class="form-group">
+                    <select>
+                        <option>Meubles et articles généraux</option>
+                        <option>Voitures</option>
+                        <option>Autre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="text" placeholder="Numéro de suivi">
+                </div>
+                <div class="form-group">
+                    <input type="text" placeholder="Email">
+                </div>
+                <button type="submit" class="quote-button">SUIVRE LA LIVRAISON</button>
+            </form>
+        </div>
+    </main>
+
+    <section>
+        <div class="section-content">
+            <h2 class="section-title">Pourquoi choisir Shiply ?</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sed diam eget risus varius blandit sit amet non magna. Aenean eu leo quam. Pellentesque ornare sem lacinia quam venenatis vestibulum.</p>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="feature">
+            <i class="feature-icon fas fa-truck"></i>
+            <h3 class="feature-title">Livraison rapide et fiable</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+        <div class="feature">
+            <i class="feature-icon fas fa-money-bill-wave"></i>
+            <h3 class="feature-title">Prix compétitifs</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+        <div class="feature">
+            <i class="feature-icon fas fa-shield-alt"></i>
+            <h3 class="feature-title">Assurance incluse</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+    </section>
+
+    <section class="testimonials">
+        <div class="section-content">
+            <h2 class="section-title">Ce que nos clients disent</h2>
+        </div>
+        <div class="testimonial">
+            <div class="testimonial-image">
+                <img src="img/client1.jpg" alt="Client 1">
+            </div>
+            <div>
+                <p class="testimonial-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+                <p class="testimonial-author">- John Doe, Client satisfait</p>
+            </div>
+        </div>
+        <div class="testimonial">
+            <div class="testimonial-image">
+                <img src="img/client2.jpg" alt="Client 2">
+            </div>
+            <div>
+                <p class="testimonial-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas sed diam eget risus varius blandit sit amet non magna.</p>
+                <p class="testimonial-author">- Jane Doe, Client satisfait</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="call-to-action">
+        <div class="section-content">
+            <h2>Prêt à obtenir des devis ?</h2>
+            <a href="#" class="cta-button">Obtenir des devis</a>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-logos">
+            <img src="img/img3.png" alt="Stratégie Logistique">
+            <img src="img/img4.png" alt="Europages">
+            <img src="img/img5.png" alt="Reuters">
+            <img src="img/img6.png" alt="The New York Times">
+        </div>
+        <p>Lisez nos 23 861 avis</p>
+        <img src="img/img7.png" alt="5 étoiles">
+        <img src="img/img8.png" alt="Reviews">
+        <img src="img/img9.png" alt="Compatible avec l'application eBay">
+    </footer>
+
+    <script>
+        const backgroundImages = document.querySelectorAll('.background-slideshow img');
+        let currentImageIndex = 0;
+
+        function changeBackgroundImage() {
+            backgroundImages[currentImageIndex].classList.remove('active');
+            currentImageIndex = (currentImageIndex + 1) % backgroundImages.length;
+            backgroundImages[currentImageIndex].classList.add('active');
+        }
+
+        setInterval(changeBackgroundImage, 5000); // Change l'image toutes les 5 secondes
+    </script>
+</body>
+</html>

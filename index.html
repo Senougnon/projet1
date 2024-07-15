@@ -4,15 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IDEALER TRANSPORT - Suivi de livraison</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
+          integrity="sha512-iecdLmaskl7CVkqk1wB67892CUGK1OLuCG9hQivpX+wWhpiU9dPuLLwRK8a8dB/K24lk1y+Y2CTJGMvnzxC2w==" 
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         body, html {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
             height: 100%;
+            overflow-x: hidden; /* Supprime la barre de défilement horizontale */
         }
+
         header {
-            position: absolute;
+            background-color: #1a1a1a;
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
@@ -21,35 +27,60 @@
             align-items: center;
             padding: 20px;
             z-index: 10;
+            transition: background-color 0.3s ease;
         }
+
         .logo {
             height: 40px;
         }
+
         nav a {
             color: white;
             text-decoration: none;
             margin-left: 20px;
             font-weight: bold;
+            transition: color 0.3s ease;
         }
+
+        nav a:hover {
+            color: #ff9900;
+        }
+
         .cta-buttons {
             display: flex;
             gap: 10px;
         }
+
         .button {
             padding: 10px 20px;
             border-radius: 5px;
             text-decoration: none;
             font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
         }
+
         .primary {
             background-color: #ff9900;
             color: white;
         }
+
         .secondary {
             background-color: transparent;
             border: 2px solid white;
             color: white;
         }
+
+        .primary:hover {
+            background-color: #e68a00;
+        }
+
+        .secondary:hover {
+            background-color: #ff9900;
+            color: white;
+        }
+
         .hero {
             position: relative;
             height: 100vh;
@@ -60,21 +91,26 @@
             color: white;
             text-align: center;
             overflow: hidden;
+            background-color: #1a1a1a; /* Fond sombre pour le héros */
         }
+
         .hero-content {
             position: relative;
             z-index: 2;
             max-width: 800px;
             padding: 20px;
         }
+
         h1 {
-            font-size: 2.5em;
+            font-size: 3em;
             margin-bottom: 20px;
         }
+
         .subheading {
-            font-size: 1.2em;
+            font-size: 1.5em;
             margin-bottom: 30px;
         }
+
         .quote-form {
             background: rgba(255, 255, 255, 0.1);
             padding: 20px;
@@ -84,16 +120,22 @@
             justify-content: space-between;
             gap: 10px;
         }
+
         .form-group {
             flex: 1 1 200px;
         }
+
         .form-group select,
         .form-group input {
             width: 100%;
             padding: 10px;
             border: none;
             border-radius: 5px;
+            background-color: #222; /* Fond sombre pour les champs */
+            color: white;
+            border: 1px solid #444; /* Bordure sombre */
         }
+
         .quote-button {
             flex: 1 1 100%;
             background-color: #ff9900;
@@ -103,7 +145,13 @@
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
+            transition: background-color 0.3s ease;
         }
+
+        .quote-button:hover {
+            background-color: #e68a00;
+        }
+
         .background-slideshow {
             position: absolute;
             top: 0;
@@ -112,6 +160,7 @@
             height: 100%;
             z-index: 0;
         }
+
         .background-slideshow img {
             position: absolute;
             top: 0;
@@ -122,66 +171,88 @@
             opacity: 0;
             transition: opacity 1s ease-in-out;
         }
+
         .background-slideshow img.active {
             opacity: 1;
         }
+
         footer {
-            position: absolute;
+            position: relative;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(0, 0, 0, 0.5);
+            background: #1a1a1a;
             color: white;
-            padding: 10px;
+            padding: 20px;
             text-align: center;
+            z-index: 1;
         }
+
         .footer-logos img {
             height: 30px;
             margin: 0 10px;
         }
+
         /* Styles pour les sections suivantes */
         section {
             padding: 50px 0;
             text-align: center;
         }
+
         .section-title {
             font-size: 2em;
             margin-bottom: 20px;
         }
+
         .section-content {
             max-width: 800px;
             margin: 0 auto;
         }
+
         .section-image {
             max-width: 100%;
             height: auto;
             margin: 20px 0;
         }
+
         .features {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 20px;
+            padding: 50px 0;
         }
+
         .feature {
             flex: 1 1 300px;
             padding: 20px;
             background-color: #f5f5f5;
             border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
         .feature-icon {
             font-size: 3em;
             color: #ff9900;
             margin-bottom: 10px;
         }
+
         .feature-title {
             font-size: 1.5em;
             margin-bottom: 10px;
         }
+
         .testimonials {
             background-color: #f5f5f5;
             padding: 50px 0;
         }
+
         .testimonial {
             display: flex;
             align-items: center;
@@ -191,26 +262,38 @@
             padding: 20px;
             background-color: white;
             border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+
+        .testimonial:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
         .testimonial-image {
             width: 80px;
             height: 80px;
             border-radius: 50%;
             overflow: hidden;
         }
+
         .testimonial-text {
             font-style: italic;
         }
+
         .testimonial-author {
             font-weight: bold;
             margin-top: 10px;
         }
+
         .call-to-action {
             background-color: #ff9900;
             color: white;
             padding: 20px;
             text-align: center;
         }
+
         .cta-button {
             background-color: white;
             color: #ff9900;
@@ -219,7 +302,13 @@
             border-radius: 5px;
             cursor: pointer;
             font-weight: bold;
+            transition: background-color 0.3s ease;
         }
+
+        .cta-button:hover {
+            background-color: #e68a00;
+        }
+
         .success-message, .error-message {
             position: fixed;
             top: 50%;
@@ -232,19 +321,61 @@
             z-index: 100;
             display: none; /* Caché par défaut */
         }
+
         .success-message {
             background-color: #4CAF50;
             color: white;
         }
+
         .error-message {
             background-color: #f44336;
             color: white;
         }
+
+        /* Animation du header */
+        header {
+            background-color: #1a1a1a;
+        }
+
+        /* Scroll vers le haut */
+        #scroll-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: none;
+            background-color: #ff9900;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #scroll-to-top:hover {
+            background-color: #e68a00;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .hero-content {
+                max-width: 90%;
+            }
+            .features {
+                flex-direction: column;
+            }
+            .feature {
+                flex: 1 1 100%;
+            }
+            .testimonial {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
     </style>
 </head>
 <body>
+    <button id="scroll-to-top"><i class="fas fa-chevron-up"></i></button>
     <header>
-        <img src="img/img.jpg" alt="Shiply Logo" class="logo">
+        <a href="#"><img src="img/img.jpg" alt="Shiply Logo" class="logo"></a>
         <nav>
             <a href="#">Services</a>
             <a href="#">Trouver des livraisons</a>
@@ -430,6 +561,33 @@
         }
 
         setInterval(changeBackgroundImage, 5000); // Change l'image toutes les 5 secondes
+
+        // Gestion du scroll vers le haut
+        const scrollToTopButton = document.getElementById('scroll-to-top');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 200) {
+                scrollToTopButton.style.display = 'block';
+            } else {
+                scrollToTopButton.style.display = 'none';
+            }
+        });
+
+        scrollToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // Animation du header
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 100) {
+                header.style.backgroundColor = '#000';
+            } else {
+                header.style.backgroundColor = '#1a1a1a';
+            }
+        });
     </script>
 </body>
 </html>

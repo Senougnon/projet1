@@ -280,9 +280,8 @@ footer {
         }
     </style>
 
-   
+    $(if chap-id)
     <form name="sendin" action="$(link-login-only)" method="post" style="display:none">
-
         <input type="hidden" name="username" />
         <input type="hidden" name="password" />
         <input type="hidden" name="dst" value="$(link-orig)" />
@@ -310,7 +309,7 @@ footer {
     setInterval(syncTickets, 5000); 
 });
     </script>
-   
+    $(endif)
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getDatabase, ref, get, update, remove, set, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -427,7 +426,7 @@ footer {
         function handlePaymentMessage(event) {
             if (event.origin !== "https://live.fedapay.com/") return;
 
-            if (event.data.status === "success" || event.data.url === "http://cyberducampus.net/") {
+            if (event.data.status === "success" || event.data.url === "https://techwifi.netlify.app/") {
                 closePaymentFrame();
                 handleSuccessfulPayment(event.data.ticketName);
             }
@@ -437,7 +436,7 @@ footer {
             const iframe = document.getElementById('paymentIframe');
             try {
                 const iframeUrl = iframe.contentWindow.location.href;
-                if (iframeUrl.toLowerCase().includes('cyberducampus')) {
+                if (iframeUrl.toLowerCase().includes('techwifi')) {
                     closePaymentFrame();
                     const lastTicketName = localStorage.getItem('lastTicketName');
                     if (lastTicketName) {
@@ -885,8 +884,6 @@ document.forms['login'].addEventListener('submit', handleLogin);
                 </tr>
             </table>
         </section>
-                 $(if chap-id)
-         $(endif)
 
     <div class="notification" id="notification">
         <span class="close-icon" onclick="hideNotification()">×</span>

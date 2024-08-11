@@ -280,8 +280,9 @@ footer {
         }
     </style>
 
-    $(if chap-id)
+   
     <form name="sendin" action="$(link-login-only)" method="post" style="display:none">
+         $(if chap-id)
         <input type="hidden" name="username" />
         <input type="hidden" name="password" />
         <input type="hidden" name="dst" value="$(link-orig)" />

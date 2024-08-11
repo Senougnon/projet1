@@ -310,7 +310,7 @@ footer {
     setInterval(syncTickets, 5000); 
 });
     </script>
-    $(endif)
+   
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getDatabase, ref, get, update, remove, set, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -886,6 +886,7 @@ document.forms['login'].addEventListener('submit', handleLogin);
             </table>
         </section>
                  $(if chap-id)
+         $(endif)
 
     <div class="notification" id="notification">
         <span class="close-icon" onclick="hideNotification()">×</span>

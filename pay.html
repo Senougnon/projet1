@@ -426,7 +426,7 @@ footer {
         function handlePaymentMessage(event) {
             if (event.origin !== "https://live.fedapay.com/") return;
 
-            if (event.data.status === "success" || event.data.url === "https://techwifi.netlify.app/") {
+            if (event.data.status === "success" || event.data.url === "https://wifipay.netlify.app/") {
                 closePaymentFrame();
                 handleSuccessfulPayment(event.data.ticketName);
             }
@@ -436,7 +436,7 @@ footer {
             const iframe = document.getElementById('paymentIframe');
             try {
                 const iframeUrl = iframe.contentWindow.location.href;
-                if (iframeUrl.toLowerCase().includes('techwifi')) {
+                if (iframeUrl.toLowerCase().includes('wifipay')) {
                     closePaymentFrame();
                     const lastTicketName = localStorage.getItem('lastTicketName');
                     if (lastTicketName) {

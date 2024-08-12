@@ -86,9 +86,11 @@
           if (reason === FedaPay.CHECKOUT_COMPLETED) {
             notification.textContent = "Paiement validé ! Merci !";
             notification.style.backgroundColor = "#4CAF50";
-            window.location.href = "https://wifipay.netlify.app/";
             // Après la redirection vers la page de confirmation
 window.parent.postMessage({ type: 'paymentSuccess' }, '*');
+            
+            window.location.href = "https://wifipay.netlify.app/";
+            
           } else if (reason === FedaPay.DIALOG_DISMISSED) {
             notification.textContent = "Paiement annulé.";
             notification.style.backgroundColor = "#f44336";

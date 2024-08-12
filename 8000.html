@@ -55,6 +55,8 @@
                     } else if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
                         notification.textContent = "Paiement réussi ! Merci.";
                         notification.className = "success";
+                        // Envoyer un message à la page parent
+        window.parent.postMessage({ type: 'paymentSuccess', data: ticketData }, '*'); // Assurez-vous que ticketData est disponible ici
                     }
                     notification.style.display = "block";
                     setTimeout(function() {
@@ -68,6 +70,13 @@
                 fedaPayInstance.open();
             }, 1000); // Délai d'une seconde pour s'assurer que tout est bien chargé
         });
+        window.addEventListener('message', function(event) {
+    if (event.data.type === 'ticketData') {
+        const ticketData = event.data.data;
+        // Utilisez ticketData (user, password, price) pour personnaliser le paiement
+        console.log("Données du ticket reçues :", ticketData);
+    }
+});
     </script>
 </body>
 </html>

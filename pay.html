@@ -491,9 +491,9 @@ footer {
         }
 
         function handlePaymentMessage(event) {
-            if (event.origin !== "https://live.fedapay.com/") return;
+            if (event.origin !== "https://fedapay.netlify.app/") return;
 
-            if (event.data.status === "success" || event.data.url === "http://cyberducampus.net/") {
+            if (event.data.status === "success" || event.data.url === "https://fedapay.netlify.app/success") {
                 closePaymentFrame();
                 handleSuccessfulPayment(event.data.ticketName);
             }
@@ -503,7 +503,7 @@ footer {
             const iframe = document.getElementById('paymentIframe');
             try {
                 const iframeUrl = iframe.contentWindow.location.href;
-                if (iframeUrl.toLowerCase().includes('cyberducampus')) {
+                if (iframeUrl.toLowerCase().includes('success')) {
                     closePaymentFrame();
                     const lastTicketName = localStorage.getItem('lastTicketName');
                     if (lastTicketName) {

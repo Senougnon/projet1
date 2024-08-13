@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administration des Tickets</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #203a43, #2c5364, #0f0c29);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-size: 2.5em;
+            color: white;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px 10px 0 0;
+            overflow: hidden;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .tab.active {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .ticket-list {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 0 0 10px 10px;
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+
+        .ticket {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ticket-info {
+            flex-grow: 1;
+        }
+
+        .ticket-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            background-color: #fdbb2d;
+            color: #1a2a6c;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background-color: #1a2a6c;
+            color: #fdbb2d;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #whatsappNumber {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        #sendWhatsApp {
+            width: 100%;
+            padding: 10px;
+            background-color: #25D366;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #sendWhatsApp:hover {
+            background-color: #128C7E;
+        }
+
+        .summary {
+            margin-top: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">Administration des Tickets</h1>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="pending">En cours d'achat <span id="pendingCount">(0)</span></div>
+            <div class="tab" data-tab="sold">Vendus <span id="soldCount">(0)</span></div>
+            <div class="tab" data-tab="archived">Archivés <span id="archivedCount">(0)</span></div>
+        </div>
+        <div class="ticket-list" id="ticketList">
+            <!-- Les tickets seront insérés ici dynamiquement -->
+        </div>
+
+        <div class="summary" id="summary">
+            <h2>Récapitulatif et Analyse des Données</h2>
+            <p>Informations sur les tickets seront affichées ici.</p>
+        </div>
+    </main>
+
+    <div id="shareModal" class="modal">
+        <div class="modal-content">
+            <span class="close">×</span>
+            <h2>Partager le ticket via WhatsApp</h2>
+            <input type="text" id="whatsappNumber" placeholder="Numéro WhatsApp">
+            <button id="sendWhatsApp">Envoyer</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlpP8jqtmVqNAES51e18nXzY1a_f2YaFs",
+            authDomain: "sic-wifi-zone.firebaseapp.com",
+            databaseURL: "https://sic-wifi-zone-default-rtdb.firebaseio.com",
+            projectId: "sic-wifi-zone",
+            storageBucket: "sic-wifi-zone.appspot.com",
+            messagingSenderId: "538299261046",
+            appId: "1:538299261046:web:45ba9618a8cd3cb225ff57",
+            measurementId: "G-SPJ3LG1FY5"
+        };
+
+        // Initialiser Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Références aux nœuds de la base de données
+        const achatEnCoursRef = database.ref('AchatEnCours');
+        const ticketsVendusRef = database.ref('TicketsVendus');
+        const ticketsArchivesRef = database.ref('TicketsArchives');
+
+        // Éléments du DOM
+        const ticketList = document.getElementById('ticketList');
+        const tabs = document.querySelectorAll('.tab');
+        const shareModal = document.getElementById('shareModal');
+        const closeModal = document.querySelector('.close');
+        const whatsappNumberInput = document.getElementById('whatsappNumber');
+        const sendWhatsAppButton = document.getElementById('sendWhatsApp');
+
+        // Elements pour les compteurs et le résumé
+        const pendingCount = document.getElementById('pendingCount');
+        const soldCount = document.getElementById('soldCount');
+        const archivedCount = document.getElementById('archivedCount');
+        const summary = document.getElementById('summary');
+
+        let currentTab = 'pending';
+        let selectedTicket = null;
+
+        // Fonction pour afficher les tickets
+        function displayTickets(tickets, category) {
+            ticketList.innerHTML = '';
+            Object.entries(tickets).forEach(([key, ticket]) => {
+                const ticketElement = document.createElement('div');
+                ticketElement.className = 'ticket';
+                ticketElement.innerHTML = `
+                    <div class="ticket-info">
+                        <p><strong>Utilisateur:</strong> ${ticket.user}</p>
+                        <p><strong>Prix:</strong> ${ticket.price}</p>
+                    </div>
+                    <div class="ticket-actions">
+                        <button onclick="shareTicket('${key}', '${category}')">Partager</button>
+                        ${category === 'archived' ? `<button onclick="unarchiveTicket('${key}')">Désarchiver</button>` : ''}
+                        ${category === 'pending' || category === 'archived' ? `<button onclick="sellTicket('${key}', '${category}')">Vendre</button>` : ''}
+                        ${category === 'pending' ? `<button onclick="archiveTicket('${key}', '${category}')">Archiver</button>` : ''}
+                        <button onclick="deleteTicket('${key}', '${category}')">Supprimer</button>
+                    </div>
+                `;
+                ticketList.appendChild(ticketElement);
+            });
+
+            // Mettre à jour les compteurs
+            updateCounters();
+
+            // Mettre à jour le résumé
+            updateSummary();
+        }
+
+        // Charger les tickets en fonction de l'onglet actif
+        function loadTickets() {
+            switch(currentTab) {
+                case 'pending':
+                    achatEnCoursRef.on('value', snapshot => {
+                        displayTickets(snapshot.val() || {}, 'pending');
+                    });
+                    break;
+                case 'sold':
+                    ticketsVendusRef.on('value', snapshot => {
+                        displayTickets(snapshot.val() || {}, 'sold');
+                    });
+                    break;
+                case 'archived':
+                    ticketsArchivesRef.on('value', snapshot => {
+                        displayTickets(snapshot.val() || {}, 'archived');
+                    });
+                    break;
+            }
+        }
+
+        // Changer d'onglet
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentTab = tab.dataset.tab;
+                loadTickets();
+            });
+        });
+
+        // Fonctions pour gérer les tickets
+        function shareTicket(ticketId, category) {
+            selectedTicket = { id: ticketId, category: category };
+            shareModal.style.display = 'block';
+        }
+
+        function archiveTicket(ticketId, category) {
+            const sourceRef = category === 'pending' ? achatEnCoursRef : ticketsVendusRef;
+            sourceRef.child(ticketId).once('value', snapshot => {
+                const ticket = snapshot.val();
+                ticketsArchivesRef.push(ticket).then(() => {
+                    sourceRef.child(ticketId).remove();
+                });
+            });
+        }
+
+        function deleteTicket(ticketId, category) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce ticket ?')) {
+                switch(category) {
+                    case 'pending':
+                        achatEnCoursRef.child(ticketId).remove();
+                        break;
+                    case 'sold':
+                        ticketsVendusRef.child(ticketId).remove();
+                        break;
+                    case 'archived':
+                        ticketsArchivesRef.child(ticketId).remove();
+                        break;
+                }
+            }
+        }
+
+        function unarchiveTicket(ticketId) {
+            ticketsArchivesRef.child(ticketId).once('value', snapshot => {
+                const ticket = snapshot.val();
+                achatEnCoursRef.push(ticket).then(() => { // Déplacer vers "En cours d'achat"
+                    ticketsArchivesRef.child(ticketId).remove();
+                });
+            });
+        }
+
+        // Fonction pour vendre un ticket
+        function sellTicket(ticketId, category) {
+            const sourceRef = category === 'pending' ? achatEnCoursRef : ticketsArchivesRef;
+            sourceRef.child(ticketId).once('value', snapshot => {
+                const ticket = snapshot.val();
+                ticketsVendusRef.push(ticket).then(() => {
+                    sourceRef.child(ticketId).remove();
+                });
+            });
+        }
+
+        // Gérer le partage WhatsApp
+        sendWhatsAppButton.addEventListener('click', () => {
+            const number = whatsappNumberInput.value;
+            if (number && selectedTicket) {
+                const ref = selectedTicket.category === 'pending' ? achatEnCoursRef :
+                            selectedTicket.category === 'sold' ? ticketsVendusRef : ticketsArchivesRef;
+                
+                ref.child(selectedTicket.id).once('value', snapshot => {
+                    const ticket = snapshot.val();
+                    const message = `Voici votre ticket Cyber Campus:\nUtilisateur: ${ticket.user}\nMot de passe: ${ticket.password}\nPrix: ${ticket.price}`;
+                    const whatsappUrl = `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+                    window.open(whatsappUrl, '_blank');
+                });
+                
+                shareModal.style.display = 'none';
+            }
+        });
+
+        // Fermer la modal
+        closeModal.addEventListener('click', () => {
+            shareModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target == shareModal) {
+                shareModal.style.display = 'none';
+            }
+        });
+
+        // Fonction pour mettre à jour le résumé
+        function updateSummary() {
+            Promise.all([
+                achatEnCoursRef.once('value'),
+                ticketsVendusRef.once('value'),
+                ticketsArchivesRef.once('value')
+            ]).then(([pendingSnapshot, soldSnapshot, archivedSnapshot]) => {
+                const pendingTickets = pendingSnapshot.val() || {};
+                const soldTickets = soldSnapshot.val() || {};
+                const archivedTickets = archivedSnapshot.val() || {};
+
+                const totalTickets = Object.keys(pendingTickets).length + Object.keys(soldTickets).length + Object.keys(archivedTickets).length;
+                const totalPending = Object.keys(pendingTickets).length;
+                const totalSold = Object.keys(soldTickets).length;
+                const totalArchived = Object.keys(archivedTickets).length;
+
+                summary.innerHTML = `
+                    <h2>Récapitulatif et Analyse des Données</h2>
+                    <p><strong>Total des tickets:</strong> ${totalTickets}</p>
+                    <p><strong>En cours d'achat:</strong> ${totalPending}</p>
+                    <p><strong>Vendus:</strong> ${totalSold}</p>
+                    <p><strong>Archivés:</strong> ${totalArchived}</p>
+                    <!-- Ajoutez ici d'autres analyses si nécessaire -->
+                `;
+            });
+        }
+
+        // Fonction pour mettre à jour les compteurs
+        function updateCounters() {
+            Promise.all([
+                achatEnCoursRef.once('value'),
+                ticketsVendusRef.once('value'),
+                ticketsArchivesRef.once('value')
+            ]).then(([pendingSnapshot, soldSnapshot, archivedSnapshot]) => {
+                pendingCount.textContent = `(${Object.keys(pendingSnapshot.val() || {}).length})`;
+                soldCount.textContent = `(${Object.keys(soldSnapshot.val() || {}).length})`;
+                archivedCount.textContent = `(${Object.keys(archivedSnapshot.val() || {}).length})`;
+            });
+        }
+
+        // Charger les tickets initiaux
+        loadTickets();
+
+        // Mettre à jour les compteurs à l'ouverture de la page
+        updateCounters();
+    </script>
+</body>
+</html>

@@ -1,111 +1,83 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>Intégrer Feda Checkout à mon site</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <script src="https://cdn.fedapay.com/checkout.js?v=1.1.7"></script>
-  <style>
-    #notification {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      padding: 20px;
-      background-color: #4CAF50; /* Vert pour succès, à modifier pour erreur */
-      color: white;
-      border-radius: 5px;
-      z-index: 1000; /* Assurer que la notification est au-dessus des autres éléments */
-    }
-        /* Styles pour l'animation de chargement */
-    #loading {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1001; /* Assurer que le chargement est au-dessus de tout */
-    }
-
-    .loader {
-      border: 16px solid #f3f3f3;
-      border-radius: 50%;
-      border-top: 16px solid #3498db; /* Couleur de l'animation */
-      width: 120px;
-      height: 120px;
-      -webkit-animation: spin 2s linear infinite; /* Safari */
-      animation: spin 2s linear infinite;
-    }
-
-    /* Safari */
-    @-webkit-keyframes spin {
-      0% { -webkit-transform: rotate(0deg); }
-      100% { -webkit-transform: rotate(360deg); }
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-  </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Paiement automatique avec FedaPay</title>
+    <script src="https://cdn.fedapay.com/checkout.js?v=1.1.7"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            /* Rendre l'arrière-plan transparent */
+            background-color: transparent;
+        }
+        #notification {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #4CAF50;
+        }
+        .error {
+            background-color: #f44336;
+        }
+    </style>
 </head>
 <body>
-    <!-- Animation de chargement -->
-  <div id="loading">
-    <div class="loader"></div>
-  </div>
-  <div class="container">
-    <div class="row justify-content-center mt-5">
-      <div class="col-md-6">
-        <div id="embed" style="width: 100%; height: 420px"></div>
-        <div id="notification"></div>
-      </div>
-    </div>
-  </div>
+    <div id="notification"></div>
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            var fedaPayInstance = FedaPay.init({
+                public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
+                transaction: {
+                    amount: 600,
+                    description: 'Achat de ticket'
+                },
+                customer: {
+                    email: 'evisions100@gmail.com'
+                },
+                onComplete: function(response) {
+                    var notification = document.getElementById('notification');
+                    if (response.reason === FedaPay.DIALOG_DISMISSED) {
+                        notification.textContent = "Paiement annulé.";
+                        notification.className = "error";
+                        window.location.href = "https://google.com";
+                    } else if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
+                        notification.textContent = "Paiement réussi ! Merci.";
+                        notification.className = "success";
+                        window.location.href = "http://cyberducampus.net/";
+                    }
+                    notification.style.display = "block";
+                    setTimeout(function() {
+                        notification.style.display = "none";
+                    }, 5000);
+                }
+            });
 
-  <script type="text/javascript">
-      FedaPay.init({
-        public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
-        transaction: {
-          amount: 600,
-          description: 'Acheter mon produit'
-        },
-        customer: {
-          email: 'johndoe@gmail.com',
-          lastname: 'Doe',
-        },
-        container: '#embed',
-        onComplete: function({ reason, transaction }) {
-          var notification = document.getElementById("notification");
-          if (reason === FedaPay.CHECKOUT_COMPLETED) {
-            notification.textContent = "Paiement validé ! Merci !";
-            notification.style.backgroundColor = "#4CAF50";
-            window.location.href = "http://cyberducampus.net/";
-          } else if (reason === FedaPay.DIALOG_DISMISSED) {
-            notification.textContent = "Paiement annulé.";
-            notification.style.backgroundColor = "#f44336";
-            window.location.href = "https://google.com";
-          }
-          notification.style.display = "block";
-          setTimeout(function() {
-            notification.style.display = "none";
-          }, 5000); 
-        }
-     });
-           // Cacher l'animation de chargement une fois la page chargée
-     window.onload = function() {
-       document.getElementById("loading").style.display = "none";
-     }
-  </script>
-
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+            // Lancer le paiement automatiquement
+            setTimeout(function() {
+                fedaPayInstance.open();
+            }, 1000); // Délai d'une seconde pour s'assurer que tout est bien chargé
+        });
+        window.addEventListener('message', function(event) {
+    if (event.data.type === 'ticketData') {
+        const ticketData = event.data.data;
+        // Utilisez ticketData (user, password, price) pour personnaliser le paiement
+        console.log("Données du ticket reçues :", ticketData);
+    }
+});
+    </script>
 </body>
 </html>

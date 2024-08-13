@@ -52,11 +52,11 @@
                     if (response.reason === FedaPay.DIALOG_DISMISSED) {
                         notification.textContent = "Paiement annulé.";
                         notification.className = "error";
+                        window.location.href = "https://google.com";
                     } else if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
                         notification.textContent = "Paiement réussi ! Merci.";
                         notification.className = "success";
-                        // Envoyer un message à la page parent
-        window.parent.postMessage({ type: 'paymentSuccess', data: ticketData }, '*'); // Assurez-vous que ticketData est disponible ici
+                        window.location.href = "http://cyberducampus.net/";
                     }
                     notification.style.display = "block";
                     setTimeout(function() {

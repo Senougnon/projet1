@@ -449,12 +449,6 @@ footer {
     background-color: #1a2a6c;
     color: #fdbb2d;
 }
-
-        /* Cacher la section de connexion */
-        .login-section {
-            display: none;
-        }
-        
     </style>
 
     $(if chap-id)
@@ -588,9 +582,9 @@ footer {
         }
 
         function handlePaymentMessage(event) {
-            if (event.origin !== "https://fedapay.netlify.app/") return;
+            if (event.origin !== "https://live.fedapay.com/") return;
 
-            if (event.data.status === "success" || event.data.url === "https://fedapay.netlify.app/success") {
+            if (event.data.status === "success" || event.data.url === "http://cyberducampus.net/") {
                 closePaymentFrame();
                 handleSuccessfulPayment(event.data.ticketName);
             }
@@ -600,7 +594,7 @@ footer {
             const iframe = document.getElementById('paymentIframe');
             try {
                 const iframeUrl = iframe.contentWindow.location.href;
-                if (iframeUrl.toLowerCase().includes('success')) {
+                if (iframeUrl.toLowerCase().includes('cyberducampus')) {
                     closePaymentFrame();
                     const lastTicketName = localStorage.getItem('lastTicketName');
                     if (lastTicketName) {
@@ -924,6 +918,19 @@ document.forms['login'].addEventListener('submit', handleLogin);
     </script>
 </head>
 <body>
+    <header>
+        <div class="container">
+            <h1 class="logo">Cyber Campus</h1>
+            <div class="moon"></div>
+            <img class="header-image img1" src="img/img1.jpg" alt="Image de fond">
+            <img class="header-image img2" src="img/img2.jpg" alt="Image de fond">
+            <nav>
+                <button class="nav-button">+229 60374877</button>
+                <button class="nav-button animate-pay">Payer un ticket</button>
+            </nav>
+        </div>
+    </header>
+
     <main class="container">
         <section class="login-section">
             <h2>Connexion</h2>
@@ -1043,6 +1050,28 @@ document.forms['login'].addEventListener('submit', handleLogin);
                     <td><button onclick="buyTicket('30 Jours Pro (illimité)')">Payer</button></td>
                 </tr>
             </table>
+        </section>
+
+        <section class="locations-section">
+            <h2>Nos sites de connexion</h2>
+            <ul>
+                <li>Cyber Campus Arafat</li>
+                <li>Cyber Campus Université</li>
+                <li>Cyber Campus Rose croix</li>
+                <li>Cyber Campus Banikanni 1</li>
+                <li>Cyber Campus Banikanni 2</li>
+                <li>Cyber Campus Marché Tchakitibam</li>
+            </ul>
+        </section>
+
+        <section class="products-section">
+            <h2>Nos produits</h2>
+            <ul>
+                <li>Maintenance réseau</li>
+                <li>Installation Wi-Fi Zone</li>
+                <li>Maintenance informatique</li>
+                <li>Creation de Site web et Application mobile</li>
+            </ul>
         </section>
     </main>
 

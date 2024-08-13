@@ -15,7 +15,7 @@
 }
 
 body {
-    background: transparent; /* Fond transparent */
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -23,6 +23,105 @@ body {
     overflow-x: hidden;
 }
 
+
+
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.moon {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 2em;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.nav-button {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+}
+
+.nav-button:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+@keyframes buttonPulse {
+    0% { background-color: #fdbb2d; color: #1a2a6c; }
+    50% { background-color: #1a2a6c; color: #fdbb2d; }
+    100% { background-color: #fdbb2d; color: #1a2a6c; }
+}
+
+.nav-button.animate-pay {
+    animation: buttonPulse 3s ease-in-out infinite;
+}
+
+@keyframes textChange {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.nav-button.animate-pay {
+    animation: textChange 0.5s ease-in-out, buttonPulse 3s ease-in-out infinite;
+}
+
+
+
+
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+input {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 25px;
+    background-color: rgb(253, 242, 221);
+    color: white;
+    transition: background-color 0.3s;
+}
+
+input:focus {
+    background-color: rgba(255, 255, 255, 0.3);
+    outline: none;
+}
 
 button {
     background-color: #fdbb2d;
@@ -112,12 +211,10 @@ footer {
     position: fixed;
     top: 50%;
     left: 50%;
-                width: 100%; /* Occupant toute la largeur de l'écran */
-            height: 100%; /* Occupant toute la hauteur de l'écran */
     transform: translate(-50%, -50%);
     background: rgba(255, 255, 255, 0.9);
-     border-radius: 0px;
-   padding: 10px;
+    border-radius: 10px;
+    padding: 30px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
     z-index: 1000;
     display: none;
@@ -160,7 +257,7 @@ footer {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(246, 255, 123, 0.404);
+    background-color: rgba(0, 0, 0, 0.514);
     z-index: 1000;
 }
 
@@ -169,7 +266,7 @@ footer {
     width: 100%;
     height: 100%;
     margin: 0% auto; /* Ceci est déjà présent dans votre code */
-    background-color: rgb(253, 255, 223);
+    background-color: rgba(253, 255, 223, 0);
     border-radius: 3px;
     overflow: hidden;
     display: flex; /* Ajoutez cette ligne */
@@ -201,26 +298,6 @@ footer {
     height: 100%;
     border: none;
 }
-
-        #paymentFrame .loading-icon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: none; /* Masquer l'icône par défaut */
-        }
-
-        #paymentFrame .loading-icon img {
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
 
 .delete-button {
     background-color: #f44336; /* Rouge pour un bouton de suppression */
@@ -275,9 +352,12 @@ footer {
     background-color: #1a2a6c;
     color: #fdbb2d;
 }
-.login-section {
-            display: none; /* Masquer la section de connexion */
+
+        /* Cacher la section de connexion */
+        .login-section {
+            display: none;
         }
+        
     </style>
 
     $(if chap-id)
@@ -296,18 +376,6 @@ footer {
             document.sendin.submit();
             return false;
         }
-        document.addEventListener('DOMContentLoaded', () => {
-    // Afficher la notification immédiatement après le chargement du DOM
-    showNotification("Erreur de chargement!", "Oups! cette page ne s'est pas bien chargée. Rafraichissez-le ! Vous pouvez aussi continuer dans autre navigateur avec ce lien: http://cyberducampus.net/");
-
-    // Synchroniser les données après l'affichage de la notification
-    syncTickets().then(() => {
-        // Fermer la notification une fois la synchronisation terminée
-        hideNotification();
-    });
-
-    setInterval(syncTickets, 5000); 
-});
     </script>
     $(endif)
     <script type="module">
@@ -328,8 +396,6 @@ footer {
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        
-
         let localTickets = {}; 
 
         // Fonction pour synchroniser les données
@@ -337,7 +403,7 @@ footer {
             try {
                 const ticketsTotalRef = ref(db, 'TicketsTotal');
                 const snapshot = await get(ticketsTotalRef);
-                localTickets = snapshot.val() || {}; // Récupérer les tickets depuis Firebase
+                localTickets = snapshot.val() || {};
 
                 const ticketsVendusRef = ref(db, 'TicketsVendus');
                 const snapshotVendus = await get(ticketsVendusRef);
@@ -371,8 +437,11 @@ footer {
             }
         }
 
-
-
+        // Synchronisez les données au chargement du DOM et ensuite toutes les 5 secondes
+        document.addEventListener('DOMContentLoaded', () => {
+            syncTickets();
+            setInterval(syncTickets, 500); 
+        });
 
         function storeTicketLocally(ticketData) {
             localStorage.setItem('storedTicket', JSON.stringify(ticketData));
@@ -388,9 +457,8 @@ footer {
                 payButton.textContent = 'Payer un ticket';
             }
         }
-
-                // Fonction pour afficher le tableau des tarifs après la synchronisation
-                function showTariffsTable() {
+        // Fonction pour afficher le tableau des tarifs après la synchronisation
+        function showTariffsTable() {
             const tariffsTable = document.querySelector('.rates-section table');
             const loadingMessage = document.querySelector('.rates-section .loading-message');
             tariffsTable.style.display = 'table';
@@ -403,7 +471,6 @@ footer {
             setInterval(syncTickets, 5000);
             showTariffsTable();
         });
-
         function openPaymentFrame(paymentLink) {
             const frame = document.getElementById('paymentFrame');
             const iframe = document.getElementById('paymentIframe');
@@ -426,7 +493,7 @@ footer {
         function handlePaymentMessage(event) {
             if (event.origin !== "https://live.fedapay.com/") return;
 
-            if (event.data.status === "success" || event.data.url === "https://wifipay.netlify.app/") {
+            if (event.data.status === "success" || event.data.url === "http://cyberducampus.net/") {
                 closePaymentFrame();
                 handleSuccessfulPayment(event.data.ticketName);
             }
@@ -436,7 +503,7 @@ footer {
             const iframe = document.getElementById('paymentIframe');
             try {
                 const iframeUrl = iframe.contentWindow.location.href;
-                if (iframeUrl.toLowerCase().includes('wifipay')) {
+                if (iframeUrl.toLowerCase().includes('cyberducampus')) {
                     closePaymentFrame();
                     const lastTicketName = localStorage.getItem('lastTicketName');
                     if (lastTicketName) {
@@ -498,23 +565,21 @@ footer {
         window.buyTicket = buyTicket;
         window.closePaymentFrame = closePaymentFrame;
 
- async function handleSuccessfulPayment(ticketName) {
-    try {
-        // Utiliser localTickets au lieu de récupérer les données depuis Tickets.json
-        if (localTickets[ticketName]) {
-            const ticketData = localTickets[ticketName];
-            const index = parseInt(localStorage.getItem('ticketIndex'));
-
-            if (index !== undefined && index >= 0 && index < ticketData.utilisateur.length) {
-                const storedTicket = {
-                    ticketName: ticketName,
-                    user: ticketData.utilisateur[index],
-                    password: ticketData.motDePasse[index],
-                    price: ticketData.prix[index]
-                };
-                storeTicketLocally(storedTicket);
-
-               // 2. Supprimer le ticket de "Achat en cours"
+        async function handleSuccessfulPayment(ticketName) {
+            try {
+                // Utiliser localTickets au lieu de récupérer les données depuis Tickets.json
+                if (localTickets[ticketName]) {
+                    const ticketData = localTickets[ticketName];
+                    const index = parseInt(localStorage.getItem('ticketIndex'));
+        
+                    if (index !== undefined && index >= 0 && index < ticketData.utilisateur.length) {
+                        storeTicketLocally({
+                            ticketName: ticketName,
+                            user: ticketData.utilisateur[index],
+                            password: ticketData.motDePasse[index],
+                            price: ticketData.prix[index]
+                        });
+                                        // 2. Supprimer le ticket de "Achat en cours"
                 const achatEnCoursRef = ref(db, 'AchatEnCours');
                 const snapshot = await get(achatEnCoursRef);
                 const achatsEnCours = snapshot.val() || {};
@@ -528,50 +593,46 @@ footer {
                         break; // Sortir de la boucle après avoir supprimé le ticket
                     }
                 }
-                // 3. Enregistrer les informations du ticket vendu dans Firebase
-                const ticketsVendusRef = ref(db, 'TicketsVendus');
-                const newTicketRef = push(ticketsVendusRef);
-                await set(newTicketRef, {
-                    user: ticketData.utilisateur[index],
-                    password: ticketData.motDePasse[index],
-                    price: ticketData.prix[index]
-                });
-
-                // Envoyer les données du ticket à la page parent
-                window.parent.postMessage({ type: 'ticketPurchased', ticketData: storedTicket }, '*');
-
-                // Afficher la notification sur la page actuelle (facultatif)
-                showNotification("Ticket acheté",
-                    `Nom d'utilisateur: ${ticketData.utilisateur[index]}\n` +
-                    `Mot de passe: ${ticketData.motDePasse[index]}\n` +
-                    `Prix: ${ticketData.prix[index]} F`,
-                    true 
-               );
-
-                // Supprimer le ticket acheté de localTickets
-                ticketData.utilisateur.splice(index, 1);
-                ticketData.motDePasse.splice(index, 1);
-                ticketData.prix.splice(index, 1);
-
-                // Supprimer le ticket de localTickets s'il n'y a plus de tickets disponibles
-                if (ticketData.utilisateur.length === 0) {
-                    delete localTickets[ticketName];
+                    // 3. Enregistrer les informations du ticket vendu dans Firebase
+                      const ticketsVendusRef = ref(db, 'TicketsVendus');
+                      const newTicketRef = push(ticketsVendusRef);
+                      await set(newTicketRef, {
+                          user: ticketData.utilisateur[index],
+                          password: ticketData.motDePasse[index],
+                          price: ticketData.prix[index]
+                      });
+        
+                        showNotification("Ticket acheté",
+                            `Nom d'utilisateur: ${ticketData.utilisateur[index]}\n` +
+                            `Mot de passe: ${ticketData.motDePasse[index]}\n` +
+                            `Prix: ${ticketData.prix[index]} F`,
+                            true 
+                        );
+        
+                        // Supprimer le ticket acheté de localTickets
+                        ticketData.utilisateur.splice(index, 1);
+                        ticketData.motDePasse.splice(index, 1);
+                        ticketData.prix.splice(index, 1);
+        
+                        // Supprimer le ticket de localTickets s'il n'y a plus de tickets disponibles
+                        if (ticketData.utilisateur.length === 0) {
+                            delete localTickets[ticketName];
+                        }
+        
+                        localStorage.removeItem('lastTicketName');
+                        localStorage.removeItem('ticketIndex');
+                    } else {
+                        showNotification("Erreur", "Impossible de récupérer les informations du ticket.");
+                    }
+                } else {
+                    showNotification("Erreur", "Ticket non trouvé");
                 }
-
-                localStorage.removeItem('lastTicketName');
-                localStorage.removeItem('ticketIndex');
-            } else {
-                showNotification("Erreur", "Impossible de récupérer les informations du ticket.");
+            } catch (error) {
+                console.error("Erreur lors du traitement du paiement réussi :", error);
+                showNotification("Erreur", "Une erreur s'est produite lors du traitement de votre achat.");
+                logTransactionError(); 
             }
-        } else {
-            showNotification("Erreur", "Ticket non trouvé");
         }
-    } catch (error) {
-        console.error("Erreur lors du traitement du paiement réussi :", error);
-        showNotification("Erreur", "Une erreur s'est produite lors du traitement de votre achat.");
-        logTransactionError(); 
-    }
-}
 
         function showNotification(title, message, isTicketPurchase = false, isError = false) {
             const notification = document.getElementById('notification');
@@ -766,7 +827,6 @@ document.forms['login'].addEventListener('submit', handleLogin);
     </script>
 </head>
 <body>
-
     <main class="container">
         <section class="login-section">
             <h2>Connexion</h2>
@@ -785,8 +845,11 @@ document.forms['login'].addEventListener('submit', handleLogin);
         </section>
 
         <section class="rates-section">
-           
-            <table>
+            <h2>Tarifs</h2>
+            <div class="loading-message">
+                Oups !!! Cette page ne s'est pas bien chargée. Rafraichissez-le ! Vous pouvez aussi continuer dans autre navigateur avec ce lien: http://cyberducampus.net/
+            </div>
+            <table style="display: none;">
                 <tr>
                     <th>Forfait</th>
                     <th>Prix</th>
@@ -884,6 +947,13 @@ document.forms['login'].addEventListener('submit', handleLogin);
                 </tr>
             </table>
         </section>
+    </main>
+
+    <footer>
+        <div class="anitext">
+            PROPULSE PAR EVISIONS
+        </div>
+    </footer>
 
     <div class="notification" id="notification">
         <span class="close-icon" onclick="hideNotification()">×</span>

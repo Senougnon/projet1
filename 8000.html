@@ -70,9 +70,21 @@
                     } else if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
                         notification.textContent = "Paiement réussi ! Merci.";
                         notification.className = "success";
-                        // Redirection vers la page de succès
-                        window.location.href = "https://fedapay.netlify.app/success/"; 
+                
+                        // Écouter le message inter-fenêtres après paiement réussi
+                window.addEventListener('message', function(event) {
+                    if (event.data.type === 'ticketData') {
+                        const ticketData = event.data.data;
+                        console.log("Données du ticket reçues :", ticketData);
+                        // Affichez les informations du ticket sur la page
+                        document.getElementById("ticket-info").textContent = 
+                            `Nom d'utilisateur: ${ticketData.user}\n` +
+                            `Mot de passe: ${ticketData.password}\n` +
+                            `Prix: ${ticketData.price} F`;
+                        document.getElementById("ticket-info").style.display = "block";
                     }
+                });
+            }
                     notification.style.display = "block";
                     setTimeout(function() {
                         notification.style.display = "none";
@@ -86,19 +98,7 @@
             }, 1000); // Délai d'une seconde pour s'assurer que tout est bien chargé
         });
 
-        window.addEventListener('message', function(event) {
-            if (event.data.type === 'ticketData') {
-                const ticketData = event.data.data;
-                // Utilisez ticketData (user, password, price) pour personnaliser la page
-                console.log("Données du ticket reçues :", ticketData);
-                // Affichez les informations du ticket sur la page
-                document.getElementById("ticket-info").textContent = 
-                    `Nom d'utilisateur: ${ticketData.user}\n` +
-                    `Mot de passe: ${ticketData.password}\n` +
-                    `Prix: ${ticketData.price} F`;
-                document.getElementById("ticket-info").style.display = "block";
-            }
-        });
+       
     </script>
 </body>
 </html>

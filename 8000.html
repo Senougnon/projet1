@@ -33,16 +33,16 @@
             background-color: #f44336;
         }
         #ticket-info {
-            position: fixed;
-            top: 100px;
+            display: none;
+            position: absolute;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate(-50%, -50%);
             padding: 20px;
             border-radius: 5px;
             background-color: rgba(0, 0, 0, 0.7);
             color: white;
             font-weight: bold;
-            text-align: center;
         }
     </style>
 </head>
@@ -65,12 +65,26 @@
                     if (response.reason === FedaPay.DIALOG_DISMISSED) {
                         notification.textContent = "Paiement annulé.";
                         notification.className = "error";
-                        // Redirection vers la page d'erreur
-                        window.location.href = "https://google.com";
+                        // Rediriger si besoin
                     } else if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
                         notification.textContent = "Paiement réussi ! Merci.";
                         notification.className = "success";
-            }
+                        // Rediriger si besoin
+
+                        // Écouter le message inter-fenêtres après paiement réussi
+                        window.addEventListener('message', function(event) {
+                            if (event.data.type === 'ticketData') {
+                                const ticketData = event.data.data;
+                                console.log("Données du ticket reçues :", ticketData);
+                                // Affichez les informations du ticket sur la page
+                                document.getElementById("ticket-info").textContent = 
+                                    `Nom d'utilisateur: ${ticketData.user}\n` +
+                                    `Mot de passe: ${ticketData.password}\n` +
+                                    `Prix: ${ticketData.price} F`;
+                                document.getElementById("ticket-info").style.display = "block";
+                            }
+                        });
+                    }
                     notification.style.display = "block";
                     setTimeout(function() {
                         notification.style.display = "none";
@@ -86,17 +100,10 @@
         window.addEventListener('message', function(event) {
             if (event.data.type === 'ticketData') {
                 const ticketData = event.data.data;
-                // Utilisez ticketData (user, password, price) pour personnaliser la page
+                // Utilisez ticketData (user, password, price) pour personnaliser le paiement
                 console.log("Données du ticket reçues :", ticketData);
-                // Affichez les informations du ticket sur la page
-                document.getElementById("ticket-info").textContent = 
-                    `Nom d'utilisateur: ${ticketData.user}\n` +
-                    `Mot de passe: ${ticketData.password}\n` +
-                    `Prix: ${ticketData.price} F`;
-                document.getElementById("ticket-info").style.display = "block";
             }
         });
-       
     </script>
 </body>
 </html>

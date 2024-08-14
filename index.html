@@ -661,91 +661,75 @@ footer {
         window.buyTicket = buyTicket;
         window.closePaymentFrame = closePaymentFrame;
 
-        window.addEventListener('message', function(event) {
-            if (event.origin !== "https://fedapay.netlify.app") return; // Vérifiez l'origine du message
-
-            const message = JSON.parse(event.data);
-            const secretKey = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; // Clé secrète commune
-            const decryptedUser = CryptoJS.AES.decrypt(message.user, secretKey).toString(CryptoJS.enc.Utf8);
-            const decryptedPassword = CryptoJS.AES.decrypt(message.password, secretKey).toString(CryptoJS.enc.Utf8);
-            const decryptedPrice = CryptoJS.AES.decrypt(message.price, secretKey).toString(CryptoJS.enc.Utf8);
-
-            handleSuccessfulPayment(message.ticketName, decryptedUser, decryptedPassword, decryptedPrice);
-        });
-
-        async function handleSuccessfulPayment(ticketName, user, password, price) {
-    try {
-        // Utiliser localTickets au lieu de récupérer les données depuis Tickets.json
-        if (localTickets[ticketName]) {
-            const ticketData = localTickets[ticketName];
-            const index = parseInt(localStorage.getItem('ticketIndex'));
-
-            if (index !== undefined && index >= 0 && index < ticketData.utilisateur.length) {
-                // Stocker les informations du ticket acheté localement 
-                storeTicketLocally({
-                    ticketName: ticketName,
-                    user: user, 
-                    password: password, 
-                    price: price,
-                });
-
-                // 2. Supprimer le ticket de "Achat en cours"
+        async function handleSuccessfulPayment(ticketName) {
+            try {
+                // Utiliser localTickets au lieu de récupérer les données depuis Tickets.json
+                if (localTickets[ticketName]) {
+                    const ticketData = localTickets[ticketName];
+                    const index = parseInt(localStorage.getItem('ticketIndex'));
+        
+                    if (index !== undefined && index >= 0 && index < ticketData.utilisateur.length) {
+                        storeTicketLocally({
+                            ticketName: ticketName,
+                            user: ticketData.utilisateur[index],
+                            password: ticketData.motDePasse[index],
+                            price: ticketData.prix[index]
+                        });
+                                        // 2. Supprimer le ticket de "Achat en cours"
                 const achatEnCoursRef = ref(db, 'AchatEnCours');
                 const snapshot = await get(achatEnCoursRef);
                 const achatsEnCours = snapshot.val() || {};
 
                 for (const ticketId in achatsEnCours) {
                     const ticket = achatsEnCours[ticketId];
-                    if (ticket.user === user &&
-                        ticket.password === password &&
-                        ticket.price === price) {
+                    if (ticket.user === ticketData.utilisateur[index] &&
+                        ticket.password === ticketData.motDePasse[index] &&
+                        ticket.price === ticketData.prix[index]) {
                         await remove(ref(db, `AchatEnCours/${ticketId}`));
                         break; // Sortir de la boucle après avoir supprimé le ticket
                     }
                 }
-
-                // 3. Enregistrer les informations du ticket vendu dans Firebase
-                const ticketsVendusRef = ref(db, 'TicketsVendus');
-                const newTicketRef = push(ticketsVendusRef);
-                await set(newTicketRef, {
-                    user: user,
-                    password: password,
-                    price: price
-                });
-
-                // Afficher une notification de succès
-                showNotification("Ticket acheté",
-                    `Nom d'utilisateur: ${user}\n` +
-                    `Mot de passe: ${password}\n` +
-                    `Prix: ${price} F`,
-                    true
-                );
-
-                // Supprimer le ticket acheté de localTickets
-                ticketData.utilisateur.splice(index, 1);
-                ticketData.motDePasse.splice(index, 1);
-                ticketData.prix.splice(index, 1);
-
-                // Supprimer le ticket de localTickets s'il n'y a plus de tickets disponibles
-                if (ticketData.utilisateur.length === 0) {
-                    delete localTickets[ticketName];
+                    // 3. Enregistrer les informations du ticket vendu dans Firebase
+                      const ticketsVendusRef = ref(db, 'TicketsVendus');
+                      const newTicketRef = push(ticketsVendusRef);
+                      await set(newTicketRef, {
+                          user: ticketData.utilisateur[index],
+                          password: ticketData.motDePasse[index],
+                          price: ticketData.prix[index]
+                      });
+        
+                        showNotification("Ticket acheté",
+                            `Nom d'utilisateur: ${ticketData.utilisateur[index]}\n` +
+                            `Mot de passe: ${ticketData.motDePasse[index]}\n` +
+                            `Prix: ${ticketData.prix[index]} F`,
+                            true 
+                        );
+        
+                        // Supprimer le ticket acheté de localTickets
+                        ticketData.utilisateur.splice(index, 1);
+                        ticketData.motDePasse.splice(index, 1);
+                        ticketData.prix.splice(index, 1);
+        
+                        // Supprimer le ticket de localTickets s'il n'y a plus de tickets disponibles
+                        if (ticketData.utilisateur.length === 0) {
+                            delete localTickets[ticketName];
+                        }
+        
+                        localStorage.removeItem('lastTicketName');
+                        localStorage.removeItem('ticketIndex');
+                    } else {
+                        showNotification("Erreur", "Impossible de récupérer les informations du ticket.");
+                    }
+                } else {
+                    showNotification("Erreur", "Ticket non trouvé");
                 }
-
-                // Supprimer les informations de l'index et du nom du ticket dans le localStorage
-                localStorage.removeItem('lastTicketName');
-                localStorage.removeItem('ticketIndex');
-            } else {
-                showNotification("Erreur", "Impossible de récupérer les informations du ticket.");
+            } catch (error) {
+                console.error("Erreur lors du traitement du paiement réussi :", error);
+                showNotification("Erreur", "Une erreur s'est produite lors du traitement de votre achat.");
+                logTransactionError(); 
             }
-        } else {
-            showNotification("Erreur", "Ticket non trouvé");
         }
-    } catch (error) {
-        console.error("Erreur lors du traitement du paiement réussi :", error);
-        showNotification("Erreur", "Une erreur s'est produite lors du traitement de votre achat.");
-        logTransactionError(); 
-    }
-}
+
         function showNotification(title, message, isTicketPurchase = false, isError = false) {
             const notification = document.getElementById('notification');
             const notificationTitle = document.getElementById('notification-title');
@@ -975,9 +959,7 @@ document.forms['login'].addEventListener('submit', handleLogin);
                     <h2>Tarifs</h2>
                     <iframe src="https://fedapay.netlify.app/pay" width="100%" height="500px" frameborder="0"></iframe>
             </div>
-            <table style="display: none;">  
-                <iframe src="https://fedapay.netlify.app/pay" width="100%" height="500px" frameborder="0"></iframe>
-             
+            <table style="display: none;">        
                 <tr>
                     <th>Forfait</th>
                     <th>Prix</th>

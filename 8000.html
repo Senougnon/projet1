@@ -51,21 +51,18 @@
     <div id="notification"></div>
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function() {
-            // Récupérer les données du ticket à partir de l'URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const user = urlParams.get('user');
-            const password = urlParams.get('password');
-            const price = urlParams.get('price');
-
-            if (user && password && price) {
-                // Affichez les informations du ticket
+            // 1. Récupérer les données du ticket à partir du cookie
+            const cookieValue = document.cookie.match('(?:^|;\\s*)ticketData=([^;]*)');
+            if (cookieValue) {
+                const ticketData = JSON.parse(cookieValue[1]);
                 document.getElementById("ticket-info").textContent = 
-                    `Nom d'utilisateur: ${user}\n` +
-                    `Mot de passe: ${password}\n` +
-                    `Prix: ${price} F`;
+                    `Nom d'utilisateur: ${ticketData.user}\n` +
+                    `Mot de passe: ${ticketData.password}\n` +
+                    `Prix: ${ticketData.price} F`;
                 document.getElementById("ticket-info").style.display = "block";
             }
 
+            // 2. Initialiser FedaPay
             var fedaPayInstance = FedaPay.init({
                 public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
                 transaction: {
@@ -85,6 +82,17 @@
                         notification.textContent = "Paiement réussi ! Merci.";
                         notification.className = "success";
                         // Rediriger si besoin
+                        
+                        // 3. Afficher le ticket après le succès du paiement
+                        const cookieValue = document.cookie.match('(?:^|;\\s*)ticketData=([^;]*)');
+                        if (cookieValue) {
+                            const ticketData = JSON.parse(cookieValue[1]);
+                            document.getElementById("ticket-info").textContent = 
+                                `Nom d'utilisateur: ${ticketData.user}\n` +
+                                `Mot de passe: ${ticketData.password}\n` +
+                                `Prix: ${ticketData.price} F`;
+                            document.getElementById("ticket-info").style.display = "block";
+                        }
                     }
                     notification.style.display = "block";
                     setTimeout(function() {

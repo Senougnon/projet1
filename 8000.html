@@ -6,8 +6,106 @@
     <title>Paiement automatique avec FedaPay</title>
     <script src="https://cdn.fedapay.com/checkout.js?v=1.1.7"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script> 
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"></script> 
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getDatabase, ref, get, update, remove, set, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
+            authDomain: "cyber-campus-2706f.firebaseapp.com",
+            databaseURL: "https://cyber-campus-2706f-default-rtdb.firebaseio.com",
+            projectId: "cyber-campus-2706f",
+            storageBucket: "cyber-campus-2706f.appspot.com",
+            messagingSenderId: "719410601264",
+            appId: "1:719410601264:web:44fd2e3757721866303cf5",
+            measurementId: "G-CEEFJP5LYZ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuration de FedaPay 
+            var fedaPayInstance = FedaPay.init({
+                public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
+                transaction: {
+                    amount: 1, // Ajustez le montant ici si nécessaire
+                    description: 'Achat de ticket'
+                },
+                customer: {
+                    email: 'sic@gmail.com' // Ajustez l'email ici si nécessaire
+                },
+                onComplete: function(response) {
+                    var notification = document.getElementById('notification');
+                    if (response.reason === FedaPay.DIALOG_DISMISSED) {
+                        notification.textContent = "Paiement annulé.";
+                        notification.className = "error";
+                        // Rediriger si besoin
+                    } else if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
+                        notification.textContent = "Paiement réussi ! Merci.";
+                        notification.className = "success";
+
+                        // Récupérer les données chiffrées du ticket à partir de l'URL
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const encryptedUser = urlParams.get('user');
+                        const encryptedPassword = urlParams.get('password');
+                        const encryptedPrice = urlParams.get('price');
+
+                        if (encryptedUser && encryptedPassword && encryptedPrice) {
+                            const secretKey = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; // Remplacez par votre clé secrète réelle
+
+                            // Déchiffrer les données du ticket
+                            const decryptedUser = CryptoJS.AES.decrypt(encryptedUser, secretKey).toString(CryptoJS.enc.Utf8);
+                            const decryptedPassword = CryptoJS.AES.decrypt(encryptedPassword, secretKey).toString(CryptoJS.enc.Utf8);
+                            const decryptedPrice = CryptoJS.AES.decrypt(encryptedPrice, secretKey).toString(CryptoJS.enc.Utf8);
+
+                            // Affichez les informations du ticket
+                            document.getElementById("ticket-info").textContent = 
+                                `Nom d'utilisateur: ${decryptedUser}\n` +
+                                `Mot de passe: ${decryptedPassword}\n` +
+                                `Prix: ${decryptedPrice} F`;
+                            document.getElementById("ticket-info").style.display = "block";
+
+                            // Enregistrer les informations du ticket dans Firebase
+                            const ticketsVendusRef = ref(db, 'TicketsVendus');
+                            push(ticketsVendusRef, {
+                                user: decryptedUser,
+                                password: decryptedPassword,
+                                price: decryptedPrice
+                            })
+                            .then(() => {
+                                // Afficher une notification avec les informations du ticket
+                                notification.textContent = `Ticket acheté:\nNom d'utilisateur: ${decryptedUser}\nMot de passe: ${decryptedPassword}\nPrix: ${decryptedPrice} F`;
+                                notification.className = "success";
+                                notification.style.display = "block";
+                                setTimeout(function() {
+                                    notification.style.display = "none";
+                                }, 5000);
+                            })
+                            .catch((error) => {
+                                console.error('Erreur lors de l\'enregistrement du ticket dans Firebase:', error);
+                                notification.textContent = "Erreur lors de l'enregistrement du ticket. Veuillez réessayer.";
+                                notification.className = "error";
+                                notification.style.display = "block";
+                            });
+                        }
+                        // Rediriger si besoin
+                    }
+                    notification.style.display = "block";
+                    setTimeout(function() {
+                        notification.style.display = "none";
+                    }, 5000);
+                }
+            });
+
+            // Lancer le paiement automatiquement
+            setTimeout(function() {
+                fedaPayInstance.open();
+            }, 1000); // Délai d'une seconde pour s'assurer que tout est bien chargé
+        });
+
+        
+    </script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -52,96 +150,5 @@
 <body>
     <div id="ticket-info"></div>
     <div id="notification"></div>
-    <script type="text/javascript">
-        // Configuration Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
-            authDomain: "cyber-campus-2706f.firebaseapp.com",
-            databaseURL: "https://cyber-campus-2706f-default-rtdb.firebaseio.com",
-            projectId: "cyber-campus-2706f",
-            storageBucket: "cyber-campus-2706f.appspot.com",
-            messagingSenderId: "719410601264",
-            appId: "1:719410601264:web:44fd2e3757721866303cf5",
-            measurementId: "G-CEEFJP5LYZ"
-        };
-
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Configuration de FedaPay
-            var fedaPayInstance = FedaPay.init({
-                public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
-                transaction: {
-                    amount: 1, // Ajustez le montant ici si nécessaire
-                    description: 'Achat de ticket'
-                },
-                customer: {
-                    email: 'sic@gmail.com' // Ajustez l'email ici si nécessaire
-                },
-                onComplete: function(response) {
-                    var notification = document.getElementById('notification');
-                    if (response.reason === FedaPay.DIALOG_DISMISSED) {
-                        notification.textContent = "Paiement annulé.";
-                        notification.className = "error";
-                        // Rediriger si besoin
-                    } else if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
-                        notification.textContent = "Paiement réussi ! Merci.";
-                        notification.className = "success";
-
-                        // Récupérer les données chiffrées du ticket à partir de l'URL
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const encryptedUser = urlParams.get('user');
-                        const encryptedPassword = urlParams.get('password');
-                        const encryptedPrice = urlParams.get('price');
-
-                        if (encryptedUser && encryptedPassword && encryptedPrice) {
-                            const secretKey = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; // Remplacez par votre clé secrète réelle
-
-                            // Déchiffrer les données du ticket
-                            const decryptedUser = CryptoJS.AES.decrypt(encryptedUser, secretKey).toString(CryptoJS.enc.Utf8);
-                            const decryptedPassword = CryptoJS.AES.decrypt(encryptedPassword, secretKey).toString(CryptoJS.enc.Utf8);
-                            const decryptedPrice = CryptoJS.AES.decrypt(encryptedPrice, secretKey).toString(CryptoJS.enc.Utf8);
-
-                            // Affichez les informations du ticket
-                            document.getElementById("ticket-info").textContent = 
-                                `Nom d'utilisateur: ${decryptedUser}\n` +
-                                `Mot de passe: ${decryptedPassword}\n` +
-                                `Prix: ${decryptedPrice} F`;
-                            document.getElementById("ticket-info").style.display = "block";
-
-                            // Enregistrer les informations du ticket dans Firebase
-                            const ticketsVendusRef = db.ref('TicketsVendus');
-                            ticketsVendusRef.push({
-                                user: decryptedUser,
-                                password: decryptedPassword,
-                                price: decryptedPrice
-                            });
-
-                            // Afficher une notification avec les informations du ticket
-                            notification.textContent = `Ticket acheté:\nNom d'utilisateur: ${decryptedUser}\nMot de passe: ${decryptedPassword}\nPrix: ${decryptedPrice} F`;
-                            notification.className = "success";
-                            notification.style.display = "block";
-                            setTimeout(function() {
-                                notification.style.display = "none";
-                            }, 5000);
-                        }
-                        // Rediriger si besoin
-                    }
-                    notification.style.display = "block";
-                    setTimeout(function() {
-                        notification.style.display = "none";
-                    }, 5000);
-                }
-            });
-
-            // Lancer le paiement automatiquement
-            setTimeout(function() {
-                fedaPayInstance.open();
-            }, 1000); // Délai d'une seconde pour s'assurer que tout est bien chargé
-        });
-
-        
-    </script>
 </body>
 </html>

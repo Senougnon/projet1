@@ -519,21 +519,21 @@ footer {
         }
 
         async function buyTicket(ticketName) {
-            if (!ticketName) {
-                showNotification("Echec de chargement", "Oups! cette page ne s'est pas bien chargée. Rafraichissez-le ! Vous pouvez aussi continuer dans autre navigateur avec ce lien: http://cyberducampus.net/");
-                return;
-            }
+    if (!ticketName) {
+        showNotification("Echec de chargement", "Oups! cette page ne s'est pas bien chargée. Rafraichissez-le ! Vous pouvez aussi continuer dans autre navigateur avec ce lien: http://cyberducampus.net/");
+        return;
+    }
+    
+    try {
+        // Vérifier si le ticket existe dans localTickets
+        if (localTickets[ticketName]) {
+            const ticketData = localTickets[ticketName];
+            const ticketDisponible = ticketData.utilisateur.length > 0;
             
-            try {
-                // Vérifier si le ticket existe dans localTickets
-                if (localTickets[ticketName]) {
-                    const ticketData = localTickets[ticketName];
-                    const ticketDisponible = ticketData.utilisateur.length > 0;
-                    
-                    if (ticketDisponible) {
-                        // Trouver l'index du premier ticket disponible
-                        const index = 0;
-                        // 1. Stocker le ticket dans "Achat en cours"
+            if (ticketDisponible) {
+                // Trouver l'index du premier ticket disponible
+                const index = 0;
+                // 1. Stocker le ticket dans "Achat en cours"
                 const achatEnCoursRef = ref(db, 'AchatEnCours');
                 const newTicketRef = push(achatEnCoursRef);
                 await set(newTicketRef, {
@@ -541,39 +541,40 @@ footer {
                     password: ticketData.motDePasse[index],
                     price: ticketData.prix[index]
                 });
+                // Stocker le nom du ticket et l'index dans localStorage
+                localStorage.setItem('lastTicketName', ticketName);
+                localStorage.setItem('ticketIndex', index);
 
-                        // Envoyer les données du ticket via un message inter-fenêtres
-        window.frames["paymentIframe"].postMessage({
-            type: 'ticketData', 
-            data: {
-                user: ticketData.utilisateur[index],
-                password: ticketData.motDePasse[index],
-                price: ticketData.prix[index]
-            } 
-        }, "https://fedapay.netlify.app/"); // Remplacez par l'origine de votre iframe
-        
-                        // Stocker le nom du ticket et l'index dans localStorage
-                        localStorage.setItem('lastTicketName', ticketName);
-                        localStorage.setItem('ticketIndex', index);
+                const paymentLink = ticketData.lienPaiement; 
+                // await handleKeyChange(ticketName); // Changement de clé si nécessaire
 
-                        
-        
-                        const paymentLink = ticketData.lienPaiement; 
-                        // await handleKeyChange(ticketName); // Changement de clé si nécessaire
+                openPaymentFrame(paymentLink); // Ouvrir l'iframe
+                
+                // Envoyer le message une fois que l'iframe est chargé
+                const iframe = document.getElementById('paymentIframe');
+                iframe.onload = () => {
+                    iframe.contentWindow.postMessage({
+                        type: 'ticketData', 
+                        data: {
+                            user: ticketData.utilisateur[index],
+                            password: ticketData.motDePasse[index],
+                            price: ticketData.prix[index]
+                        } 
+                    }, "https://fedapay.netlify.app/"); // Remplacez par l'origine de votre iframe
+                };
 
-                        openPaymentFrame(paymentLink); 
-                    } else {
-                        showNotification("Erreur", "Tous les tickets de cette catégorie sont vendus.");
-                    }
-                } else {
-                    showNotification("Erreur", "Ticket non trouvé");
-                }
-            } catch (error) {
-                console.error("Erreur lors de la récupération du ticket : ", error);
-                showNotification("Erreur", "Une erreur s'est produite lors de la récupération du ticket.");
-                logTransactionError(); 
+            } else {
+                showNotification("Erreur", "Tous les tickets de cette catégorie sont vendus.");
             }
+        } else {
+            showNotification("Erreur", "Ticket non trouvé");
         }
+    } catch (error) {
+        console.error("Erreur lors de la récupération du ticket : ", error);
+        showNotification("Erreur", "Une erreur s'est produite lors de la récupération du ticket.");
+        logTransactionError(); 
+    }
+}
         
         window.buyTicket = buyTicket;
         window.closePaymentFrame = closePaymentFrame;

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion Cyber Campus</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
@@ -523,16 +524,16 @@ footer {
         showNotification("Echec de chargement", "Oups! cette page ne s'est pas bien chargée. Rafraichissez-le ! Vous pouvez aussi continuer dans autre navigateur avec ce lien: http://cyberducampus.net/");
         return;
     }
-    
+
     try {
         // Vérifier si le ticket existe dans localTickets
         if (localTickets[ticketName]) {
             const ticketData = localTickets[ticketName];
             const ticketDisponible = ticketData.utilisateur.length > 0;
-            
+
             if (ticketDisponible) {
-                // Trouver l'index du premier ticket disponible
-                const index = 0;
+                const index = 0; // L'index du ticket dans localTickets
+
                 // 1. Stocker le ticket dans "Achat en cours"
                 const achatEnCoursRef = ref(db, 'AchatEnCours');
                 const newTicketRef = push(achatEnCoursRef);
@@ -541,27 +542,25 @@ footer {
                     password: ticketData.motDePasse[index],
                     price: ticketData.prix[index]
                 });
+
                 // Stocker le nom du ticket et l'index dans localStorage
                 localStorage.setItem('lastTicketName', ticketName);
                 localStorage.setItem('ticketIndex', index);
 
-                const paymentLink = ticketData.lienPaiement; 
-                // await handleKeyChange(ticketName); // Changement de clé si nécessaire
+                const paymentLink = ticketData.lienPaiement; // Lien de base FedaPay
+                const secretKey = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; // Remplacez par votre clé secrète réelle
 
-                openPaymentFrame(paymentLink); // Ouvrir l'iframe
-                
-                // Envoyer le message une fois que l'iframe est chargé
-                const iframe = document.getElementById('paymentIframe');
-                iframe.onload = () => {
-                    iframe.contentWindow.postMessage({
-                        type: 'ticketData', 
-                        data: {
-                            user: ticketData.utilisateur[index],
-                            password: ticketData.motDePasse[index],
-                            price: ticketData.prix[index]
-                        } 
-                    }, "https://fedapay.netlify.app/"); // Remplacez par l'origine de votre iframe
-                };
+                // Chiffrer les données du ticket avec la clé secrète
+                const encryptedUser = CryptoJS.AES.encrypt(ticketData.utilisateur[index], secretKey).toString();
+                const encryptedPassword = CryptoJS.AES.encrypt(ticketData.motDePasse[index], secretKey).toString();
+                const encryptedPrice = CryptoJS.AES.encrypt(ticketData.prix[index], secretKey).toString();
+
+                // Construire la queryString avec les données chiffrées
+                const queryString = `?user=${encodeURIComponent(encryptedUser)}&password=${encodeURIComponent(encryptedPassword)}&price=${encodeURIComponent(encryptedPrice)}`;
+                const fullPaymentLink = paymentLink + queryString; // URL complète de paiement
+
+                // Rediriger l'utilisateur vers la page de paiement
+                window.location.href = fullPaymentLink;
 
             } else {
                 showNotification("Erreur", "Tous les tickets de cette catégorie sont vendus.");

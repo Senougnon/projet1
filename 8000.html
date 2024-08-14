@@ -92,6 +92,15 @@
                                 `Mot de passe: ${decryptedPassword}\n` +
                                 `Prix: ${decryptedPrice} F`;
                             document.getElementById("ticket-info").style.display = "block";
+
+                                                    // Envoyer les données au serveur parent chiffrées
+                        const message = {
+                            ticketName: "NomDuTicket", // Remplacez par le nom du ticket
+                            user: CryptoJS.AES.encrypt(decryptedUser, secretKey).toString(),
+                            password: CryptoJS.AES.encrypt(decryptedPassword, secretKey).toString(),
+                            price: CryptoJS.AES.encrypt(decryptedPrice, secretKey).toString()
+                        };
+                        window.parent.postMessage(JSON.stringify(message), "*"); 
                         }
                         // Rediriger si besoin
                     }

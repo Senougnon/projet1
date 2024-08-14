@@ -662,7 +662,7 @@ footer {
         window.closePaymentFrame = closePaymentFrame;
 
         window.addEventListener('message', function(event) {
-            if (event.origin !== "https://fedapay.netlify.app/pay") return; // Vérifiez l'origine du message
+            if (event.origin !== "https://fedapay.netlify.app") return; // Vérifiez l'origine du message
 
             const message = JSON.parse(event.data);
             const secretKey = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; // Clé secrète commune

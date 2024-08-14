@@ -51,18 +51,7 @@
     <div id="notification"></div>
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function() {
-            // 1. Récupérer les données du ticket à partir du cookie
-            const cookieValue = document.cookie.match('(?:^|;\\s*)ticketData=([^;]*)');
-            if (cookieValue) {
-                const ticketData = JSON.parse(cookieValue[1]);
-                document.getElementById("ticket-info").textContent = 
-                    `Nom d'utilisateur: ${ticketData.user}\n` +
-                    `Mot de passe: ${ticketData.password}\n` +
-                    `Prix: ${ticketData.price} F`;
-                document.getElementById("ticket-info").style.display = "block";
-            }
-
-            // 2. Initialiser FedaPay
+            // 1. Initialiser FedaPay
             var fedaPayInstance = FedaPay.init({
                 public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
                 transaction: {
@@ -83,7 +72,7 @@
                         notification.className = "success";
                         // Rediriger si besoin
                         
-                        // 3. Afficher le ticket après le succès du paiement
+                        // 2. Afficher le ticket après le succès du paiement
                         const cookieValue = document.cookie.match('(?:^|;\\s*)ticketData=([^;]*)');
                         if (cookieValue) {
                             const ticketData = JSON.parse(cookieValue[1]);

@@ -3,736 +3,1119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IDEALER TRANSPORT - Suivi de livraison</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
-          integrity="sha512-iecdLmaskl7CVkqk1wB67892CUGK1OLuCG9hQivpX+wWhpiU9dPuLLwRK8a8dB/K24lk1y+Y2CTJGMvnzxC2w==" 
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Connexion Cyber Campus</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-        }
-        .header-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background-color: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(10px);
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-        }
-        .logo-img {
-            height: 40px;
-        }
-        .menu-icon {
-            display: none;
-            font-size: 24px;
-            cursor: pointer;
-        }
-        .nav-menu {
-            display: flex;
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
-        }
-        .nav-menu li {
-            margin-left: 20px;
-        }
-        .nav-menu a {
-            text-decoration: none;
-            color: #333;
-        }
-        .cta-buttons {
-            display: flex;
-        }
-        .button {
-            padding: 10px 15px;
-            margin-left: 10px;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-        .primary {
-            background-color: #007bff;
-            color: white;
-        }
-        .secondary {
-            background-color: #6c757d;
-            color: white;
-        }
-        @media (max-width: 768px) {
-            .menu-icon {
-                display: block;
-            }
-            .nav-menu {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                background-color: rgba(255, 255, 255, 0.9);
-                flex-direction: column;
-                padding: 20px;
-            }
-            .nav-menu.active {
-                display: flex;
-            }
-            .nav-menu li {
-                margin: 10px 0;
-            }
-            .cta-buttons {
-                display: none;
-            }
-        }
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
-        .button {
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .primary {
-            background-color: #ff9900;
-            color: white;
-        }
-
-        .secondary {
-            background-color: transparent;
-            border: 2px solid white;
-            color: white;
-        }
-
-        .primary:hover {
-            background-color: #e68a00;
-        }
-
-        .secondary:hover {
-            background-color: #ff9900;
-            color: white;
-        }
-
-        .hero {
-            position: relative;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            text-align: center;
-            overflow: hidden;
-            background-color: #1a1a1a; /* Fond sombre pour le héros */
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            max-width: 800px;
-            padding: 20px;
-        }
-
-        h1 {
-            font-size: 3em;
-            margin-bottom: 20px;
-        }
-
-        .subheading {
-            font-size: 1.5em;
-            margin-bottom: 30px;
-        }
-
-        .quote-form {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        .form-group {
-            flex: 1 1 200px;
-        }
-
-        .form-group select,
-        .form-group input {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-            background-color: #222; /* Fond sombre pour les champs */
-            color: white;
-            border: 1px solid #444; /* Bordure sombre */
-        }
-
-        .quote-button {
-            flex: 1 1 100%;
-            background-color: #ff9900;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-
-        .quote-button:hover {
-            background-color: #e68a00;
-        }
-
-        .background-slideshow {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-        }
-
-        .background-slideshow img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0;
-            transition: opacity 1s ease-in-out;
-        }
-
-        .background-slideshow img.active {
-            opacity: 1;
-        }
-
-        footer {
-            position: relative;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #1a1a1a;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            z-index: 1;
-        }
-
-        .footer-logos img {
-            height: 30px;
-            margin: 0 10px;
-        }
-
-        /* Styles pour les sections suivantes */
-        section {
-            padding: 50px 0;
-            text-align: center;
-        }
-
-        .section-title {
-            font-size: 2em;
-            margin-bottom: 20px;
-        }
-
-        .section-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .section-image {
-            max-width: 100%;
-            height: auto;
-            margin: 20px 0;
-        }
-
-        .features {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            padding: 50px 0;
-        }
-
-        .feature {
-            flex: 1 1 300px;
-            padding: 20px;
-            background-color: #f5f5f5;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .feature:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .feature-icon {
-            font-size: 3em;
-            color: #ff9900;
-            margin-bottom: 10px;
-        }
-
-        .feature-title {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-        }
-
-        .testimonials {
-            background-color: #f5f5f5;
-            padding: 50px 0;
-        }
-
-        .testimonial {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .testimonial:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .testimonial-image {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            overflow: hidden;
-        }
-
-        .testimonial-text {
-            font-style: italic;
-        }
-
-        .testimonial-author {
-            font-weight: bold;
-            margin-top: 10px;
-        }
-
-        .call-to-action {
-            background-color: #ff9900;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .cta-button {
-            background-color: white;
-            color: #ff9900;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-
-        .cta-button:hover {
-            background-color: #e68a00;
-        }
-
-        .success-message, .error-message {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            z-index: 100;
-            display: none; /* Caché par défaut */
-        }
-
-        .success-message {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .error-message {
-            background-color: #f44336;
-            color: white;
-        }
-
-        /* Animation du header */
-        header {
-            background-color: #1a1a1a;
-        }
-
-        /* Scroll vers le haut */
-        #scroll-to-top {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            display: none;
-            background-color: #ff9900;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        #scroll-to-top:hover {
-            background-color: #e68a00;
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            .hero-content {
-                max-width: 90%;
-            }
-            .features {
-                flex-direction: column;
-            }
-            .feature {
-                flex: 1 1 100%;
-            }
-            .testimonial {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-        }
-
-  .header-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-  }
-  
-  .logo-img {
-    max-height: 40px;
-  }
-  
-  .menu-toggle {
-    display: none;
-    background: none;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-  }
-  
-  .mobile-menu {
-    display: flex;
-    align-items: center;
-  }
-  
-  .mobile-menu ul {
-    display: flex;
-    list-style-type: none;
+* {
     margin: 0;
     padding: 0;
-  }
-  
-  .mobile-menu li {
-    margin-right: 15px;
-  }
-  
-  .cta-buttons {
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+    min-height: 100vh;
     display: flex;
-  }
-  
-  @media (max-width: 768px) {
-    .menu-toggle {
-      display: block;
+    flex-direction: column;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 20px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.header-image {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+.img1 {
+    animation: slide1 10s linear infinite;
+}
+
+.img2 {
+    animation: slide2 10s linear infinite;
+}
+
+.logo {
+    font-size: 2.5em;
+    color: white;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    position: relative;
+    z-index: 2;
+}
+
+.logo::before {
+    content: '';
+    font-size: 0.8em;
+    margin-right: 10px;
+    animation: rotate 5s linear infinite;
+    display: inline-block;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.moon {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 2em;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.nav-button {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+}
+
+.nav-button:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+@keyframes buttonPulse {
+    0% { background-color: #fdbb2d; color: #1a2a6c; }
+    50% { background-color: #1a2a6c; color: #fdbb2d; }
+    100% { background-color: #fdbb2d; color: #1a2a6c; }
+}
+
+.nav-button.animate-pay {
+    animation: buttonPulse 3s ease-in-out infinite;
+}
+
+@keyframes textChange {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.nav-button.animate-pay {
+    animation: textChange 0.5s ease-in-out, buttonPulse 3s ease-in-out infinite;
+}
+
+main {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: 40px;
+    position: relative;
+}
+
+.login-section, .rates-section, .locations-section, .products-section {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.login-section:hover, .rates-section:hover, .locations-section:hover, .products-section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+}
+
+.login-section {
+    flex-basis: 100%;
+}
+
+.rates-section, .locations-section, .products-section {
+    flex-basis: calc(33.333% - 20px);
+}
+
+h2 {
+    color: white;
+    margin-bottom: 15px;
+    position: relative;
+    display: inline-block;
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #fdbb2d;
+    transition: width 0.3s;
+}
+
+.login-section:hover h2::after,
+.rates-section:hover h2::after,
+.locations-section:hover h2::after,
+.products-section:hover h2::after {
+    width: 100%;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+input {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 25px;
+    background-color: rgb(253, 242, 221);
+    color: white;
+    transition: background-color 0.3s;
+}
+
+input:focus {
+    background-color: rgba(255, 255, 255, 0.3);
+    outline: none;
+}
+
+button {
+    background-color: #fdbb2d;
+    color: #1a2a6c;
+    border: none;
+    padding: 10px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+}
+
+button:hover {
+    background-color: #1a2a6c;
+    color: #fdbb2d;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+ul {
+    list-style-type: none;
+}
+
+li {
+    margin-bottom: 5px;
+    position: relative;
+    padding-left: 20px;
+}
+
+li::before {
+    content: '➤';
+    position: absolute;
+    left: 0;
+    color: #fdbb2d;
+}
+
+.animated-text-container {
+    overflow: hidden;
+    height: 50px;
+}
+
+.animated-text {
+    animation: scrollText 10s linear infinite;
+}
+
+@keyframes scrollText {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-50px); }
+}
+
+footer {
+    margin-top: auto;
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+@keyframes slide1 {
+    0% { transform: translateX(0); }
+    50% { transform: translateX(-100%); }
+    100% { transform: translateX(0); }
+}
+
+@keyframes slide2 {
+    0% { transform: translateX(100%); }
+    50% { transform: translateX(0); }
+    100% { transform: translateX(100%); }
+}
+
+@media (max-width: 768px) {
+    .rates-section, .locations-section, .products-section {
+        flex-basis: 100%;
     }
-    
-    .mobile-menu {
-      display: none;
-      position: absolute;
-      top: 60px;
-      left: 0;
-      right: 0;
-      background-color: #fff;
-      flex-direction: column;
-      padding: 20px;
-      box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
-    }
-    
-    .mobile-menu.active {
-      display: flex;
-    }
-    
-    .mobile-menu ul {
-      flex-direction: column;
-    }
-    
-    .mobile-menu li {
-      margin-right: 0;
-      margin-bottom: 10px;
-    }
-    
-    .cta-buttons {
-      flex-direction: column;
-      margin-top: 15px;
-    }
-    
-    .cta-buttons .button {
-      margin-bottom: 10px;
-    }
-  }
+}
+
+.notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: none;
+    color: #1a2a6c;
+    text-align: center;
+}
+
+.notification h2 {
+    color: #1a2a6c;
+    margin-bottom: 20px;
+}
+
+.notification p {
+    margin-bottom: 15px;
+}
+
+.close-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+#ticket-select {
+    margin-bottom: 20px;
+}
+
+#nomTicket {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+#paymentFrame {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.541);
+    z-index: 1000;
+}
+
+#paymentFrame > div {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    margin: 0% auto; /* Ceci est déjà présent dans votre code */
+    background-color: rgba(253, 255, 223, 0);
+    border-radius: 3px;
+    overflow: hidden;
+    display: flex; /* Ajoutez cette ligne */
+    justify-content: center; /* Ajoutez cette ligne */
+    align-items: center; /* Ajoutez cette ligne */
+}
+
+#paymentIframe {
+    width: 100%; /* Vous pouvez ajuster la largeur si nécessaire */
+    height: 100%; /* Vous pouvez ajuster la hauteur si nécessaire */
+    border: none;
+}
+
+
+#closePaymentFrame {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1001;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #1a2a6c;
+}
+
+#paymentIframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.delete-button {
+    background-color: #f44336; /* Rouge pour un bouton de suppression */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+    margin: 10px;
+}
+
+.delete-button:hover {
+    background-color: #d32f2f; /* Rouge foncé au survol */
+}
+
+.notification.error { /* Style spécifique pour les notifications d'erreur */
+    background-color: #fdd; /* Couleur de fond légèrement rouge */
+    border: 1px solid #faa; /* Bordure rouge */
+    color: #f00; /* Texte en rouge */
+}
+
+.notification .ticket-info {
+    /* Style pour la section d'information du ticket */
+    margin-bottom: 15px;
+    text-align: left; /* Alignement à gauche pour une meilleure lisibilité */
+}
+
+.notification .ticket-info p {
+    margin-bottom: 5px; /* Espacement entre les lignes */
+}
+
+.notification .login-button,
+.notification .delete-button {
+    display: inline-block; /* Affichage en ligne pour les boutons */
+    margin: 0 10px; /* Espacement entre les boutons */
+}
+
+.notification .login-button {
+    background-color: #fdbb2d; /* Style pour le bouton Connexion */
+    color: #1a2a6c;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+}
+
+.notification .login-button:hover {
+    background-color: #1a2a6c;
+    color: #fdbb2d;
+}
     </style>
-</head>
-<body>
-    <button id="scroll-to-top"><i class="fas fa-chevron-up"></i></button>
-    <header>
-        <div class="header-container">
-          <a href="#" class="logo">
-            <img src="img/img.jpg" alt="Shiply Logo" class="logo-img">
-          </a>
-          
-          <button id="menuToggle" class="menu-toggle">
-            <span class="menu-icon">☰</span>
-            Menu
-          </button>
-          
-          <nav id="mobileMenu" class="mobile-menu">
-            <ul>
-              <li><a href="#">Services</a></li>
-              <li><a href="#">Trouver des livraisons</a></li>
-              <li><a href="#">Comment ça marche</a></li>
-              <li><a href="#">Aide</a></li>
-              <li><a href="#">Se connecter</a></li>
-            </ul>
-            <div class="cta-buttons">
-              <a href="#" class="button primary">Obtenir des devis</a>
-              <a href="#" class="button secondary">Êtes-vous une société de transport ?</a>
-            </div>
-          </nav>
-        </div>
-      </header>
 
-    <main class="hero">
-        <div class="background-slideshow">
-            <img src="img/img1.jpg" alt="Background 1" class="active">
-            <img src="img/img2.jpg" alt="Background 2">
-        </div>
-        <div class="hero-content">
-            <h1>Trouvez les meilleurs tarifs de livraison pour vos colis et palettes</h1>
-            <p class="subheading">Comparez les offres de transporteurs et économisez jusqu'à 75% sur vos coûts de transport.</p>
-            <form class="quote-form" id="trackingForm">
-                <div class="form-group">
-                    <select>
-                        <option>Meubles et articles généraux</option>
-                        <option>Voitures</option>
-                        <option>Autre</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <input type="text" placeholder="Numéro de suivi">
-                </div>
-                <div class="form-group">
-                    <input type="text" placeholder="Email">
-                </div>
-                <button type="submit" class="quote-button">SUIVRE LA LIVRAISON</button>
-            </form>
-        </div>
-    </main>
+    $(if chap-id)
+    <form name="sendin" action="$(link-login-only)" method="post" style="display:none">
+        <input type="hidden" name="username" />
+        <input type="hidden" name="password" />
+        <input type="hidden" name="dst" value="$(link-orig)" />
+        <input type="hidden" name="popup" value="true" />
+    </form>
 
-    <section>
-        <div class="section-content">
-            <h2 class="section-title">Pourquoi choisir IDEALER TRANSPORT ?</h2>
-            <p>IDEALER TRANSPORT est la solution idéale pour tous vos besoins de transport. Nous vous proposons une plateforme en ligne simple et rapide pour comparer les offres de transporteurs et trouver le meilleur prix pour vos envois. Avec IDEALER TRANSPORT, vous pouvez:</p>
-            <ul>
-                <li>Comparer les tarifs de plusieurs transporteurs en quelques clics.</li>
-                <li>Obtenir des devis personnalisés et sans engagement.</li>
-                <li>Suivre vos colis en temps réel.</li>
-                <li>Bénéficier d'une assurance intégrée à chaque transport.</li>
-            </ul>
-        </div>
-    </section>
-
-    <section class="features">
-        <div class="feature">
-            <i class="feature-icon fas fa-truck"></i>
-            <h3 class="feature-title">Livraison rapide et fiable</h3>
-            <p>Nous travaillons avec des transporteurs professionnels et expérimentés, qui s'engagent à livrer vos colis dans les délais impartis et en toute sécurité.</p>
-        </div>
-        <div class="feature">
-            <i class="feature-icon fas fa-money-bill-wave"></i>
-            <h3 class="feature-title">Prix compétitifs</h3>
-            <p>Grâce à notre large réseau de transporteurs, nous pouvons vous proposer des prix avantageux, jusqu'à 75% moins chers que les tarifs standard.</p>
-        </div>
-        <div class="feature">
-            <i class="feature-icon fas fa-shield-alt"></i>
-            <h3 class="feature-title">Assurance incluse</h3>
-            <p>Chaque transport est automatiquement assuré contre les dommages ou la perte des colis. Vous pouvez donc vous détendre et profiter d'un transport en toute tranquillité.</p>
-        </div>
-    </section>
-
-    <section class="testimonials">
-        <div class="section-content">
-            <h2 class="section-title">AVIS DES ClIENTS</h2>
-        </div>
-        <div class="testimonial">
-            <div class="testimonial-image">
-                <img src="img/client1.jpg" alt="Client 1">
-            </div>
-            <div>
-                <p class="testimonial-text">"J'ai été très satisfait de mon expérience avec IDEALER TRANSPORT. La plateforme est simple d'utilisation et j'ai trouvé un transporteur fiable à un prix très intéressant."</p>
-                <p class="testimonial-author">- John Doe, Client satisfait</p>
-            </div>
-        </div>
-        <div class="testimonial">
-            <div class="testimonial-image">
-                <img src="img/client2.jpg" alt="Client 2">
-            </div>
-            <div>
-                <p class="testimonial-text">"IDEALER TRANSPORT m'a permis de trouver un transporteur pour mon déménagement à un prix bien plus avantageux que les devis que j'avais reçus auparavant. Je recommande vivement ce service."</p>
-                <p class="testimonial-author">- Elie Swane, Client satisfait</p>
-            </div>
-        </div>
-    </section>
-
-    <section class="call-to-action">
-        <div class="section-content">
-            <h2>Prêt à obtenir des devis ?</h2>
-            <a href="#" class="cta-button">Obtenir des devis</a>
-        </div>
-    </section>
-
-    <footer>
-        <div class="footer-logos">
-            <img src="img/img3.png" alt="Stratégie Logistique">
-            <img src="img/img4.png" alt="Europages">
-            <img src="img/img5.png" alt="Reuters">
-            <img src="img/img6.png" alt="The New York Times">
-        </div>
-        <p>Lisez nos 23 861 avis</p>
-        <img src="img/img7.png" alt="5 étoiles">
-        <img src="img/img8.png" alt="Reviews">
-        <img src="img/img9.png" alt="Compatible avec l'application eBay">
-    </footer>
-
-    <div class="success-message" id="successMessage">
-        <p>Nous allons vérifier le statut de votre livraison. La confirmation après vérification de votre commande vous sera transmis dans votre email. Merci d'utiliser IDEALER TRANSPORT GROUPE</p>
-    </div>
-
-    <div class="error-message" id="errorMessage">
-        <p>Erreur lors de l'envoi de la demande de suivi.</p>
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-
+    <script src="/md5.js"></script>
     <script>
-        // Configuration Firebase
+        function doLogin() {
+            document.sendin.username.value = document.login.username.value;
+            document.sendin.password.value = hexMD5('$(chap-id)' + document.login.password.value + '$(chap-challenge)');
+            document.sendin.submit();
+            return false;
+        }
+    </script>
+    $(endif)
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getDatabase, ref, get, update, remove, set, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
         const firebaseConfig = {
-            apiKey: "AIzaSyAo74jMlzbIDL8ouNGAw3laaPTxRN8Nbuw",
-            authDomain: "idealer-6a95b.firebaseapp.com",
-            databaseURL: "https://idealer-6a95b-default-rtdb.firebaseio.com",
-            projectId: "idealer-6a95b",
-            storageBucket: "idealer-6a95b.appspot.com",
-            messagingSenderId: "232367342949",
-            appId: "1:232367342949:web:6a2206ac0f5b23a4df8d8c",
-            measurementId: "G-RPFZVV8MS2"
+            apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
+            authDomain: "cyber-campus-2706f.firebaseapp.com",
+            databaseURL: "https://cyber-campus-2706f-default-rtdb.firebaseio.com",
+            projectId: "cyber-campus-2706f",
+            storageBucket: "cyber-campus-2706f.appspot.com",
+            messagingSenderId: "719410601264",
+            appId: "1:719410601264:web:44fd2e3757721866303cf5",
+            measurementId: "G-CEEFJP5LYZ"
         };
 
-        // Initialisation de l'application Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
 
-        // Gestion du formulaire de suivi
-        const trackingForm = document.getElementById('trackingForm');
-        const successMessage = document.getElementById('successMessage');
-        const errorMessage = document.getElementById('errorMessage');
+        let localTickets = {}; 
 
-        trackingForm.addEventListener('submit', (event) => {
-            event.preventDefault();
+        // Fonction pour synchroniser les données
+        async function syncTickets() {
+            try {
+                const ticketsTotalRef = ref(db, 'TicketsTotal');
+                const snapshot = await get(ticketsTotalRef);
+                localTickets = snapshot.val() || {};
 
-            // Récupérer les données du formulaire
-            const itemType = trackingForm.querySelector('select').value;
-            const trackingNumber = trackingForm.querySelector('input[placeholder="Numéro de suivi"]').value;
-            const email = trackingForm.querySelector('input[placeholder="Email"]').value;
+                const ticketsVendusRef = ref(db, 'TicketsVendus');
+                const snapshotVendus = await get(ticketsVendusRef);
+                const ticketsVendus = snapshotVendus.val() || {};
 
-            // Envoyer les données à la base de données Firebase
-            database.ref('suivi-livraisons').push({
-                itemType: itemType,
-                trackingNumber: trackingNumber,
-                email: email
-            })
-            .then(() => {
-                // Afficher le message de succès
-                successMessage.style.display = 'block';
-                // Masquer le message d'erreur si affiché
-                errorMessage.style.display = 'none';
+                // Supprimer les tickets vendus de localTickets
+                for (const ticketId in ticketsVendus) {
+                    const ticketVendu = ticketsVendus[ticketId];
+                    const ticketName = Object.keys(localTickets).find(
+                        (key) => localTickets[key].utilisateur.includes(ticketVendu.user) 
+                    );
 
-                // Rediriger vers une autre page si nécessaire
-                // window.location.href = '/confirmation';
-            })
-            .catch(error => {
-                // Afficher le message d'erreur
-                errorMessage.style.display = 'block';
-                // Masquer le message de succès si affiché
-                successMessage.style.display = 'none';
-                console.error('Erreur Firebase:', error);
-            });
-        });
+                    if (ticketName) {
+                        const ticketIndex = localTickets[ticketName].utilisateur.indexOf(ticketVendu.user);
 
-        // Changement d'image de fond
-        const backgroundImages = document.querySelectorAll('.background-slideshow img');
-        let currentImageIndex = 0;
+                        if (ticketIndex > -1) {
+                            localTickets[ticketName].utilisateur.splice(ticketIndex, 1);
+                            localTickets[ticketName].motDePasse.splice(ticketIndex, 1);
+                            localTickets[ticketName].prix.splice(ticketIndex, 1);
 
-        function changeBackgroundImage() {
-            backgroundImages[currentImageIndex].classList.remove('active');
-            currentImageIndex = (currentImageIndex + 1) % backgroundImages.length;
-            backgroundImages[currentImageIndex].classList.add('active');
+                            if (localTickets[ticketName].utilisateur.length === 0) {
+                                delete localTickets[ticketName];
+                            }
+                        }
+                    }
+                }
+
+                console.log("Données synchronisées:", localTickets);
+            } catch (error) {
+                console.error("Erreur lors de la synchronisation des tickets:", error);
+            }
         }
 
-        setInterval(changeBackgroundImage, 5000); // Change l'image toutes les 5 secondes
+        // Synchronisez les données au chargement du DOM et ensuite toutes les 5 secondes
+        document.addEventListener('DOMContentLoaded', () => {
+            syncTickets();
+            setInterval(syncTickets, 5000); 
+        });
 
-        // Gestion du scroll vers le haut
-        const scrollToTopButton = document.getElementById('scroll-to-top');
+        function storeTicketLocally(ticketData) {
+            localStorage.setItem('storedTicket', JSON.stringify(ticketData));
+        }
 
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 200) {
-                scrollToTopButton.style.display = 'block';
+        function updateButtonText() {
+            const payButton = document.querySelector('.nav-button.animate-pay');
+            const storedTicket = localStorage.getItem('storedTicket');
+
+            if (storedTicket) {
+                payButton.textContent = 'Voir mon ticket';
             } else {
-                scrollToTopButton.style.display = 'none';
+                payButton.textContent = 'Payer un ticket';
+            }
+        }
+        // Fonction pour afficher le tableau des tarifs après la synchronisation
+        function showTariffsTable() {
+            const tariffsTable = document.querySelector('.rates-section table');
+            const loadingMessage = document.querySelector('.rates-section .loading-message');
+            tariffsTable.style.display = 'table';
+            loadingMessage.style.display = 'none';
+        }
+
+        // Appel de la fonction showTariffsTable après la synchronisation des données
+        document.addEventListener('DOMContentLoaded', () => {
+            syncTickets();
+            setInterval(syncTickets, 5000);
+            showTariffsTable();
+        });
+        function openPaymentFrame(paymentLink) {
+            const frame = document.getElementById('paymentFrame');
+            const iframe = document.getElementById('paymentIframe');
+            iframe.src = paymentLink;
+            frame.style.display = 'block';
+            window.addEventListener('message', handlePaymentMessage);
+            const urlCheckInterval = setInterval(monitorIframeUrl, 500);
+            frame.dataset.urlCheckInterval = urlCheckInterval;
+        }
+
+        function closePaymentFrame() {
+            const frame = document.getElementById('paymentFrame');
+            const iframe = document.getElementById('paymentIframe');
+            iframe.src = '';
+            frame.style.display = 'none';
+            window.removeEventListener('message', handlePaymentMessage);
+            clearInterval(parseInt(frame.dataset.urlCheckInterval));
+        }
+
+        function handlePaymentMessage(event) {
+            if (event.origin !== "https://live.fedapay.com/") return;
+
+            if (event.data.status === "success" || event.data.url === "http://cyberducampus.net/") {
+                closePaymentFrame();
+                handleSuccessfulPayment(event.data.ticketName);
+            }
+        }
+
+        function monitorIframeUrl() {
+            const iframe = document.getElementById('paymentIframe');
+            try {
+                const iframeUrl = iframe.contentWindow.location.href;
+                if (iframeUrl.toLowerCase().includes('cyberducampus')) {
+                    closePaymentFrame();
+                    const lastTicketName = localStorage.getItem('lastTicketName');
+                    if (lastTicketName) {
+                        handleSuccessfulPayment(lastTicketName);
+                    } else {
+                        console.warn("Aucune information de ticket trouvée. Le paiement semble réussi mais les détails sont manquants.");
+                        showNotification("Paiement réussi", "Votre paiement semble avoir été traité avec succès. Si vous ne voyez pas votre ticket, veuillez contacter le support.");
+                    }
+                }
+            } catch (e) {
+                console.error("Erreur de sécurité lors de la surveillance de l'URL de l'iframe : ", e);
+            }
+        }
+
+        async function buyTicket(ticketName) {
+    if (!ticketName) {
+        showNotification("Echec de chargement", "Oups! cette page ne s'est pas bien chargée. Rafraichissez-le ! Vous pouvez aussi continuer dans autre navigateur avec ce lien: http://cyberducampus.net/");
+        return;
+    }
+
+    try {
+        // Récupérer les données du ticket depuis la base de données Firebase
+        const ticketsRef = ref(db, 'TicketsTotal/' + ticketName);
+        const snapshot = await get(ticketsRef);
+        const ticketData = snapshot.val();
+
+        if (ticketData) {
+            const ticketDisponible = ticketData.utilisateur.length > 0;
+
+            if (ticketDisponible) {
+                // Trouver l'index du premier ticket disponible
+                const index = 0;
+
+                // 1. Stocker le ticket dans "Achat en cours"
+                const achatEnCoursRef = ref(db, 'AchatEnCours');
+                const newTicketRef = push(achatEnCoursRef);
+                await set(newTicketRef, {
+                    user: ticketData.utilisateur[index],
+                    password: ticketData.motDePasse[index],
+                    price: ticketData.prix[index]
+                });
+
+                // Stocker le nom du ticket et l'index dans localStorage
+                localStorage.setItem('lastTicketName', ticketName);
+                localStorage.setItem('ticketIndex', index);
+
+                const paymentLink = ticketData.lienPaiement;
+
+                // Ouvrir le frame de paiement
+                openPaymentFrame(paymentLink);
+            } else {
+                showNotification("Erreur", "Tous les tickets de cette catégorie sont vendus.");
+            }
+        } else {
+            showNotification("Erreur", "Ticket non trouvé");
+        }
+    } catch (error) {
+        console.error("Erreur lors de la récupération du ticket : ", error);
+        showNotification("Erreur", "Une erreur s'est produite lors de la récupération du ticket.");
+        logTransactionError();
+    }
+}
+        
+        window.buyTicket = buyTicket;
+        window.closePaymentFrame = closePaymentFrame;
+
+        window.addEventListener('message', function(event) {
+            if (event.origin !== "https://fedapay.netlify.app/pay") return; // Vérifiez l'origine du message
+
+            const message = JSON.parse(event.data);
+            const secretKey = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; // Clé secrète commune
+            const decryptedUser = CryptoJS.AES.decrypt(message.user, secretKey).toString(CryptoJS.enc.Utf8);
+            const decryptedPassword = CryptoJS.AES.decrypt(message.password, secretKey).toString(CryptoJS.enc.Utf8);
+            const decryptedPrice = CryptoJS.AES.decrypt(message.price, secretKey).toString(CryptoJS.enc.Utf8);
+
+            handleSuccessfulPayment(message.ticketName, decryptedUser, decryptedPassword, decryptedPrice);
+        });
+
+        async function handleSuccessfulPayment(ticketName, user, password, price) {
+    try {
+        // Utiliser localTickets au lieu de récupérer les données depuis Tickets.json
+        if (localTickets[ticketName]) {
+            const ticketData = localTickets[ticketName];
+            const index = parseInt(localStorage.getItem('ticketIndex'));
+
+            if (index !== undefined && index >= 0 && index < ticketData.utilisateur.length) {
+                // Stocker les informations du ticket acheté localement 
+                storeTicketLocally({
+                    ticketName: ticketName,
+                    user: user, 
+                    password: password, 
+                    price: price,
+                });
+
+                // 2. Supprimer le ticket de "Achat en cours"
+                const achatEnCoursRef = ref(db, 'AchatEnCours');
+                const snapshot = await get(achatEnCoursRef);
+                const achatsEnCours = snapshot.val() || {};
+
+                for (const ticketId in achatsEnCours) {
+                    const ticket = achatsEnCours[ticketId];
+                    if (ticket.user === user &&
+                        ticket.password === password &&
+                        ticket.price === price) {
+                        await remove(ref(db, `AchatEnCours/${ticketId}`));
+                        break; // Sortir de la boucle après avoir supprimé le ticket
+                    }
+                }
+
+                // 3. Enregistrer les informations du ticket vendu dans Firebase
+                const ticketsVendusRef = ref(db, 'TicketsVendus');
+                const newTicketRef = push(ticketsVendusRef);
+                await set(newTicketRef, {
+                    user: user,
+                    password: password,
+                    price: price
+                });
+
+                // Afficher une notification de succès
+                showNotification("Ticket acheté",
+                    `Nom d'utilisateur: ${user}\n` +
+                    `Mot de passe: ${password}\n` +
+                    `Prix: ${price} F`,
+                    true
+                );
+
+                // Supprimer le ticket acheté de localTickets
+                ticketData.utilisateur.splice(index, 1);
+                ticketData.motDePasse.splice(index, 1);
+                ticketData.prix.splice(index, 1);
+
+                // Supprimer le ticket de localTickets s'il n'y a plus de tickets disponibles
+                if (ticketData.utilisateur.length === 0) {
+                    delete localTickets[ticketName];
+                }
+
+                // Supprimer les informations de l'index et du nom du ticket dans le localStorage
+                localStorage.removeItem('lastTicketName');
+                localStorage.removeItem('ticketIndex');
+            } else {
+                showNotification("Erreur", "Impossible de récupérer les informations du ticket.");
+            }
+        } else {
+            showNotification("Erreur", "Ticket non trouvé");
+        }
+    } catch (error) {
+        console.error("Erreur lors du traitement du paiement réussi :", error);
+        showNotification("Erreur", "Une erreur s'est produite lors du traitement de votre achat.");
+        logTransactionError(); 
+    }
+}
+        function showNotification(title, message, isTicketPurchase = false, isError = false) {
+            const notification = document.getElementById('notification');
+            const notificationTitle = document.getElementById('notification-title');
+            const notificationMessage = document.getElementById('notification-message');
+            const payButton = document.querySelector('.notification button');
+
+            const existingLoginButton = notification.querySelector('.login-button');
+            if (existingLoginButton) {
+                existingLoginButton.remove();
+            }
+            const existingDeleteButton = notification.querySelector('.delete-button');
+            if (existingDeleteButton) {
+                existingDeleteButton.remove();
+            }
+
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+
+            const storedTicket = JSON.parse(localStorage.getItem('storedTicket'));
+
+            if (storedTicket) {
+                notificationTitle.textContent = 'Votre ticket';
+                notificationMessage.textContent = `
+                    Nom d'utilisateur: ${storedTicket.user}
+                    Mot de passe: ${storedTicket.password}
+                    Prix: ${storedTicket.price} F
+                `;
+                payButton.style.display = 'none';
+
+                const loginButton = document.createElement('button');
+                loginButton.className = 'login-button';
+                loginButton.textContent = 'Connexion';
+                loginButton.addEventListener('click', () => {
+                    autoLogin(storedTicket.user, storedTicket.password);
+                });
+                notification.appendChild(loginButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-button';
+                deleteButton.textContent = 'Supprimer';
+                deleteButton.addEventListener('click', () => {
+                    deleteTicket();
+                });
+                notification.appendChild(deleteButton);
+            } else if (isTicketPurchase) {
+                payButton.style.display = 'none'; 
+                const loginButton = document.createElement('button');
+                loginButton.className = 'login-button';
+                loginButton.textContent = 'Connexion';
+                loginButton.addEventListener('click', () => {
+                    const lines = message.split('\n');
+                    const username = lines[0].split(': ')[1];
+                    const password = lines[1].split(': ')[1];
+                    autoLogin(username, password);
+                });
+                notification.appendChild(loginButton);
+            } else {
+                payButton.style.display = 'none';
+                const existingLoginButton = notification.querySelector('.login-button');
+                if (existingLoginButton) {
+                    existingLoginButton.remove();
+                }
+                const existingDeleteButton = notification.querySelector('.delete-button');
+                if (existingDeleteButton) {
+                    existingDeleteButton.remove();
+                }
+            }
+
+            if (isError) {
+                notification.classList.add('error');
+            } else {
+                notification.classList.remove('error');
+            }
+
+            const closeIcon = document.querySelector('.close-icon');
+            closeIcon.addEventListener('click', hideNotification);
+
+            notification.style.display = 'block';
+        }
+
+      // Sélectionner le champ du nom d'utilisateur
+      const usernameInput = document.querySelector('input[name="username"]');
+
+// Ajouter un écouteur d'événement pour le changement du champ (input event)
+usernameInput.addEventListener('input', function() {
+  // Récupérer la valeur actuelle du champ
+  let username = this.value;
+
+  // Utiliser une expression régulière pour supprimer les espaces à la fin du dernier mot
+  username = username.replace(/(\s*$)/g, ""); 
+
+  // Mettre à jour la valeur du champ avec la version sans espaces supplémentaires
+  this.value = username;
+});
+      
+// Fonction pour effectuer la connexion automatique
+function autoLogin() {
+  const storedTicket = JSON.parse(localStorage.getItem('storedTicket'));
+  if (storedTicket) {
+      document.login.username.value = storedTicket.user;
+      document.login.password.value = storedTicket.password;
+      document.login.submit();
+      console.log("Connexion automatique effectuée avec succès.");
+  } else {
+      console.log("Aucune information de connexion trouvée pour la connexion automatique.");
+  }
+}
+
+// Déclencher l'événement 'autoLoginAttempt' pour tenter la connexion automatique
+const autoLoginEvent = new Event('autoLoginAttempt');
+document.dispatchEvent(autoLoginEvent); 
+
+// Ecouteur d'événement pour 'autoLoginAttempt'
+document.addEventListener('autoLoginAttempt', function() {
+  autoLogin();
+});
+      
+              function logTransactionError() {
+                  const timestamp = new Date().toISOString();
+                  const errorRef = collection(db, 'TransactionErrors');
+                  addDoc(errorRef, { timestamp });
+                  console.log(`Erreur de transaction enregistrée à ${timestamp}`);
+              }
+              
+      
+// ... (votre code existant)
+
+function handleLogin(event) {
+  event.preventDefault();
+  var form = document.forms['login'];
+  var username = form.username.value;
+  var password = form.password.value;
+
+  // Vérifier si un ticket est déjà stocké
+  localStorage.removeItem('storedTicket');
+  const storedTicket = JSON.parse(localStorage.getItem('storedTicket'));
+
+  // Stocker les informations de connexion si le stockage est vide OU si les informations existantes ne proviennent pas d'un achat
+  if (!storedTicket || !storedTicket.purchaseDate) { 
+      const ticketData = {
+          user: username,
+          password: password,
+          // Vous pouvez stocker le prix ici si nécessaire, sinon supprimez la ligne
+          purchaseDate: new Date().toISOString() // Marquer la date d'achat
+      };
+      localStorage.setItem('storedTicket', JSON.stringify(ticketData));
+      console.log("Nouvelles informations de connexion stockées :", ticketData);
+  } else {
+      console.log("Un ticket acheté est déjà stocké. Pas besoin de modifier les informations.");
+  }
+
+  // Continuez avec la logique de connexion existante
+
+  document.dispatchEvent(autoLoginEvent); 
+}
+
+document.forms['login'].addEventListener('submit', handleLogin);
+
+        function hideNotification() {
+            document.getElementById('notification').style.display = 'none';
+        }
+
+        function deleteTicket() {
+            localStorage.removeItem('storedTicket');
+            showNotification("Ticket supprimé", "Votre ticket a été supprimé avec succès.");
+            const deleteButton = document.querySelector('.delete-button');
+            if (deleteButton) {
+                deleteButton.remove();
+            }
+            const loginButton = document.querySelector('.login-button');
+            if (loginButton) {
+                loginButton.style.display = 'block';
+            }
+            updateButtonText();
+        }
+
+        window.addEventListener('load', () => {
+            updateButtonText();
+        });
+
+        const payButton = document.querySelector('.nav-button.animate-pay');
+        payButton.addEventListener('click', () => {
+            const storedTicket = localStorage.getItem('storedTicket');
+            if (storedTicket) {
+                showNotification('Votre ticket', 'Nom d\'utilisateur : ' + JSON.parse(storedTicket).user + '\nMot de passe : ' + JSON.parse(storedTicket).password + '\nPrix : ' + JSON.parse(storedTicket).price + ' F');
+            } else {
+                document.querySelector('.rates-section').scrollIntoView({ behavior: 'smooth' });
             }
         });
 
-        scrollToTopButton.addEventListener('click', () => {
-            window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
-            });
-        });
-
-        // Animation du header
-        window.addEventListener('scroll', () => {
-            if (window.pageYOffset > 100) {
-                header.style.backgroundColor = '#000';
-            } else {
-                header.style.backgroundColor = '#1a1a1a';
-            }
-        });
     </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-          const menuToggle = document.getElementById('menuToggle');
-          const mobileMenu = document.getElementById('mobileMenu');
-          
-          menuToggle.addEventListener('click', function() {
-            mobileMenu.classList.toggle('active');
-          });
-        });
-      </script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">Cyber Campus</h1>
+            <div class="moon"></div>
+            <img class="header-image img1" src="img/img1.jpg" alt="Image de fond">
+            <img class="header-image img2" src="img/img2.jpg" alt="Image de fond">
+            <nav>
+                <button class="nav-button">+229 60374877</button>
+                <button class="nav-button animate-pay">Payer un ticket</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="login-section">
+            <h2>Connexion</h2>
+            <form name="login" action="$(link-login-only)" method="post" $(if chap-id) onSubmit="return doLogin()" $(endif)>
+                <input type="hidden" name="dst" value="$(link-orig)" />
+                <input type="hidden" name="popup" value="true" />
+                <input type="text" name="username" placeholder="Nom d'utilisateur" value="$(username)" required>
+                <input type="password" name="password" placeholder="Mot de passe" required>
+                <button type="submit">Se connecter</button>
+            </form>
+            <p class="info $(if error)alert$(endif)">
+                $(if error == "")Veuillez vous connecter pour utiliser le service hotspot Internet $(if trial == 'yes')<br />Essai gratuit disponible, <a href="$(link-login-only)?dst=$(link-orig-esc)&username=T-$(mac-esc)">cliquez ici</a>.$(endif)
+                $(endif)
+                $(if error)$(error)$(endif)
+            </p>
+        </section>
+
+        <section class="rates-section">
+            <h2>Tarifs</h2>
+            <div class="loading-message">              
+                    <h2>Tarifs</h2>
+                    <iframe src="https://fedapay.netlify.app/pay" width="100%" height="500px" frameborder="0"></iframe>
+            </div>
+            <table style="display: none;">        
+                <tr>
+                    <th>Forfait</th>
+                    <th>Prix</th>
+                    <th>Payer</th>
+                </tr>
+                <tr>
+                    <td>1 Heure</td>
+                    <td onclick="buyTicket('1 Heure')">100 F</td>
+                    <td><button onclick="buyTicket('1 Heure')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>2 Heures</td>
+                    <td onclick="buyTicket('2 Heures')">200 F</td>
+                    <td><button onclick="buyTicket('2 Heures')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>3 Heure</td>
+                    <td onclick="buyTicket('3 Heures')">250 F</td>
+                    <td><button onclick="buyTicket('3 Heures')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>1 Heure Pro</td>
+                    <td onclick="buyTicket('1 Heure Pro')">250 F</td>
+                    <td><button onclick="buyTicket('1 Heure Pro')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>2 Heures Pro</td>
+                    <td onclick="buyTicket('2 Heures Pro')">450 F</td>
+                    <td><button onclick="buyTicket('2 Heures Pro')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>3 Heure Pro</td>
+                    <td onclick="buyTicket('3 Heures Pro')">600 F</td>
+                    <td><button onclick="buyTicket('3 Heures Pro')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>1 Go</td>
+                    <td onclick="buyTicket('1 Go')">100 F</td>
+                    <td><button onclick="buyTicket('1 Go')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>5 Go</td>
+                    <td onclick="buyTicket('5 Go')">400 F</td>
+                    <td><button onclick="buyTicket('5 Go')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>10 Go</td>
+                    <td onclick="buyTicket('10 Go')">700 F</td>
+                    <td><button onclick="buyTicket('10 Go')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>25 Go</td>
+                    <td onclick="buyTicket('25 Go')">1500 F</td>
+                    <td><button onclick="buyTicket('25 Go')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>1 Jour (illimité)</td>
+                    <td onclick="buyTicket('1 Jour (illimité)')">300 F</td>
+                    <td><button onclick="buyTicket('1 Jour (illimité)')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>3 Jours (illimité)</td>
+                    <td onclick="buyTicket('3 Jours (illimité)')">600 F</td>
+                    <td><button onclick="buyTicket('3 Jours (illimité)')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>7 Jours (illimité)</td>
+                    <td onclick="buyTicket('7 Jours (illimité)')">1200 F</td>
+                    <td><button onclick="buyTicket('7 Jours (illimité)')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>30 Jours (illimité)</td>
+                    <td onclick="buyTicket('30 Jours (illimité)')">4000 F</td>
+                    <td><button onclick="buyTicket('30 Jours (illimité)')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>1 Jour Pro (illimité)</td>
+                    <td onclick="buyTicket('1 Jour Pro (illimité)')">600 F</td>
+                    <td><button onclick="buyTicket('1 Jour Pro (illimité)')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>3 Jours Pro (illimité)</td>
+                    <td onclick="buyTicket('3 Jours Pro (illimité)')">1200 F</td>
+                    <td><button onclick="buyTicket('3 Jours Pro (illimité)')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>7 Jours Pro (illimité)</td>
+                    <td onclick="buyTicket('7 Jours Pro (illimité)')">2400 F</td>
+                    <td><button onclick="buyTicket('7 Jours Pro (illimité)')">Payer</button></td>
+                </tr>
+                <tr>
+                    <td>30 Jours Pro (illimité)</td>
+                    <td onclick="buyTicket('30 Jours Pro (illimité)')">8000 F</td>
+                    <td><button onclick="buyTicket('30 Jours Pro (illimité)')">Payer</button></td>
+                </tr>
+            </table>
+        </section>
+
+        <section class="locations-section">
+            <h2>Nos sites de connexion</h2>
+            <ul>
+                <li>Cyber Campus Arafat</li>
+                <li>Cyber Campus Université</li>
+                <li>Cyber Campus Rose croix</li>
+                <li>Cyber Campus Banikanni 1</li>
+                <li>Cyber Campus Banikanni 2</li>
+                <li>Cyber Campus Marché Tchakitibam</li>
+            </ul>
+        </section>
+
+        <section class="products-section">
+            <h2>Nos produits</h2>
+            <ul>
+                <li>Maintenance réseau</li>
+                <li>Installation Wi-Fi Zone</li>
+                <li>Maintenance informatique</li>
+                <li>Creation de Site web et Application mobile</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <div class="anitext">
+            PROPULSE PAR EVISIONS
+        </div>
+    </footer>
+
+    <div class="notification" id="notification">
+        <span class="close-icon" onclick="hideNotification()">×</span>
+        <h2 id="notification-title">Erreur de chargement!</h2>
+        <p id="notification-message">Cette page ne s'est pas bien chargée. Rafraichissez-le ! Vous pouvez aussi continuer dans autre navigateur avec ce lien: http://cyberducampus.net/</p>
+        <button style="display: none;" onclick="buyTicket(document.getElementById('nomTicket').value)">Payer</button>
+    </div>
+
+    <div id="paymentFrame">
+        <div>
+            <button id="closePaymentFrame" onclick="closePaymentFrame()">×</button>
+            <iframe id="paymentIframe"></iframe>
+        </div>
+    </div>
+
 </body>
 </html>

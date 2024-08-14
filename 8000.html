@@ -51,14 +51,29 @@
     <div id="notification"></div>
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function() {
+            // Récupérer les données du ticket à partir de l'URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const user = urlParams.get('user');
+            const password = urlParams.get('password');
+            const price = urlParams.get('price');
+
+            if (user && password && price) {
+                // Affichez les informations du ticket
+                document.getElementById("ticket-info").textContent = 
+                    `Nom d'utilisateur: ${user}\n` +
+                    `Mot de passe: ${password}\n` +
+                    `Prix: ${price} F`;
+                document.getElementById("ticket-info").style.display = "block";
+            }
+
             var fedaPayInstance = FedaPay.init({
                 public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
                 transaction: {
-                    amount: 1,
+                    amount: 1, // Vous pouvez ajuster le montant ici si nécessaire
                     description: 'Achat de ticket'
                 },
                 customer: {
-                    email: 'sic@gmail.com'
+                    email: 'sic@gmail.com' // Vous pouvez ajuster l'email ici si nécessaire
                 },
                 onComplete: function(response) {
                     var notification = document.getElementById('notification');
@@ -70,20 +85,6 @@
                         notification.textContent = "Paiement réussi ! Merci.";
                         notification.className = "success";
                         // Rediriger si besoin
-
-                        // Écouter le message inter-fenêtres après paiement réussi
-                        window.addEventListener('message', function(event) {
-                            if (event.data.type === 'ticketData') {
-                                const ticketData = event.data.data;
-                                console.log("Données du ticket reçues :", ticketData);
-                                // Affichez les informations du ticket sur la page
-                                document.getElementById("ticket-info").textContent = 
-                                    `Nom d'utilisateur: ${ticketData.user}\n` +
-                                    `Mot de passe: ${ticketData.password}\n` +
-                                    `Prix: ${ticketData.price} F`;
-                                document.getElementById("ticket-info").style.display = "block";
-                            }
-                        });
                     }
                     notification.style.display = "block";
                     setTimeout(function() {
@@ -97,13 +98,10 @@
                 fedaPayInstance.open();
             }, 1000); // Délai d'une seconde pour s'assurer que tout est bien chargé
         });
-        window.addEventListener('message', function(event) {
-            if (event.data.type === 'ticketData') {
-                const ticketData = event.data.data;
-                // Utilisez ticketData (user, password, price) pour personnaliser le paiement
-                console.log("Données du ticket reçues :", ticketData);
-            }
-        });
+        //  Supprimez l'écouteur de messages inter-fenêtres
+        //  window.addEventListener('message', function(event) {
+        //      // ... 
+        //  }); 
     </script>
 </body>
 </html>

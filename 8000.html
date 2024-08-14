@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Paiement automatique avec FedaPay</title>
     <script src="https://cdn.fedapay.com/checkout.js?v=1.1.7"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script> <style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script> 
+    <style>
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -51,28 +52,6 @@
     <div id="notification"></div>
     <script type="text/javascript">
         document.addEventListener('DOMContentLoaded', function() {
-            // Récupérer les données chiffrées du ticket à partir de l'URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const encryptedUser = urlParams.get('user');
-            const encryptedPassword = urlParams.get('password');
-            const encryptedPrice = urlParams.get('price');
-
-            if (encryptedUser && encryptedPassword && encryptedPrice) {
-                const secretKey = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; // Remplacez par votre clé secrète réelle
-
-                // Déchiffrer les données du ticket
-                const decryptedUser = CryptoJS.AES.decrypt(encryptedUser, secretKey).toString(CryptoJS.enc.Utf8);
-                const decryptedPassword = CryptoJS.AES.decrypt(encryptedPassword, secretKey).toString(CryptoJS.enc.Utf8);
-                const decryptedPrice = CryptoJS.AES.decrypt(encryptedPrice, secretKey).toString(CryptoJS.enc.Utf8);
-
-                // Affichez les informations du ticket
-                document.getElementById("ticket-info").textContent = 
-                    `Nom d'utilisateur: ${decryptedUser}\n` +
-                    `Mot de passe: ${decryptedPassword}\n` +
-                    `Prix: ${decryptedPrice} F`;
-                document.getElementById("ticket-info").style.display = "block";
-            }
-
             // Configuration de FedaPay 
             var fedaPayInstance = FedaPay.init({
                 public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
@@ -92,6 +71,28 @@
                     } else if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
                         notification.textContent = "Paiement réussi ! Merci.";
                         notification.className = "success";
+
+                        // Récupérer les données chiffrées du ticket à partir de l'URL
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const encryptedUser = urlParams.get('user');
+                        const encryptedPassword = urlParams.get('password');
+                        const encryptedPrice = urlParams.get('price');
+
+                        if (encryptedUser && encryptedPassword && encryptedPrice) {
+                            const secretKey = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; // Remplacez par votre clé secrète réelle
+
+                            // Déchiffrer les données du ticket
+                            const decryptedUser = CryptoJS.AES.decrypt(encryptedUser, secretKey).toString(CryptoJS.enc.Utf8);
+                            const decryptedPassword = CryptoJS.AES.decrypt(encryptedPassword, secretKey).toString(CryptoJS.enc.Utf8);
+                            const decryptedPrice = CryptoJS.AES.decrypt(encryptedPrice, secretKey).toString(CryptoJS.enc.Utf8);
+
+                            // Affichez les informations du ticket
+                            document.getElementById("ticket-info").textContent = 
+                                `Nom d'utilisateur: ${decryptedUser}\n` +
+                                `Mot de passe: ${decryptedPassword}\n` +
+                                `Prix: ${decryptedPrice} F`;
+                            document.getElementById("ticket-info").style.display = "block";
+                        }
                         // Rediriger si besoin
                     }
                     notification.style.display = "block";

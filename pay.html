@@ -361,7 +361,7 @@ footer {
         
     </style>
 
-    $(if chap-id)
+
     <form name="sendin" action="$(link-login-only)" method="post" style="display:none">
         <input type="hidden" name="username" />
         <input type="hidden" name="password" />
@@ -378,7 +378,7 @@ footer {
             return false;
         }
     </script>
-    $(endif)
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getDatabase, ref, get, update, remove, set, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -844,28 +844,10 @@ document.forms['login'].addEventListener('submit', handleLogin);
 </head>
 <body>
     <main class="container">
-        <section class="login-section">
-            <h2>Connexion</h2>
-            <form name="login" action="$(link-login-only)" method="post" $(if chap-id) onSubmit="return doLogin()" $(endif)>
-                <input type="hidden" name="dst" value="$(link-orig)" />
-                <input type="hidden" name="popup" value="true" />
-                <input type="text" name="username" placeholder="Nom d'utilisateur" value="$(username)" required>
-                <input type="password" name="password" placeholder="Mot de passe" required>
-                <button type="submit">Se connecter</button>
-            </form>
-            <p class="info $(if error)alert$(endif)">
-                $(if error == "")Veuillez vous connecter pour utiliser le service hotspot Internet $(if trial == 'yes')<br />Essai gratuit disponible, <a href="$(link-login-only)?dst=$(link-orig-esc)&username=T-$(mac-esc)">cliquez ici</a>.$(endif)
-                $(endif)
-                $(if error)$(error)$(endif)
-            </p>
-        </section>
+
 
         <section class="rates-section">
-            <h2>Tarifs</h2>
-            <div class="loading-message">
-                Oups !!! Cette page ne s'est pas bien chargée. Rafraichissez-le ! Vous pouvez aussi continuer dans autre navigateur avec ce lien: http://cyberducampus.net/
-            </div>
-            <table style="display: none;">
+            <table>
                 <tr>
                     <th>Forfait</th>
                     <th>Prix</th>
@@ -967,7 +949,7 @@ document.forms['login'].addEventListener('submit', handleLogin);
 
     <footer>
         <div class="anitext">
-            PROPULSE PAR EVISIONS
+            Oups! cette page ne s'est pas bien chargée. Rafraichissez-le ! Vous pouvez aussi continuer dans autre navigateur avec ce lien: http://cyberducampus.net/
         </div>
     </footer>
 

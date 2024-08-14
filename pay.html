@@ -526,9 +526,12 @@ footer {
     }
 
     try {
-        // Vérifier si le ticket existe dans localTickets
-        if (localTickets[ticketName]) {
-            const ticketData = localTickets[ticketName];
+        // Récupérer les données du ticket depuis la base de données Firebase
+        const ticketsRef = ref(db, 'TicketsTotal/' + ticketName);
+        const snapshot = await get(ticketsRef);
+        const ticketData = snapshot.val();
+
+        if (ticketData) {
             const ticketDisponible = ticketData.utilisateur.length > 0;
 
             if (ticketDisponible) {

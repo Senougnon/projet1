@@ -518,7 +518,6 @@ footer {
                 console.error("Erreur de sécurité lors de la surveillance de l'URL de l'iframe : ", e);
             }
         }
-
         async function buyTicket(ticketName) {
     if (!ticketName) {
         showNotification("Echec de chargement", "Oups! cette page ne s'est pas bien chargée. Rafraichissez-le ! Vous pouvez aussi continuer dans autre navigateur avec ce lien: http://cyberducampus.net/");
@@ -532,123 +531,121 @@ footer {
         const ticketData = snapshot.val();
 
         if (ticketData) {
-            const ticketDisponible = ticketData.utilisateur.length > 0;
+            // 1. Stocker le ticket dans "Achat en cours"
+            const achatEnCoursRef = ref(db, 'AchatEnCours');
+            const newTicketRef = push(achatEnCoursRef);
+            await set(newTicketRef, {
+                user: ticketData.utilisateur[0], 
+                password: ticketData.motDePasse[0], 
+                price: ticketData.prix[0]
+            });
 
-            if (ticketDisponible) {
-                const index = 0; // L'index du ticket dans localTickets
+            // Stocker le nom du ticket dans localStorage
+            localStorage.setItem('lastTicketName', ticketName);
 
-                // 1. Stocker le ticket dans "Achat en cours"
-                const achatEnCoursRef = ref(db, 'AchatEnCours');
-                const newTicketRef = push(achatEnCoursRef);
-                await set(newTicketRef, {
-                    user: ticketData.utilisateur[index],
-                    password: ticketData.motDePasse[index],
-                    price: ticketData.prix[index]
-                });
+            const paymentLink = ticketData.lienPaiement;
 
-                // Stocker le nom du ticket et l'index dans localStorage
-                localStorage.setItem('lastTicketName', ticketName);
-                localStorage.setItem('ticketIndex', index);
+            const secretKey = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; // Remplacez par votre clé secrète réelle
 
-                const paymentLink = ticketData.lienPaiement; // Lien de base FedaPay
-                const secretKey = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; // Remplacez par votre clé secrète réelle
+// Chiffrer les données du ticket avec la clé secrète
+const encryptedUser = CryptoJS.AES.encrypt(ticketData.utilisateur[index], secretKey).toString();
+const encryptedPassword = CryptoJS.AES.encrypt(ticketData.motDePasse[index], secretKey).toString();
+const encryptedPrice = CryptoJS.AES.encrypt(ticketData.prix[index], secretKey).toString();
 
-                // Chiffrer les données du ticket avec la clé secrète
-                const encryptedUser = CryptoJS.AES.encrypt(ticketData.utilisateur[index], secretKey).toString();
-                const encryptedPassword = CryptoJS.AES.encrypt(ticketData.motDePasse[index], secretKey).toString();
-                const encryptedPrice = CryptoJS.AES.encrypt(ticketData.prix[index], secretKey).toString();
+// Construire la queryString avec les données chiffrées
+const queryString = `?user=${encodeURIComponent(encryptedUser)}&password=${encodeURIComponent(encryptedPassword)}&price=${encodeURIComponent(encryptedPrice)}`;
+const fullPaymentLink = paymentLink + queryString; // URL complète de paiement
 
-                // Construire la queryString avec les données chiffrées
-                const queryString = `?user=${encodeURIComponent(encryptedUser)}&password=${encodeURIComponent(encryptedPassword)}&price=${encodeURIComponent(encryptedPrice)}`;
-                const fullPaymentLink = paymentLink + queryString; // URL complète de paiement
-
-                // Rediriger l'utilisateur vers la page de paiement
-                window.location.href = fullPaymentLink;
-
-            } else {
-                showNotification("Erreur", "Tous les tickets de cette catégorie sont vendus.");
-            }
+// Rediriger l'utilisateur vers la page de paiement
+window.location.href = fullPaymentLink;
         } else {
-            showNotification("Erreur", "Ticket non trouvé");
+            showNotification("Rupture de stock", "Ce ticket est fini en stock pour le moment.");
         }
     } catch (error) {
         console.error("Erreur lors de la récupération du ticket : ", error);
-        showNotification("Erreur", "Une erreur s'est produite lors de la récupération du ticket.");
-        logTransactionError(); 
+        showNotification("Rupture de stock", "Ce ticket est fini en stock pour le moment.");
+        logTransactionError();
     }
 }
-        
+    
         window.buyTicket = buyTicket;
         window.closePaymentFrame = closePaymentFrame;
 
         async function handleSuccessfulPayment(ticketName) {
-            try {
-                // Utiliser localTickets au lieu de récupérer les données depuis Tickets.json
-                if (localTickets[ticketName]) {
-                    const ticketData = localTickets[ticketName];
-                    const index = parseInt(localStorage.getItem('ticketIndex'));
-        
-                    if (index !== undefined && index >= 0 && index < ticketData.utilisateur.length) {
-                        storeTicketLocally({
-                            ticketName: ticketName,
-                            user: ticketData.utilisateur[index],
-                            password: ticketData.motDePasse[index],
-                            price: ticketData.prix[index]
-                        });
-                                        // 2. Supprimer le ticket de "Achat en cours"
-                const achatEnCoursRef = ref(db, 'AchatEnCours');
-                const snapshot = await get(achatEnCoursRef);
-                const achatsEnCours = snapshot.val() || {};
+    try {
+        // Récupérer les données du ticket depuis Firebase
+        const ticketsRef = ref(db, 'TicketsTotal/' + ticketName);
+        const snapshot = await get(ticketsRef);
+        const ticketData = snapshot.val();
 
-                for (const ticketId in achatsEnCours) {
-                    const ticket = achatsEnCours[ticketId];
-                    if (ticket.user === ticketData.utilisateur[index] &&
-                        ticket.password === ticketData.motDePasse[index] &&
-                        ticket.price === ticketData.prix[index]) {
-                        await remove(ref(db, `AchatEnCours/${ticketId}`));
-                        break; // Sortir de la boucle après avoir supprimé le ticket
-                    }
+        if (ticketData) {
+            // Stocker le ticket dans localStorage
+            storeTicketLocally({
+                ticketName: ticketName,
+                user: ticketData.utilisateur[0], 
+                password: ticketData.motDePasse[0], 
+                price: ticketData.prix[0]
+            });
+
+            // 2. Supprimer le ticket de "Achat en cours"
+            const achatEnCoursRef = ref(db, 'AchatEnCours');
+            const snapshot = await get(achatEnCoursRef);
+            const achatsEnCours = snapshot.val() || {};
+
+            for (const ticketId in achatsEnCours) {
+                const ticket = achatsEnCours[ticketId];
+                if (ticket.user === ticketData.utilisateur[0] && 
+                    ticket.password === ticketData.motDePasse[0] &&
+                    ticket.price === ticketData.prix[0]) {
+                    await remove(ref(db, `AchatEnCours/${ticketId}`));
+                    break;
                 }
-                    // 3. Enregistrer les informations du ticket vendu dans Firebase
-                      const ticketsVendusRef = ref(db, 'TicketsVendus');
-                      const newTicketRef = push(ticketsVendusRef);
-                      await set(newTicketRef, {
-                          user: ticketData.utilisateur[index],
-                          password: ticketData.motDePasse[index],
-                          price: ticketData.prix[index]
-                      });
-        
-                        showNotification("Ticket acheté",
-                            `Nom d'utilisateur: ${ticketData.utilisateur[index]}\n` +
-                            `Mot de passe: ${ticketData.motDePasse[index]}\n` +
-                            `Prix: ${ticketData.prix[index]} F`,
-                            true 
-                        );
-        
-                        // Supprimer le ticket acheté de localTickets
-                        ticketData.utilisateur.splice(index, 1);
-                        ticketData.motDePasse.splice(index, 1);
-                        ticketData.prix.splice(index, 1);
-        
-                        // Supprimer le ticket de localTickets s'il n'y a plus de tickets disponibles
-                        if (ticketData.utilisateur.length === 0) {
-                            delete localTickets[ticketName];
-                        }
-        
-                        localStorage.removeItem('lastTicketName');
-                        localStorage.removeItem('ticketIndex');
-                    } else {
-                        showNotification("Erreur", "Impossible de récupérer les informations du ticket.");
-                    }
-                } else {
-                    showNotification("Erreur", "Ticket non trouvé");
-                }
-            } catch (error) {
-                console.error("Erreur lors du traitement du paiement réussi :", error);
-                showNotification("Erreur", "Une erreur s'est produite lors du traitement de votre achat.");
-                logTransactionError(); 
             }
+
+            // 3. Enregistrer les informations du ticket vendu dans Firebase
+            const ticketsVendusRef = ref(db, 'TicketsVendus');
+            const newTicketRef = push(ticketsVendusRef);
+            await set(newTicketRef, {
+                user: ticketData.utilisateur[0], 
+                password: ticketData.motDePasse[0],
+                price: ticketData.prix[0]
+            });
+
+            // 4. Mettre à jour la liste de tickets dans Firebase (TicketsTotal)
+            const ticketsTotalRef = ref(db, 'TicketsTotal/' + ticketName);
+            await update(ticketsTotalRef, {
+                utilisateur: ticketData.utilisateur.slice(1), // Supprimer le premier élément
+                motDePasse: ticketData.motDePasse.slice(1),
+                prix: ticketData.prix.slice(1)
+            });
+
+            showNotification("Ticket acheté",
+                `Nom d'utilisateur: ${ticketData.utilisateur[0]}\n` +
+                `Mot de passe: ${ticketData.motDePasse[0]}\n` +
+                `Prix: ${ticketData.prix[0]} F`,
+                true 
+            );
+
+            // 5. Supprimer la catégorie de tickets si tous les tickets sont épuisés
+            if (ticketData.utilisateur.length === 0) {
+                await remove(ticketsRef); // Supprimer la catégorie de tickets
+            }
+
+            // 6. Recharger les données locales après avoir supprimé une catégorie
+            await syncTickets(); // Recharger les données locales
+
+            localStorage.removeItem('lastTicketName');
+            
+        } else {
+            showNotification("Erreur", "Ticket non trouvé");
         }
+    } catch (error) {
+        console.error("Erreur lors du traitement du paiement réussi :", error);
+        showNotification("Erreur", "Une erreur s'est produite lors du traitement de votre achat.");
+        logTransactionError(); 
+    }
+}
+
 
         function showNotification(title, message, isTicketPurchase = false, isError = false) {
             const notification = document.getElementById('notification');

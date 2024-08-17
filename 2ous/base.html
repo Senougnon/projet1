@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des tickets totaux</title>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .delete-btn {
+            background-color: #f44336;
+        }
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+        #searchBar {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gestion des tickets totaux</h1>
+        <input type="text" id="searchBar" placeholder="Rechercher un ticket (mot de passe, prix ou utilisateur)">
+        <button onclick="deleteSearchResults()">Supprimer les résultats de recherche</button>
+        <div id="ticketCategories"></div>
+    </div>
+
+    <script>
+        // Configuration de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBtE9rvAdgKv4QclmzwtdDsiLnAGaNe5L8",
+            authDomain: "souswifizone.firebaseapp.com",
+            databaseURL: "https://souswifizone-default-rtdb.firebaseio.com",
+            projectId: "souswifizone",
+            storageBucket: "souswifizone.appspot.com",
+            messagingSenderId: "1038584535801",
+            appId: "1:1038584535801:web:55e2d5eba6c10afbf36028",
+            measurementId: "G-JS9JY7PRKB"
+        };
+
+        // Initialisation de Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let allTickets = {};
+
+        // Fonction pour charger les tickets
+        function loadTickets() {
+            const ticketsRef = database.ref('TicketsTotal');
+            ticketsRef.on('value', (snapshot) => {
+                allTickets = snapshot.val();
+                displayTickets(allTickets);
+            });
+        }
+
+        // Fonction pour afficher les tickets
+        function displayTickets(tickets, searchTerm = '') {
+            const categoriesContainer = document.getElementById('ticketCategories');
+            categoriesContainer.innerHTML = '';
+            for (let category in tickets) {
+                const categoryTickets = tickets[category];
+                const categoryHtml = `
+                    <h2>${category}</h2>
+                    <button onclick="deleteAllTicketsInCategory('${category}')">Supprimer tous les tickets de ${category}</button>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Sélectionner</th>
+                                <th>Mot de passe</th>
+                                <th>Prix</th>
+                                <th>Utilisateur</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ticketsBody_${category}">
+                        </tbody>
+                    </table>
+                    <button onclick="deleteSelectedTickets('${category}')">Supprimer les tickets sélectionnés de ${category}</button>
+                `;
+                categoriesContainer.innerHTML += categoryHtml;
+
+                const ticketsBody = document.getElementById(`ticketsBody_${category}`);
+                for (let i = 0; i < categoryTickets.motDePasse.length; i++) {
+                    if (searchTerm && !matchesSearch(categoryTickets, i, searchTerm)) continue;
+                    const row = `
+                        <tr>
+                            <td><input type="checkbox" name="ticketSelect_${category}" value="${i}"></td>
+                            <td>${highlightMatch(categoryTickets.motDePasse[i], searchTerm)}</td>
+                            <td>${highlightMatch(categoryTickets.prix[i], searchTerm)}</td>
+                            <td>${highlightMatch(categoryTickets.utilisateur[i], searchTerm)}</td>
+                            <td><button onclick="deleteTicket('${category}', ${i})" class="delete-btn">Supprimer</button></td>
+                        </tr>
+                    `;
+                    ticketsBody.innerHTML += row;
+                }
+            }
+        }
+
+        // Fonction pour vérifier si un ticket correspond à la recherche
+        function matchesSearch(categoryTickets, index, searchTerm) {
+            const lowerSearchTerm = searchTerm.toLowerCase();
+            return categoryTickets.motDePasse[index].toLowerCase().includes(lowerSearchTerm) ||
+                   categoryTickets.prix[index].toLowerCase().includes(lowerSearchTerm) ||
+                   categoryTickets.utilisateur[index].toLowerCase().includes(lowerSearchTerm);
+        }
+
+        // Fonction pour mettre en surbrillance les termes de recherche
+        function highlightMatch(text, searchTerm) {
+            if (!searchTerm) return text;
+            const regex = new RegExp(searchTerm, 'gi');
+            return text.replace(regex, match => `<span class="highlight">${match}</span>`);
+        }
+
+        // Fonction pour supprimer un ticket
+        function deleteTicket(category, index) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer ce ticket ?')) {
+                database.ref(`TicketsTotal/${category}`).once('value', (snapshot) => {
+                    const categoryData = snapshot.val();
+                    categoryData.motDePasse.splice(index, 1);
+                    categoryData.prix.splice(index, 1);
+                    categoryData.utilisateur.splice(index, 1);
+                    database.ref(`TicketsTotal/${category}`).set(categoryData);
+                });
+            }
+        }
+
+        // Fonction pour supprimer les tickets sélectionnés dans une catégorie
+        function deleteSelectedTickets(category) {
+            const selectedTickets = document.querySelectorAll(`input[name="ticketSelect_${category}"]:checked`);
+            if (selectedTickets.length > 0 && confirm('Êtes-vous sûr de vouloir supprimer les tickets sélectionnés ?')) {
+                database.ref(`TicketsTotal/${category}`).once('value', (snapshot) => {
+                    const categoryData = snapshot.val();
+                    const indicesToRemove = Array.from(selectedTickets).map(checkbox => parseInt(checkbox.value)).sort((a, b) => b - a);
+                    indicesToRemove.forEach(index => {
+                        categoryData.motDePasse.splice(index, 1);
+                        categoryData.prix.splice(index, 1);
+                        categoryData.utilisateur.splice(index, 1);
+                    });
+                    database.ref(`TicketsTotal/${category}`).set(categoryData);
+                });
+            }
+        }
+
+        // Fonction pour supprimer tous les tickets d'une catégorie
+        function deleteAllTicketsInCategory(category) {
+            if (confirm(`Êtes-vous sûr de vouloir supprimer TOUS les tickets de la catégorie ${category} ? Cette action est irréversible.`)) {
+                database.ref(`TicketsTotal/${category}`).update({
+                    motDePasse: [],
+                    prix: [],
+                    utilisateur: []
+                });
+            }
+        }
+
+        // Fonction pour supprimer les résultats de recherche
+        function deleteSearchResults() {
+            const searchTerm = document.getElementById('searchBar').value.trim();
+            if (!searchTerm) {
+                alert('Veuillez entrer un terme de recherche avant de supprimer.');
+                return;
+            }
+            if (confirm('Êtes-vous sûr de vouloir supprimer tous les tickets correspondant à votre recherche ?')) {
+                for (let category in allTickets) {
+                    const categoryTickets = allTickets[category];
+                    const newCategoryData = {
+                        motDePasse: [],
+                        prix: [],
+                        utilisateur: []
+                    };
+                    for (let i = 0; i < categoryTickets.motDePasse.length; i++) {
+                        if (!matchesSearch(categoryTickets, i, searchTerm)) {
+                            newCategoryData.motDePasse.push(categoryTickets.motDePasse[i]);
+                            newCategoryData.prix.push(categoryTickets.prix[i]);
+                            newCategoryData.utilisateur.push(categoryTickets.utilisateur[i]);
+                        }
+                    }
+                    database.ref(`TicketsTotal/${category}`).set(newCategoryData);
+                }
+            }
+        }
+
+        // Fonction de recherche
+        function searchTickets() {
+            const searchTerm = document.getElementById('searchBar').value.trim();
+            displayTickets(allTickets, searchTerm);
+        }
+
+        // Événement d'écoute pour la barre de recherche
+        document.getElementById('searchBar').addEventListener('input', searchTickets);
+
+        // Charger les tickets au chargement de la page
+        window.onload = loadTickets;
+    </script>
+</body>
+</html>

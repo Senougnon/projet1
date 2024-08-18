@@ -20,7 +20,6 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background-color: var(--background-color);
             color: var(--text-color);
             margin: 0;
             padding: 0;
@@ -29,6 +28,15 @@
             align-items: center;
             min-height: 100vh;
             transition: background-color 0.3s ease;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .container {
@@ -187,6 +195,7 @@
         .fade-in {
             animation: fadeIn 0.5s ease-in;
         }
+
         .notification {
             position: fixed;
             top: 20px;
@@ -224,18 +233,6 @@
 
         body.loaded {
             opacity: 1;
-        }
-
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        body {
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
         }
     </style>
 </head>
@@ -332,6 +329,19 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        function saveUserToLocalStorage(user) {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+        }
+
+        function getUserFromLocalStorage() {
+            const userStr = localStorage.getItem('currentUser');
+            return userStr ? JSON.parse(userStr) : null;
+        }
+
+        function removeUserFromLocalStorage() {
+            localStorage.removeItem('currentUser');
+        }
+
         function showLoginForm() {
             document.getElementById('loginForm').classList.add('show-form');
             document.getElementById('registerForm').classList.remove('show-form');
@@ -356,7 +366,7 @@
             const password = document.getElementById('registerPassword').value;
             
             if (!username || !password) {
-                alert('Veuillez remplir tous les champs.');
+                showNotification('Veuillez remplir tous les champs.', 'error');
                 return;
             }
 
@@ -364,7 +374,7 @@
                 const userRef = db.ref('users/' + username);
                 const snapshot = await userRef.once('value');
                 if (snapshot.exists()) {
-                    alert('Ce nom d\'utilisateur existe déjà.');
+                    showNotification('Ce nom d\'utilisateur existe déjà.', 'error');
                     return;
                 }
                 
@@ -376,10 +386,12 @@
                 });
                 
                 currentUser = { username, credits: 3, dailyRequests: 0, lastRequestDate: new Date().toDateString() };
+                saveUserToLocalStorage(currentUser);
                 showMainContent();
+                showNotification('Inscription réussie !', 'success');
             } catch (error) {
                 console.error('Erreur lors de l\'inscription:', error);
-                alert('Erreur lors de l\'inscription. Veuillez réessayer.');
+                showNotification('Erreur lors de l\'inscription. Veuillez réessayer.', 'error');
             }
         }
 
@@ -388,7 +400,7 @@
             const password = document.getElementById('loginPassword').value;
             
             if (!username || !password) {
-                alert('Veuillez remplir tous les champs.');
+                showNotification('Veuillez remplir tous les champs.', 'error');
                 return;
             }
 
@@ -402,19 +414,23 @@
                         dailyRequests: snapshot.val().dailyRequests,
                         lastRequestDate: snapshot.val().lastRequestDate
                     };
+                    saveUserToLocalStorage(currentUser);
                     showMainContent();
+                    showNotification('Connexion réussie !', 'success');
                 } else {
-                    alert('Nom d\'utilisateur ou mot de passe incorrect.');
+                    showNotification('Nom d\'utilisateur ou mot de passe incorrect.', 'error');
                 }
             } catch (error) {
                 console.error('Erreur lors de la connexion:', error);
-                alert('Erreur lors de la connexion. Veuillez réessayer.');
+                showNotification('Erreur lors de la connexion. Veuillez réessayer.', 'error');
             }
         }
 
         function logout() {
             currentUser = null;
+            removeUserFromLocalStorage();
             showLoginForm();
+            showNotification('Déconnexion réussie.', 'success');
         }
 
         function updateUserInfo() {
@@ -432,7 +448,7 @@
 
         async function generateContent() {
             if (!currentUser) {
-                alert('Veuillez vous connecter pour utiliser le service.');
+                showNotification('Veuillez vous connecter pour utiliser le service.', 'error');
                 return;
             }
 
@@ -443,7 +459,7 @@
             }
 
             if (currentUser.dailyRequests >= 3 && currentUser.credits <= 0) {
-                alert('Vous avez atteint votre limite quotidienne gratuite et vous n\'avez plus de crédits. Veuillez acheter des crédits pour continuer.');
+                showNotification('Vous avez atteint votre limite quotidienne gratuite et vous n\'avez plus de crédits. Veuillez acheter des crédits pour continuer.', 'error');
                 return;
             }
 
@@ -478,11 +494,14 @@
                     lastRequestDate: currentUser.lastRequestDate
                 });
 
+                saveUserToLocalStorage(currentUser);
                 updateUserInfo();
+                showNotification('Contenu généré avec succès !', 'success');
             } catch (error) {
                 console.error('Erreur:', error);
                 responseElement.textContent = 'Une erreur est survenue lors de la génération du contenu.';
                 responseElement.classList.add('fade-in');
+                showNotification('Erreur lors de la génération du contenu.', 'error');
             } finally {
                 loadingElement.style.display = 'none';
             }
@@ -515,6 +534,7 @@
             await db.ref('users/' + currentUser.username).update({
                 credits: currentUser.credits
             });
+            saveUserToLocalStorage(currentUser);
             updateUserInfo();
         }
 
@@ -535,8 +555,17 @@
             }, 100);
         }
 
-        // Afficher le formulaire de connexion au chargement de la page
-        window.onload = showLoginForm;
+        // Initialisation au chargement de la page
+        window.onload = function() {
+            const savedUser = getUserFromLocalStorage();
+            if (savedUser) {
+                currentUser = savedUser;
+                showMainContent();
+            } else {
+                showLoginForm();
+            }
+            document.body.classList.add('loaded');
+        };
 
         // Ajouter des transitions fluides lors du changement de formulaires
         document.querySelectorAll('button').forEach(button => {
@@ -545,9 +574,6 @@
                 setTimeout(() => button.classList.remove('clicked'), 200);
             });
         });
-
-        // Ajouter une animation au chargement de la page
-        document.addEventListener('DOMContentLoaded', () => {
-            document.body.classList.add('loaded');
-        });
     </script>
+</body>
+</html>

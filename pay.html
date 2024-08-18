@@ -109,17 +109,24 @@
         }
 
         function displayTicket(ticket, category) {
+            const modal = document.getElementById('ticketModal');
             const ticketInfo = document.getElementById('ticket-info');
             ticketInfo.innerHTML = `
                 <h2>Votre ticket ${category}</h2>
-                <p>Utilisateur: ${ticket.utilisateur}</p>
-                <p>Mot de passe: ${ticket.motDePasse}</p>
-                <p>Prix: ${ticket.prix} FCFA</p>
-                <button onclick="downloadTicketAsJPG()">Télécharger en JPG</button>
-                <button onclick="downloadTicketAsCSV()">Télécharger en CSV</button>
-                <button onclick="downloadTicketAsPDF()">Télécharger en PDF</button>
+                <p><strong>Utilisateur:</strong> ${ticket.utilisateur}</p>
+                <p><strong>Mot de passe:</strong> ${ticket.motDePasse}</p>
+                <p><strong>Prix:</strong> ${ticket.prix} FCFA</p>
+                <div class="button-container">
+                    <button onclick="downloadTicketAsJPG()">Télécharger en JPG</button>
+                    <button onclick="downloadTicketAsCSV()">Télécharger en CSV</button>
+                    <button onclick="downloadTicketAsPDF()">Télécharger en PDF</button>
+                </div>
             `;
-            ticketInfo.style.display = 'block';
+            modal.style.display = "block";
+        }
+
+        window.closeModal = function() {
+            document.getElementById('ticketModal').style.display = "none";
         }
 
         window.downloadTicketAsJPG = function() {
@@ -199,12 +206,46 @@
         }
         .success { background-color: #4CAF50; }
         .error { background-color: #f44336; }
-        #ticket-info {
+        .modal {
             display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
             padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
             border-radius: 5px;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        #ticket-info {
+            text-align: center;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-around;
             margin-top: 20px;
         }
     </style>
@@ -212,6 +253,11 @@
 <body>
     <h1>Achat de tickets WiFi zone</h1>
     <div id="notification"></div>
-    <div id="ticket-info"></div>
+    <div id="ticketModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="ticket-info"></div>
+        </div>
+    </div>
 </body>
 </html>

@@ -10,7 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+        import { getDatabase, ref, get, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
@@ -97,7 +97,12 @@
                 const motDePasse = data.motDePasse[0];
                 const utilisateur = data.utilisateur[0];
                 const prix = data.prix[0];
-                displayTicket({motDePasse, utilisateur, prix}, category);
+                const ticket = {motDePasse, utilisateur, prix};
+                
+                displayTicket(ticket, category);
+                
+                // Stockage du ticket vendu
+                await storeTicketVendu(ticket);
                 
                 // Mise à jour de la base de données
                 await updateDatabase(category, data);
@@ -105,6 +110,16 @@
                 console.log("No tickets available");
                 document.getElementById('notification').textContent = "Désolé, plus de tickets disponibles pour cette catégorie.";
             }
+        }
+
+        async function storeTicketVendu(ticket) {
+            const ticketsVendusRef = ref(db, 'TicketsVendus');
+            await push(ticketsVendusRef, {
+                password: ticket.motDePasse,
+                price: ticket.prix,
+                user: ticket.utilisateur
+            });
+            console.log("Ticket vendu stocké avec succès");
         }
 
         async function updateDatabase(category, data) {

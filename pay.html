@@ -10,7 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getDatabase, ref, get, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+        import { getDatabase, ref, get, set, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
@@ -98,14 +98,27 @@
                 const utilisateur = data.utilisateur[0];
                 const prix = data.prix[0];
                 displayTicket({motDePasse, utilisateur, prix}, category);
-                // Suppression du ticket utilisé
-                await remove(ref(db, `TicketsTotal/${category}/motDePasse/0`));
-                await remove(ref(db, `TicketsTotal/${category}/utilisateur/0`));
-                await remove(ref(db, `TicketsTotal/${category}/prix/0`));
+                
+                // Mise à jour de la base de données
+                await updateDatabase(category, data);
             } else {
                 console.log("No tickets available");
                 document.getElementById('notification').textContent = "Désolé, plus de tickets disponibles pour cette catégorie.";
             }
+        }
+
+        async function updateDatabase(category, data) {
+            const updatedData = {
+                lienPaiement: data.lienPaiement,
+                motDePasse: data.motDePasse.slice(1),
+                prix: data.prix.slice(1),
+                utilisateur: data.utilisateur.slice(1)
+            };
+
+            // Mise à jour de la base de données avec les données réorganisées
+            await set(ref(db, `TicketsTotal/${category}`), updatedData);
+
+            console.log("Database updated successfully");
         }
 
         function displayTicket(ticket, category) {

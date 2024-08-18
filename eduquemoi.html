@@ -3,309 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plateforme Gemini Monétisée</title>
+    <title>Plateforme Gemini Améliorée</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script src="https://cdn.fedapay.com/checkout.js?v=1.1.7"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #6C63FF;
-            --secondary-color: #4CAF50;
-            --background-color: #f0f2f5;
-            --text-color: #333;
-            --card-background: #ffffff;
+            --background-color: #ffffff;
+            --text-color: #333333;
+            --input-background: #f0f0f0;
+            --button-color: #4a4b55;
+            --hover-color: #e0e0e0;
         }
 
-        body {
+        [data-theme="dark"] {
+            --background-color: #202123;
+            --text-color: #ffffff;
+            --input-background: #40414f;
+            --button-color: #4a4b55;
+            --hover-color: #2e2f34;
+        }
+
+        body, html {
             font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
             color: var(--text-color);
             margin: 0;
             padding: 0;
+            height: 100%;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            min-height: 100vh;
-            transition: background-color 0.3s ease;
-            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
+            padding: 10px 20px;
+            background-color: var(--input-background);
         }
 
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
         }
 
-        .container {
-            background-color: var(--card-background);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            width: 90%;
-            max-width: 800px;
-            transition: all 0.3s ease;
-        }
-
-        h1, h2 {
-            color: var(--primary-color);
-            text-align: center;
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-        }
-
-        .input-group {
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
+        .auth-buttons button, .theme-toggle {
+            margin-left: 10px;
+            background-color: var(--button-color);
             color: var(--text-color);
-            font-weight: 300;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
-        input[type="text"], input[type="password"], textarea, select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+        .main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
         }
 
-        input[type="text"]:focus, input[type="password"]:focus, textarea:focus, select:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2);
-            outline: none;
+        .sidebar {
+            width: 260px;
+            background-color: var(--input-background);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .message-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .input-container {
+            display: flex;
+            padding: 10px;
+            align-items: center;
+        }
+
+        input, select, button, textarea {
+            background-color: var(--input-background);
+            border: 1px solid var(--button-color);
+            color: var(--text-color);
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
         }
 
         button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            font-size: 1rem;
-            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            transition: background-color 0.3s;
         }
 
         button:hover {
-            background-color: #5753e0;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(108, 99, 255, 0.3);
+            background-color: var(--hover-color);
         }
 
-        #response, #userInfo {
-            margin-top: 1.5rem;
-            padding: 1rem;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            white-space: pre-wrap;
-            border-left: 4px solid var(--primary-color);
-            font-size: 0.9rem;
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 80%;
         }
 
-        .loading {
+        .user-message {
+            background-color: var(--input-background);
+            align-self: flex-end;
+        }
+
+        .ai-message {
+            background-color: var(--button-color);
+            align-self: flex-start;
+        }
+
+        #modelSelect, #subscriptionSelect, #creditSelect {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .hidden {
             display: none;
-            text-align: center;
-            margin-top: 1rem;
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-
-        .loading::after {
-            content: '\2026';
-            animation: ellipsis 1.5s infinite;
-        }
-
-        @keyframes ellipsis {
-            0% { content: '.'; }
-            33% { content: '..'; }
-            66% { content: '...'; }
-        }
-
-        #loginForm, #registerForm, #mainContent {
-            display: none;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-
-        .show-form {
-            display: block !important;
-            opacity: 1 !important;
-            transform: translateY(0) !important;
-        }
-
-        .btn-group {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 1rem;
-        }
-
-        .btn-secondary {
-            background-color: var(--secondary-color);
-        }
-
-        .btn-secondary:hover {
-            background-color: #45a049;
-        }
-
-        #userInfo {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #e9ecef;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .credit-info {
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-
-        .avatar {
-            width: 40px;
-            height: 40px;
-            background-color: var(--primary-color);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-weight: bold;
-            margin-right: 1rem;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
         }
 
         .notification {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 15px 20px;
+            padding: 10px 20px;
             border-radius: 5px;
             color: white;
             font-weight: 600;
             opacity: 0;
-            transform: translateY(-20px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            transition: opacity 0.3s ease;
         }
 
         .notification.show {
             opacity: 1;
-            transform: translateY(0);
         }
 
         .notification.success {
-            background-color: var(--secondary-color);
+            background-color: #4CAF50;
         }
 
         .notification.error {
             background-color: #f44336;
         }
 
-        .clicked {
-            transform: scale(0.95);
+        #gpt4oFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
-        body {
-            opacity: 0;
-            transition: opacity 0.5s ease;
+        .file-input {
+            display: none;
         }
 
-        body.loaded {
-            opacity: 1;
+        .file-label {
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .message-actions {
+            margin-top: 5px;
+        }
+
+        .message-actions button {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            margin-right: 5px;
         }
     </style>
 </head>
 <body>
-    <div class="container fade-in">
-        <h1>Plateforme Gemini Monétisée</h1>
-        
-        <div id="loginForm">
-            <h2>Connexion</h2>
-            <div class="input-group">
-                <label for="loginUsername">Nom d'utilisateur</label>
-                <input type="text" id="loginUsername" placeholder="Entrez votre nom d'utilisateur">
-            </div>
-            <div class="input-group">
-                <label for="loginPassword">Mot de passe</label>
-                <input type="password" id="loginPassword" placeholder="Entrez votre mot de passe">
-            </div>
-            <div class="btn-group">
-                <button onclick="login()">Se connecter</button>
-                <button onclick="showRegisterForm()" class="btn-secondary">S'inscrire</button>
-            </div>
+    <div class="header">
+        <div class="logo">Gemini AI</div>
+        <div class="auth-buttons">
+            <button id="loginBtn" onclick="showLoginForm()">Se connecter</button>
+            <button id="registerBtn" onclick="showRegisterForm()">S'inscrire</button>
+            <button id="logoutBtn" onclick="logout()" class="hidden">Se déconnecter</button>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <i class="fas fa-moon"></i>
+            </button>
         </div>
+    </div>
 
-        <div id="registerForm">
-            <h2>Inscription</h2>
-            <div class="input-group">
-                <label for="registerUsername">Nom d'utilisateur</label>
-                <input type="text" id="registerUsername" placeholder="Choisissez un nom d'utilisateur">
-            </div>
-            <div class="input-group">
-                <label for="registerPassword">Mot de passe</label>
-                <input type="password" id="registerPassword" placeholder="Choisissez un mot de passe">
-            </div>
-            <div class="btn-group">
-                <button onclick="register()">S'inscrire</button>
-                <button onclick="showLoginForm()" class="btn-secondary">Retour à la connexion</button>
-            </div>
-        </div>
-
-        <div id="mainContent">
-            <div id="userInfo">
-                <div class="user-details">
-                    <div class="avatar"></div>
-                    <span class="username"></span>
-                </div>
-                <div class="credit-info">
-                    <span class="credits"></span>
-                    <span class="free-requests"></span>
-                </div>
-            </div>
-            <div class="btn-group">
-                <button onclick="logout()" class="btn-secondary">Se déconnecter</button>
-                <button onclick="buyCredits()">Acheter des crédits</button>
-            </div>
-
-            <div class="input-group">
-                <label for="model">Modèle Gemini</label>
-                <select id="model">
+    <div class="main-container">
+        <div class="sidebar">
+            <h3>Modèles</h3>
+            <select id="modelSelect" onchange="handleModelChange()">
+                <optgroup label="Modèle gratuit">
+                    <option value="gpt4o-mini">GPT4o mini</option>
+                </optgroup>
+                <optgroup label="Modèles avancés">
                     <option value="gemini-pro">Gemini Pro</option>
                     <option value="gemini-1.0-pro">Gemini 1.0 Pro</option>
                     <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
                     <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro Latest</option>
                     <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
-                </select>
+                </optgroup>
+            </select>
+
+            <h3>Forfaits illimités</h3>
+            <select id="subscriptionSelect">
+                <option value="">Sélectionnez un forfait</option>
+                <option value="24h">24 heures</option>
+                <option value="3d">3 jours</option>
+                <option value="7d">7 jours</option>
+                <option value="30d">30 jours</option>
+                <option value="3m">3 mois</option>
+            </select>
+            <button onclick="buySubscription()">Acheter le forfait</button>
+
+            <h3>Acheter des crédits</h3>
+            <select id="creditSelect">
+                <option value="">Sélectionnez un pack</option>
+                <option value="100">100 crédits</option>
+                <option value="500">500 crédits</option>
+                <option value="1000">1000 crédits</option>
+            </select>
+            <button onclick="buyCredits()">Acheter des crédits</button>
+
+            <div id="userInfo" class="hidden">
+                <h3>Informations utilisateur</h3>
+                <p>Nom: <span id="username"></span></p>
+                <p>Crédits: <span id="credits"></span></p>
+                <p>Forfait: <span id="subscription"></span></p>
             </div>
-            <div class="input-group">
-                <label for="prompt">Votre question</label>
-                <textarea id="prompt" rows="4" placeholder="Posez votre question ici..."></textarea>
-            </div>
-            <button onclick="generateContent()">Générer (1 crédit)</button>
-            <div class="loading" id="loading">Génération en cours</div>
-            <div id="response"></div>
         </div>
+
+        <div class="chat-container">
+            <div id="messageContainer" class="message-container"></div>
+            <iframe id="gpt4oFrame" class="hidden" src="https://chatgpt.com/"></iframe>
+            <div class="input-container">
+                <textarea id="userInput" placeholder="Tapez votre message ici..."></textarea>
+                <label for="fileInput" class="file-label">
+                    <i class="fas fa-paperclip"></i>
+                </label>
+                <input type="file" id="fileInput" class="file-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" onchange="handleFileUpload(event)">
+                <button onclick="sendMessage()">Envoyer</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="loginForm" class="hidden">
+        <input type="text" id="loginUsername" placeholder="Nom d'utilisateur">
+        <input type="password" id="loginPassword" placeholder="Mot de passe">
+        <button onclick="login()">Se connecter</button>
+    </div>
+
+    <div id="registerForm" class="hidden">
+        <input type="text" id="registerUsername" placeholder="Nom d'utilisateur">
+        <input type="password" id="registerPassword" placeholder="Mot de passe">
+        <button onclick="register()">S'inscrire</button>
     </div>
 
     <script>
@@ -315,15 +281,15 @@
 
         // Configuration Firebase
         const firebaseConfig = {
-  apiKey: "AIzaSyCvizcYorGDPN3GXqma0opp7wAiMkaCt64",
-  authDomain: "gemini-bb56e.firebaseapp.com",
-  databaseURL: "https://gemini-bb56e-default-rtdb.firebaseio.com",
-  projectId: "gemini-bb56e",
-  storageBucket: "gemini-bb56e.appspot.com",
-  messagingSenderId: "277143630015",
-  appId: "1:277143630015:web:78736f2cf52d29495d160a",
-  measurementId: "G-CSN292219J"
-};
+            apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
+            authDomain: "cyber-campus-2706f.firebaseapp.com",
+            databaseURL: "https://cyber-campus-2706f-default-rtdb.firebaseio.com",
+            projectId: "cyber-campus-2706f",
+            storageBucket: "cyber-campus-2706f.appspot.com",
+            messagingSenderId: "719410601264",
+            appId: "1:719410601264:web:44fd2e3757721866303cf5",
+            measurementId: "G-CEEFJP5LYZ"
+        };
 
         // Initialiser Firebase
         firebase.initializeApp(firebaseConfig);
@@ -343,22 +309,30 @@
         }
 
         function showLoginForm() {
-            document.getElementById('loginForm').classList.add('show-form');
-            document.getElementById('registerForm').classList.remove('show-form');
-            document.getElementById('mainContent').classList.remove('show-form');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
         }
 
         function showRegisterForm() {
-            document.getElementById('loginForm').classList.remove('show-form');
-            document.getElementById('registerForm').classList.add('show-form');
-            document.getElementById('mainContent').classList.remove('show-form');
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
         }
 
-        function showMainContent() {
-            document.getElementById('loginForm').classList.remove('show-form');
-            document.getElementById('registerForm').classList.remove('show-form');
-            document.getElementById('mainContent').classList.add('show-form');
-            updateUserInfo();
+        function updateUIForLoggedInUser() {
+            document.getElementById('loginBtn').classList.add('hidden');
+            document.getElementById('registerBtn').classList.add('hidden');
+            document.getElementById('logoutBtn').classList.remove('hidden');
+            document.getElementById('userInfo').classList.remove('hidden');
+            document.getElementById('username').textContent = currentUser.username;
+            document.getElementById('credits').textContent = currentUser.credits;
+            document.getElementById('subscription').textContent = currentUser.subscription || 'Aucun';
+        }
+
+        function updateUIForLoggedOutUser() {
+            document.getElementById('loginBtn').classList.remove('hidden');
+            document.getElementById('registerBtn').classList.remove('hidden');
+            document.getElementById('logoutBtn').classList.add('hidden');
+            document.getElementById('userInfo').classList.add('hidden');
         }
 
         async function register() {
@@ -380,14 +354,14 @@
                 
                 await userRef.set({
                     password: password,
-                    credits: 3,
-                    dailyRequests: 0,
-                    lastRequestDate: new Date().toDateString()
+                    credits: 10,
+                    subscription: null,
+                    subscriptionEndDate: null
                 });
                 
-                currentUser = { username, credits: 3, dailyRequests: 0, lastRequestDate: new Date().toDateString() };
+                currentUser = { username, credits: 10, subscription: null, subscriptionEndDate: null };
                 saveUserToLocalStorage(currentUser);
-                showMainContent();
+                updateUIForLoggedInUser();
                 showNotification('Inscription réussie !', 'success');
             } catch (error) {
                 console.error('Erreur lors de l\'inscription:', error);
@@ -411,11 +385,11 @@
                     currentUser = { 
                         username, 
                         credits: snapshot.val().credits,
-                        dailyRequests: snapshot.val().dailyRequests,
-                        lastRequestDate: snapshot.val().lastRequestDate
+                        subscription: snapshot.val().subscription,
+                        subscriptionEndDate: snapshot.val().subscriptionEndDate
                     };
                     saveUserToLocalStorage(currentUser);
-                    showMainContent();
+                    updateUIForLoggedInUser();
                     showNotification('Connexion réussie !', 'success');
                 } else {
                     showNotification('Nom d\'utilisateur ou mot de passe incorrect.', 'error');
@@ -429,98 +403,206 @@
         function logout() {
             currentUser = null;
             removeUserFromLocalStorage();
-            showLoginForm();
+            updateUIForLoggedOutUser();
             showNotification('Déconnexion réussie.', 'success');
         }
 
-        function updateUserInfo() {
-            const userInfoElement = document.getElementById('userInfo');
-            const avatarElement = userInfoElement.querySelector('.avatar');
-            const usernameElement = userInfoElement.querySelector('.username');
-            const creditsElement = userInfoElement.querySelector('.credits');
-            const freeRequestsElement = userInfoElement.querySelector('.free-requests');
+        function handleModelChange() {
+            const model = document.getElementById('modelSelect').value;
+            const gpt4oFrame = document.getElementById('gpt4oFrame');
+            const messageContainer = document.getElementById('messageContainer');
+            const inputContainer = document.querySelector('.input-container');
 
-            avatarElement.textContent = currentUser.username.charAt(0).toUpperCase();
-            usernameElement.textContent = currentUser.username;
-            creditsElement.textContent = `Crédits: ${currentUser.credits}`;
-            freeRequestsElement.textContent = `Requêtes gratuites: ${3 - currentUser.dailyRequests}/3`;
+            if (model === 'gpt4o-mini') {
+                gpt4oFrame.classList.remove('hidden');
+                messageContainer.classList.add('hidden');
+                inputContainer.classList.add('hidden');
+            } else {
+                gpt4oFrame.classList.add('hidden');
+                messageContainer.classList.remove('hidden');
+                inputContainer.classList.remove('hidden');
+            }
         }
 
-        async function generateContent() {
+        async function sendMessage() {
             if (!currentUser) {
-                showNotification('Veuillez vous connecter pour utiliser le service.', 'error');
+                showNotification('Veuillez vous connecter pour envoyer des messages.', 'error');
                 return;
             }
 
-            const today = new Date().toDateString();
-            if (today !== currentUser.lastRequestDate) {
-                currentUser.dailyRequests = 0;
-                currentUser.lastRequestDate = today;
-            }
+            const userInput = document.getElementById('userInput').value;
+            const model = document.getElementById('modelSelect').value;
 
-            if (currentUser.dailyRequests >= 3 && currentUser.credits <= 0) {
-                showNotification('Vous avez atteint votre limite quotidienne gratuite et vous n\'avez plus de crédits. Veuillez acheter des crédits pour continuer.', 'error');
+            if (!userInput) return;
+
+            addMessageToChat('user', userInput);
+            document.getElementById('userInput').value = '';
+
+            if (model !== 'gpt4o-mini' && !hasValidSubscription() && currentUser.credits <= 0) {
+                showNotification('Vous n\'avez plus de crédits. Veuillez acheter des crédits ou un forfait pour continuer.', 'error');
                 return;
             }
-
-            const model = document.getElementById('model').value;
-            const prompt = document.getElementById('prompt').value;
-            const responseElement = document.getElementById('response');
-            const loadingElement = document.getElementById('loading');
-
-            responseElement.textContent = '';
-            loadingElement.style.display = 'block';
 
             try {
                 const response = await axios.post(`${API_BASE_URL}${model}:generateContent?key=${API_KEY}`, {
-                    contents: [{ parts: [{ text: prompt }] }]
+                    contents: [{ parts: [{ text: userInput }] }]
                 });
 
-                const generatedText = response.data.candidates[0].content.parts[0].text;
-                responseElement.textContent = generatedText;
-                responseElement.classList.add('fade-in');
+                const aiResponse = response.data.candidates[0].content.parts[0].text;
+                addMessageToChat('ai', aiResponse);
 
-                // Mise à jour des crédits/requêtes
-                if (currentUser.dailyRequests < 3) {
-                    currentUser.dailyRequests++;
-                } else {
+                if (model !== 'gpt4o-mini' && !hasValidSubscription()) {
                     currentUser.credits--;
+                    updateUserCredits();
                 }
-
-                // Mise à jour dans Firebase
-                await db.ref('users/' + currentUser.username).update({
-                    credits: currentUser.credits,
-                    dailyRequests: currentUser.dailyRequests,
-                    lastRequestDate: currentUser.lastRequestDate
-                });
-
-                saveUserToLocalStorage(currentUser);
-                updateUserInfo();
-                showNotification('Contenu généré avec succès !', 'success');
             } catch (error) {
                 console.error('Erreur:', error);
-                responseElement.textContent = 'Une erreur est survenue lors de la génération du contenu.';
-                responseElement.classList.add('fade-in');
-                showNotification('Erreur lors de la génération du contenu.', 'error');
-            } finally {
-                loadingElement.style.display = 'none';
+                showNotification('Erreur lors de la génération de la réponse.', 'error');
             }
         }
 
-        function buyCredits() {
+        function addMessageToChat(sender, message) {
+            const messageContainer = document.getElementById('messageContainer');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender === 'user' ? 'user-message' : 'ai-message');
+            messageElement.textContent = message;
+
+            if (sender === 'ai' && document.getElementById('modelSelect').value !== 'gpt4o-mini') {
+                const actionsElement = document.createElement('div');
+                actionsElement.classList.add('message-actions');
+                actionsElement.innerHTML = `
+                    <button onclick="copyResponse(this)"><i class="fas fa-copy"></i></button>
+                    <button onclick="exportResponse(this, 'word')"><i class="fas fa-file-word"></i></button>
+                    <button onclick="exportResponse(this, 'pdf')"><i class="fas fa-file-pdf"></i></button>
+                    <button onclick="shareResponse(this)"><i class="fas fa-share-alt"></i></button>
+                `;
+                messageElement.appendChild(actionsElement);
+            }
+
+            messageContainer.appendChild(messageElement);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+        function copyResponse(button) {
+            const responseText = button.closest('.message').textContent;
+            navigator.clipboard.writeText(responseText).then(() => {
+                showNotification('Réponse copiée dans le presse-papiers', 'success');
+            });
+        }
+
+        function exportResponse(button, format) {
+            const responseText = button.closest('.message').textContent;
+            // Ici, vous devriez implémenter la logique pour exporter en Word ou PDF
+            // Pour cet exemple, nous allons simplement simuler l'export
+            showNotification(`Export en ${format} simulé`, 'success');
+        }
+
+        function shareResponse(button) {
+            const responseText = button.closest('.message').textContent;
+            // Ici, vous devriez implémenter la logique de partage
+            // Pour cet exemple, nous allons simplement simuler le partage
+            showNotification('Partage simulé', 'success');
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                // Ici, vous devriez implémenter la logique pour traiter le fichier
+                // Pour cet exemple, nous allons simplement afficher le nom du fichier
+                addMessageToChat('user', `Fichier téléchargé : ${file.name}`);
+            }
+        }
+
+        function hasValidSubscription() {
+            if (!currentUser.subscription || !currentUser.subscriptionEndDate) return false;
+            return new Date() < new Date(currentUser.subscriptionEndDate);
+        }
+
+        async function updateUserCredits() {
+            await db.ref('users/' + currentUser.username).update({
+                credits: currentUser.credits
+            });
+            document.getElementById('credits').textContent = currentUser.credits;
+        }
+
+        function buySubscription() {
+            const subscriptionType = document.getElementById('subscriptionSelect').value;
+            if (!subscriptionType) {
+                showNotification('Veuillez sélectionner un forfait.', 'error');
+                return;
+            }
+
+            const subscriptionPrices = {
+                '24h': 500, '3d': 1000, '7d': 2000, '30d': 5000, '3m': 12000
+            };
+
+            const price = subscriptionPrices[subscriptionType];
+
             var fedaPayInstance = FedaPay.init({
                 public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
                 transaction: {
-                    amount: 1000, // 1000 FCFA pour 10 crédits
-                    description: 'Achat de 10 crédits pour la plateforme Gemini'
+                    amount: price,
+                    description: `Achat d'un forfait ${subscriptionType} pour Gemini AI`
                 },
                 customer: {
                     email: 'client@example.com'
                 },
                 onComplete: function(response) {
                     if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
-                        addCreditsToUser(10);
-                        showNotification('Paiement réussi ! 10 crédits ont été ajoutés à votre compte.', 'success');
+                        activateSubscription(subscriptionType);
+                        showNotification(`Forfait ${subscriptionType} activé avec succès !`, 'success');
+                    } else {
+                        showNotification('Le paiement a été annulé ou a échoué.', 'error');
+                    }
+                }
+            });
+            fedaPayInstance.open();
+        }
+
+        async function activateSubscription(subscriptionType) {
+            const durations = { '24h': 1, '3d': 3, '7d': 7, '30d': 30, '3m': 90 };
+            const days = durations[subscriptionType];
+            const endDate = new Date();
+            endDate.setDate(endDate.getDate() + days);
+
+            currentUser.subscription = subscriptionType;
+            currentUser.subscriptionEndDate = endDate.toISOString();
+
+            await db.ref('users/' + currentUser.username).update({
+                subscription: subscriptionType,
+                subscriptionEndDate: endDate.toISOString()
+            });
+
+            document.getElementById('subscription').textContent = subscriptionType;
+            saveUserToLocalStorage(currentUser);
+        }
+
+        function buyCredits() {
+            const creditAmount = document.getElementById('creditSelect').value;
+            if (!creditAmount) {
+                showNotification('Veuillez sélectionner un pack de crédits.', 'error');
+                return;
+            }
+
+            const creditPrices = {
+                '100': 1000, '500': 4500, '1000': 8000
+            };
+
+            const price = creditPrices[creditAmount];
+
+            var fedaPayInstance = FedaPay.init({
+                public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
+                transaction: {
+                    amount: price,
+                    description: `Achat de ${creditAmount} crédits pour Gemini AI`
+                },
+                customer: {
+                    email: 'client@example.com'
+                },
+                onComplete: function(response) {
+                    if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
+                        addCreditsToUser(parseInt(creditAmount));
+                        showNotification(`${creditAmount} crédits ont été ajoutés à votre compte.`, 'success');
                     } else {
                         showNotification('Le paiement a été annulé ou a échoué.', 'error');
                     }
@@ -534,8 +616,8 @@
             await db.ref('users/' + currentUser.username).update({
                 credits: currentUser.credits
             });
+            document.getElementById('credits').textContent = currentUser.credits;
             saveUserToLocalStorage(currentUser);
-            updateUserInfo();
         }
 
         function showNotification(message, type) {
@@ -555,25 +637,36 @@
             }, 100);
         }
 
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const themeToggle = document.querySelector('.theme-toggle i');
+            themeToggle.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+        }
+
         // Initialisation au chargement de la page
         window.onload = function() {
             const savedUser = getUserFromLocalStorage();
             if (savedUser) {
                 currentUser = savedUser;
-                showMainContent();
+                updateUIForLoggedInUser();
             } else {
-                showLoginForm();
+                updateUIForLoggedOutUser();
             }
-            document.body.classList.add('loaded');
-        };
 
-        // Ajouter des transitions fluides lors du changement de formulaires
-        document.querySelectorAll('button').forEach(button => {
-            button.addEventListener('click', () => {
-                button.classList.add('clicked');
-                setTimeout(() => button.classList.remove('clicked'), 200);
-            });
-        });
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+
+            handleModelChange();
+        };
     </script>
 </body>
 </html>

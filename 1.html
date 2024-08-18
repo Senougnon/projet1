@@ -46,8 +46,7 @@
                     } else if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
                         notification.textContent = "Paiement réussi ! Merci.";
                         notification.className = "success";
-                        window.location.href = "http://cyberducampus.net/";
-
+                        
                         // Récupérer les données chiffrées du ticket à partir de l'URL
                         const urlParams = new URLSearchParams(window.location.search);
                         const encryptedUser = urlParams.get('user');

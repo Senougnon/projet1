@@ -8,23 +8,37 @@
     <script src="https://cdn.fedapay.com/checkout.js?v=1.1.7"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.29.0/docxtemplater.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PizZip/3.0.6/pizzip.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --background-color: #ffffff;
+            --primary-color: #4a90e2;
+            --secondary-color: #50c878;
+            --background-color: #f5f7fa;
             --text-color: #333333;
-            --input-background: #f0f0f0;
-            --button-color: #4a4b55;
-            --hover-color: #e0e0e0;
+            --input-background: #ffffff;
+            --button-color: #4a90e2;
+            --hover-color: #3a7bc8;
+            --sidebar-color: #2c3e50;
+            --sidebar-text: #ecf0f1;
+            --input-area-color: #e8f0fe;
         }
 
         [data-theme="dark"] {
-            --background-color: #202123;
-            --text-color: #ffffff;
-            --input-background: #40414f;
-            --button-color: #4a4b55;
-            --hover-color: #2e2f34;
+            --primary-color: #6c5ce7;
+            --secondary-color: #00b894;
+            --background-color: #2d3436;
+            --text-color: #ecf0f1;
+            --input-background: #34495e;
+            --button-color: #6c5ce7;
+            --hover-color: #5b4cc4;
+            --sidebar-color: #2c3e50;
+            --sidebar-text: #ecf0f1;
+            --input-area-color: #3d4852;
         }
 
         body, html {
@@ -44,7 +58,22 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 20px;
-            background-color: var(--input-background);
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-sidebar {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            margin-right: 15px;
         }
 
         .logo {
@@ -55,11 +84,16 @@
         .auth-buttons button, .theme-toggle {
             margin-left: 10px;
             background-color: var(--button-color);
-            color: var(--text-color);
+            color: white;
             border: none;
-            padding: 5px 10px;
+            padding: 8px 15px;
             border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .auth-buttons button:hover, .theme-toggle:hover {
+            background-color: var(--hover-color);
         }
 
         .main-container {
@@ -70,9 +104,15 @@
 
         .sidebar {
             width: 260px;
-            background-color: var(--input-background);
+            background-color: var(--sidebar-color);
+            color: var(--sidebar-text);
             padding: 20px;
             overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.hidden {
+            transform: translateX(-100%);
         }
 
         .chat-container {
@@ -91,8 +131,21 @@
 
         .input-container {
             display: flex;
-            padding: 10px;
+            padding: 15px;
             align-items: center;
+            background-color: var(--input-area-color);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        #userInput {
+            flex-grow: 1;
+            border: none;
+            background-color: transparent;
+            color: var(--text-color);
+            font-size: 1em;
+            padding: 10px;
+            outline: none;
         }
 
         input, select, button, textarea {
@@ -115,24 +168,32 @@
 
         .message {
             margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 15px;
+            border-radius: 10px;
             max-width: 80%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         .user-message {
-            background-color: var(--input-background);
+            background-color: var(--primary-color);
+            color: white;
             align-self: flex-end;
         }
 
         .ai-message {
-            background-color: var(--button-color);
+            background-color: var(--secondary-color);
+            color: white;
             align-self: flex-start;
         }
 
         #modelSelect, #subscriptionSelect, #creditSelect {
             width: 100%;
             margin-bottom: 10px;
+            background-color: var(--input-background);
+            color: var(--text-color);
+            border: 1px solid var(--button-color);
+            padding: 10px;
+            border-radius: 5px;
         }
 
         .hidden {
@@ -149,6 +210,7 @@
             font-weight: 600;
             opacity: 0;
             transition: opacity 0.3s ease;
+            z-index: 1000;
         }
 
         .notification.show {
@@ -156,17 +218,11 @@
         }
 
         .notification.success {
-            background-color: #4CAF50;
+            background-color: var(--secondary-color);
         }
 
         .notification.error {
-            background-color: #f44336;
-        }
-
-        #gpt4oFrame {
-            width: 100%;
-            height: 100%;
-            border: none;
+            background-color: #e74c3c;
         }
 
         .file-input {
@@ -176,6 +232,7 @@
         .file-label {
             cursor: pointer;
             margin-left: 10px;
+            color: var(--button-color);
         }
 
         .message-actions {
@@ -185,15 +242,39 @@
         .message-actions button {
             background: none;
             border: none;
-            color: var(--text-color);
+            color: white;
             cursor: pointer;
             margin-right: 5px;
+            font-size: 0.9em;
+        }
+
+        .pinned-file {
+            background-color: var(--input-background);
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .pinned-file button {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <div class="logo">Gemini AI</div>
+        <div class="logo-container">
+            <button class="toggle-sidebar" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="logo">Eduque moi</div>
+        </div>
         <div class="auth-buttons">
             <button id="loginBtn" onclick="showLoginForm()">Se connecter</button>
             <button id="registerBtn" onclick="showRegisterForm()">S'inscrire</button>
@@ -207,13 +288,12 @@
     <div class="main-container">
         <div class="sidebar">
             <h3>Modèles</h3>
-            <select id="modelSelect" onchange="handleModelChange()">
+            <select id="modelSelect">
                 <optgroup label="Modèle gratuit">
-                    <option value="gpt4o-mini">GPT4o mini</option>
+                    <option value="gemini-1.0-pro">Gemini 1.0 Pro</option>
                 </optgroup>
                 <optgroup label="Modèles avancés">
                     <option value="gemini-pro">Gemini Pro</option>
-                    <option value="gemini-1.0-pro">Gemini 1.0 Pro</option>
                     <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
                     <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro Latest</option>
                     <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
@@ -250,13 +330,13 @@
 
         <div class="chat-container">
             <div id="messageContainer" class="message-container"></div>
-            <iframe id="gpt4oFrame" class="hidden" src="https://chatgpt.com/"></iframe>
+            <div id="pinnedFile" class="pinned-file hidden"></div>
             <div class="input-container">
                 <textarea id="userInput" placeholder="Tapez votre message ici..."></textarea>
                 <label for="fileInput" class="file-label">
                     <i class="fas fa-paperclip"></i>
                 </label>
-                <input type="file" id="fileInput" class="file-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" onchange="handleFileUpload(event)">
+                <input type="file" id="fileInput" class="file-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.txt" onchange="handleFileUpload(event)">
                 <button onclick="sendMessage()">Envoyer</button>
             </div>
         </div>
@@ -274,10 +354,12 @@
         <button onclick="register()">S'inscrire</button>
     </div>
 
+
     <script>
         const API_KEY = 'AIzaSyB3umTE3n2d5gwKzOmJz4ss1pFZMR8_vOE';
         const API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
         let currentUser = null;
+        let pinnedFile = null;
 
         // Configuration Firebase
         const firebaseConfig = {
@@ -407,23 +489,6 @@
             showNotification('Déconnexion réussie.', 'success');
         }
 
-        function handleModelChange() {
-            const model = document.getElementById('modelSelect').value;
-            const gpt4oFrame = document.getElementById('gpt4oFrame');
-            const messageContainer = document.getElementById('messageContainer');
-            const inputContainer = document.querySelector('.input-container');
-
-            if (model === 'gpt4o-mini') {
-                gpt4oFrame.classList.remove('hidden');
-                messageContainer.classList.add('hidden');
-                inputContainer.classList.add('hidden');
-            } else {
-                gpt4oFrame.classList.add('hidden');
-                messageContainer.classList.remove('hidden');
-                inputContainer.classList.remove('hidden');
-            }
-        }
-
         async function sendMessage() {
             if (!currentUser) {
                 showNotification('Veuillez vous connecter pour envoyer des messages.', 'error');
@@ -433,28 +498,38 @@
             const userInput = document.getElementById('userInput').value;
             const model = document.getElementById('modelSelect').value;
 
-            if (!userInput) return;
+            if (!userInput && !pinnedFile) {
+                showNotification('Veuillez entrer un message ou joindre un fichier.', 'error');
+                return;
+            }
 
-            addMessageToChat('user', userInput);
+            let fullMessage = userInput;
+            if (pinnedFile) {
+                fullMessage = `[Contenu du fichier joint: ${pinnedFile.content}]\n\n${userInput}`;
+            }
+
+            addMessageToChat('user', fullMessage);
             document.getElementById('userInput').value = '';
 
-            if (model !== 'gpt4o-mini' && !hasValidSubscription() && currentUser.credits <= 0) {
+            if (model !== 'gemini-1.0-pro' && !hasValidSubscription() && currentUser.credits <= 0) {
                 showNotification('Vous n\'avez plus de crédits. Veuillez acheter des crédits ou un forfait pour continuer.', 'error');
                 return;
             }
 
             try {
                 const response = await axios.post(`${API_BASE_URL}${model}:generateContent?key=${API_KEY}`, {
-                    contents: [{ parts: [{ text: userInput }] }]
+                    contents: [{ parts: [{ text: fullMessage }] }]
                 });
 
                 const aiResponse = response.data.candidates[0].content.parts[0].text;
                 addMessageToChat('ai', aiResponse);
 
-                if (model !== 'gpt4o-mini' && !hasValidSubscription()) {
+                if (model !== 'gemini-1.0-pro' && !hasValidSubscription()) {
                     currentUser.credits--;
                     updateUserCredits();
                 }
+
+                removePinnedFile();
             } catch (error) {
                 console.error('Erreur:', error);
                 showNotification('Erreur lors de la génération de la réponse.', 'error');
@@ -467,7 +542,7 @@
             messageElement.classList.add('message', sender === 'user' ? 'user-message' : 'ai-message');
             messageElement.textContent = message;
 
-            if (sender === 'ai' && document.getElementById('modelSelect').value !== 'gpt4o-mini') {
+            if (sender === 'ai') {
                 const actionsElement = document.createElement('div');
                 actionsElement.classList.add('message-actions');
                 actionsElement.innerHTML = `
@@ -490,27 +565,86 @@
             });
         }
 
-        function exportResponse(button, format) {
+        async function exportResponse(button, format) {
             const responseText = button.closest('.message').textContent;
-            // Ici, vous devriez implémenter la logique pour exporter en Word ou PDF
-            // Pour cet exemple, nous allons simplement simuler l'export
-            showNotification(`Export en ${format} simulé`, 'success');
+            if (format === 'word') {
+                const blob = await generateWordDoc(responseText);
+                saveAs(blob, "response.docx");
+            } else if (format === 'pdf') {
+                const blob = await generatePDF(responseText);
+                saveAs(blob, "response.pdf");
+            }
+            showNotification(`Export en ${format.toUpperCase()} réussi`, 'success');
+        }
+
+        async function generateWordDoc(text) {
+            const content = `
+                <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+                    <w:body>
+                        <w:p>
+                            <w:r>
+                                <w:t>${text}</w:t>
+                            </w:r>
+                        </w:p>
+                    </w:body>
+                </w:document>
+            `;
+            const zip = new PizZip();
+            zip.file("word/document.xml", content);
+            const blob = await zip.generateAsync({type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
+            return blob;
+        }
+
+        function generatePDF(text) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text(text, 10, 10);
+            return doc.output('blob');
         }
 
         function shareResponse(button) {
             const responseText = button.closest('.message').textContent;
-            // Ici, vous devriez implémenter la logique de partage
-            // Pour cet exemple, nous allons simplement simuler le partage
-            showNotification('Partage simulé', 'success');
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Réponse de Eduque moi',
+                    text: responseText
+                }).then(() => {
+                    showNotification('Partage réussi', 'success');
+                }).catch((error) => {
+                    console.error('Erreur lors du partage:', error);
+                    showNotification('Erreur lors du partage', 'error');
+                });
+            } else {
+                showNotification('Le partage n\'est pas pris en charge sur votre appareil', 'error');
+            }
         }
 
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (file) {
-                // Ici, vous devriez implémenter la logique pour traiter le fichier
-                // Pour cet exemple, nous allons simplement afficher le nom du fichier
-                addMessageToChat('user', `Fichier téléchargé : ${file.name}`);
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    pinnedFile = {
+                        name: file.name,
+                        content: e.target.result
+                    };
+                    const pinnedFileElement = document.getElementById('pinnedFile');
+                    pinnedFileElement.innerHTML = `
+                        <span>${file.name}</span>
+                        <button onclick="removePinnedFile()"><i class="fas fa-times"></i></button>
+                    `;
+                    pinnedFileElement.classList.remove('hidden');
+                };
+                reader.readAsText(file);
             }
+        }
+
+        function removePinnedFile() {
+            pinnedFile = null;
+            const pinnedFileElement = document.getElementById('pinnedFile');
+            pinnedFileElement.innerHTML = '';
+            pinnedFileElement.classList.add('hidden');
         }
 
         function hasValidSubscription() {
@@ -542,7 +676,7 @@
                 public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
                 transaction: {
                     amount: price,
-                    description: `Achat d'un forfait ${subscriptionType} pour Gemini AI`
+                    description: `Achat d'un forfait ${subscriptionType} pour Eduque moi`
                 },
                 customer: {
                     email: 'client@example.com'
@@ -594,7 +728,7 @@
                 public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
                 transaction: {
                     amount: price,
-                    description: `Achat de ${creditAmount} crédits pour Gemini AI`
+                    description: `Achat de ${creditAmount} crédits pour Eduque moi`
                 },
                 customer: {
                     email: 'client@example.com'
@@ -651,6 +785,44 @@
             themeToggle.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
         }
 
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('hidden');
+        }
+
+        // Fonction pour lire le contenu des fichiers
+        function readFileContent(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (event) => resolve(event.target.result);
+                reader.onerror = (error) => reject(error);
+                reader.readAsText(file);
+            });
+        }
+
+        // Modification de la fonction handleFileUpload pour lire le contenu du fichier
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                try {
+                    const content = await readFileContent(file);
+                    pinnedFile = {
+                        name: file.name,
+                        content: content
+                    };
+                    const pinnedFileElement = document.getElementById('pinnedFile');
+                    pinnedFileElement.innerHTML = `
+                        <span>${file.name}</span>
+                        <button onclick="removePinnedFile()"><i class="fas fa-times"></i></button>
+                    `;
+                    pinnedFileElement.classList.remove('hidden');
+                } catch (error) {
+                    console.error('Erreur lors de la lecture du fichier:', error);
+                    showNotification('Erreur lors de la lecture du fichier.', 'error');
+                }
+            }
+        }
+
         // Initialisation au chargement de la page
         window.onload = function() {
             const savedUser = getUserFromLocalStorage();
@@ -665,8 +837,29 @@
             document.body.setAttribute('data-theme', savedTheme);
             updateThemeIcon(savedTheme);
 
-            handleModelChange();
+            // Ajustement du champ de saisie pour qu'il prenne toute la largeur disponible
+            const inputContainer = document.querySelector('.input-container');
+            const userInput = document.getElementById('userInput');
+            const fileLabel = document.querySelector('.file-label');
+            const sendButton = inputContainer.querySelector('button');
+
+            function adjustInputWidth() {
+                const containerWidth = inputContainer.offsetWidth;
+                const fileLabelWidth = fileLabel.offsetWidth;
+                const sendButtonWidth = sendButton.offsetWidth;
+                const padding = 20; // Ajustez selon vos besoins
+                userInput.style.width = `${containerWidth - fileLabelWidth - sendButtonWidth - padding}px`;
+            }
+
+            // Appel initial et ajout d'un écouteur d'événement pour le redimensionnement de la fenêtre
+            adjustInputWidth();
+            window.addEventListener('resize', adjustInputWidth);
         };
+
+        // Ajout d'un écouteur d'événement pour le chargement des ressources
+        window.addEventListener('load', function() {
+            document.body.classList.add('loaded');
+        });
     </script>
 </body>
 </html>

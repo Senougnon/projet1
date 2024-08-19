@@ -57,9 +57,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
+            padding: 5px 10px;
             background-color: var(--primary-color);
             color: white;
+            height: 30px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
         }
 
         .logo-container {
@@ -71,25 +77,26 @@
             background: none;
             border: none;
             color: white;
-            font-size: 1.5em;
+            font-size: 1.2em;
             cursor: pointer;
-            margin-right: 15px;
+            margin-right: 10px;
         }
 
         .logo {
-            font-size: 1.5em;
+            font-size: 1.2em;
             font-weight: bold;
         }
 
         .auth-buttons button, .theme-toggle {
-            margin-left: 10px;
+            margin-left: 5px;
             background-color: var(--button-color);
             color: white;
             border: none;
-            padding: 8px 15px;
+            padding: 5px 10px;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            font-size: 0.8em;
         }
 
         .auth-buttons button:hover, .theme-toggle:hover {
@@ -100,6 +107,7 @@
             display: flex;
             flex: 1;
             overflow: hidden;
+            margin-top: 30px;
         }
 
         .sidebar {
@@ -109,10 +117,11 @@
             padding: 20px;
             overflow-y: auto;
             transition: transform 0.3s ease;
-        }
-
-        .sidebar.hidden {
-            transform: translateX(-100%);
+            position: fixed;
+            top: 30px;
+            bottom: 0;
+            left: 0;
+            z-index: 999;
         }
 
         .chat-container {
@@ -121,6 +130,8 @@
             flex-direction: column;
             padding: 20px;
             overflow-y: auto;
+            margin-left: 260px;
+            transition: margin-left 0.3s ease;
         }
 
         .message-container {
@@ -136,6 +147,8 @@
             background-color: var(--input-area-color);
             border-radius: 10px;
             margin-top: 20px;
+            position: sticky;
+            bottom: 0;
         }
 
         #userInput {
@@ -146,6 +159,9 @@
             font-size: 1em;
             padding: 10px;
             outline: none;
+            resize: vertical;
+            min-height: 20px;
+            max-height: 150px;
         }
 
         input, select, button, textarea {
@@ -172,6 +188,7 @@
             border-radius: 10px;
             max-width: 80%;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            word-wrap: break-word;
         }
 
         .user-message {
@@ -202,7 +219,7 @@
 
         .notification {
             position: fixed;
-            top: 20px;
+            top: 40px;
             right: 20px;
             padding: 10px 20px;
             border-radius: 5px;
@@ -259,11 +276,56 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        .pinned-file button {
-            background: none;
-            border: none;
-            color: var(--text-color);
+        #conversationHistory {
+            margin-top: 20px;
+        }
+
+        #conversationHistory h3 {
+            margin-bottom: 10px;
+        }
+
+        .conversation-item {
+            padding: 10px;
+            margin-bottom: 5px;
+            background-color: var(--input-background);
+            border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .conversation-item:hover {
+            background-color: var(--hover-color);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.visible {
+                transform: translateX(0);
+            }
+
+            .chat-container {
+                margin-left: 0;
+            }
+
+            .chat-container.sidebar-visible {
+                margin-left: 0;
+            }
+
+            .header {
+                padding: 5px;
+            }
+
+            .logo {
+                font-size: 1em;
+            }
+
+            .auth-buttons button, .theme-toggle {
+                padding: 3px 6px;
+                font-size: 0.7em;
+            }
         }
     </style>
 </head>
@@ -288,7 +350,7 @@
     <div class="main-container">
         <div class="sidebar">
             <h3>Modèles</h3>
-            <select id="modelSelect">
+            <select id="modelSelect" onchange="checkModelAccess()">
                 <optgroup label="Modèle gratuit">
                     <option value="gemini-1.0-pro">Gemini 1.0 Pro</option>
                 </optgroup>
@@ -323,8 +385,14 @@
             <div id="userInfo" class="hidden">
                 <h3>Informations utilisateur</h3>
                 <p>Nom: <span id="username"></span></p>
-                <p>Crédits: <span id="credits"></span></p>
+                <p>Crédits gratuits: <span id="freeCredits"></span></p>
+                <p>Crédits payants: <span id="paidCredits"></span></p>
                 <p>Forfait: <span id="subscription"></span></p>
+            </div>
+
+            <div id="conversationHistory">
+                <h3>Historique des conversations</h3>
+                <!-- Les conversations seront ajoutées ici dynamiquement -->
             </div>
         </div>
 
@@ -332,7 +400,7 @@
             <div id="messageContainer" class="message-container"></div>
             <div id="pinnedFile" class="pinned-file hidden"></div>
             <div class="input-container">
-                <textarea id="userInput" placeholder="Tapez votre message ici..."></textarea>
+                <textarea id="userInput" placeholder="Tapez votre message ici..." rows="1"></textarea>
                 <label for="fileInput" class="file-label">
                     <i class="fas fa-paperclip"></i>
                 </label>
@@ -354,23 +422,27 @@
         <button onclick="register()">S'inscrire</button>
     </div>
 
-
     <script>
         const API_KEY = 'AIzaSyB3umTE3n2d5gwKzOmJz4ss1pFZMR8_vOE';
         const API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
         let currentUser = null;
         let pinnedFile = null;
+        let currentConversation = [];
+        let conversations = {};
+        const FREE_CREDITS_PER_DAY = 10;
+        const FREE_MODEL_MAX_WORDS = 50;
+        const FREE_MODEL_MAX_RESPONSE = 100;
 
         // Configuration Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
-            authDomain: "cyber-campus-2706f.firebaseapp.com",
-            databaseURL: "https://cyber-campus-2706f-default-rtdb.firebaseio.com",
-            projectId: "cyber-campus-2706f",
-            storageBucket: "cyber-campus-2706f.appspot.com",
-            messagingSenderId: "719410601264",
-            appId: "1:719410601264:web:44fd2e3757721866303cf5",
-            measurementId: "G-CEEFJP5LYZ"
+            apiKey: "AIzaSyCvizcYorGDPN3GXqma0opp7wAiMkaCt64",
+  authDomain: "gemini-bb56e.firebaseapp.com",
+  databaseURL: "https://gemini-bb56e-default-rtdb.firebaseio.com",
+  projectId: "gemini-bb56e",
+  storageBucket: "gemini-bb56e.appspot.com",
+  messagingSenderId: "277143630015",
+  appId: "1:277143630015:web:78736f2cf52d29495d160a",
+  measurementId: "G-CSN292219J"
         };
 
         // Initialiser Firebase
@@ -406,8 +478,10 @@
             document.getElementById('logoutBtn').classList.remove('hidden');
             document.getElementById('userInfo').classList.remove('hidden');
             document.getElementById('username').textContent = currentUser.username;
-            document.getElementById('credits').textContent = currentUser.credits;
+            document.getElementById('freeCredits').textContent = currentUser.freeCredits;
+            document.getElementById('paidCredits').textContent = currentUser.paidCredits;
             document.getElementById('subscription').textContent = currentUser.subscription || 'Aucun';
+            loadConversationHistory();
         }
 
         function updateUIForLoggedOutUser() {
@@ -415,6 +489,7 @@
             document.getElementById('registerBtn').classList.remove('hidden');
             document.getElementById('logoutBtn').classList.add('hidden');
             document.getElementById('userInfo').classList.add('hidden');
+            document.getElementById('conversationHistory').innerHTML = '<h3>Historique des conversations</h3>';
         }
 
         async function register() {
@@ -434,14 +509,24 @@
                     return;
                 }
                 
+                const now = new Date();
                 await userRef.set({
                     password: password,
-                    credits: 10,
+                    freeCredits: FREE_CREDITS_PER_DAY,
+                    paidCredits: 0,
                     subscription: null,
-                    subscriptionEndDate: null
+                    subscriptionEndDate: null,
+                    lastFreeCreditsReset: now.toISOString()
                 });
                 
-                currentUser = { username, credits: 10, subscription: null, subscriptionEndDate: null };
+                currentUser = { 
+                    username, 
+                    freeCredits: FREE_CREDITS_PER_DAY, 
+                    paidCredits: 0, 
+                    subscription: null, 
+                    subscriptionEndDate: null,
+                    lastFreeCreditsReset: now.toISOString()
+                };
                 saveUserToLocalStorage(currentUser);
                 updateUIForLoggedInUser();
                 showNotification('Inscription réussie !', 'success');
@@ -464,12 +549,16 @@
                 const userRef = db.ref('users/' + username);
                 const snapshot = await userRef.once('value');
                 if (snapshot.exists() && snapshot.val().password === password) {
+                    const userData = snapshot.val();
                     currentUser = { 
                         username, 
-                        credits: snapshot.val().credits,
-                        subscription: snapshot.val().subscription,
-                        subscriptionEndDate: snapshot.val().subscriptionEndDate
+                        freeCredits: userData.freeCredits,
+                        paidCredits: userData.paidCredits,
+                        subscription: userData.subscription,
+                        subscriptionEndDate: userData.subscriptionEndDate,
+                        lastFreeCreditsReset: userData.lastFreeCreditsReset
                     };
+                    await resetFreeCreditsIfNeeded();
                     saveUserToLocalStorage(currentUser);
                     updateUIForLoggedInUser();
                     showNotification('Connexion réussie !', 'success');
@@ -482,11 +571,33 @@
             }
         }
 
-        function logout() {
+        async function logout() {
+            if (currentUser) {
+                await syncUserData(); // Synchroniser les données avant la déconnexion
+            }
             currentUser = null;
             removeUserFromLocalStorage();
             updateUIForLoggedOutUser();
             showNotification('Déconnexion réussie.', 'success');
+        }
+
+        async function resetFreeCreditsIfNeeded() {
+            const now = new Date();
+            const lastReset = new Date(currentUser.lastFreeCreditsReset);
+            if (now.getTime() - lastReset.getTime() >= 24 * 60 * 60 * 1000) {
+                currentUser.freeCredits = FREE_CREDITS_PER_DAY;
+                currentUser.lastFreeCreditsReset = now.toISOString();
+                await syncUserData();
+                document.getElementById('freeCredits').textContent = currentUser.freeCredits;
+            }
+        }
+
+        function checkModelAccess() {
+            const selectedModel = document.getElementById('modelSelect').value;
+            if (selectedModel !== 'gemini-1.0-pro' && !hasValidSubscription() && currentUser.paidCredits <= 0) {
+                showPaymentNotification('Ce modèle nécessite un abonnement ou des crédits payants.');
+                document.getElementById('modelSelect').value = 'gemini-1.0-pro';
+            }
         }
 
         async function sendMessage() {
@@ -508,32 +619,66 @@
                 fullMessage = `[Contenu du fichier joint: ${pinnedFile.content}]\n\n${userInput}`;
             }
 
+            // Vérification des limites pour le modèle gratuit
+            if (model === 'gemini-1.0-pro') {
+                const wordCount = fullMessage.split(/\s+/).length;
+                if (wordCount > FREE_MODEL_MAX_WORDS) {
+                    showPaymentNotification(`Le message dépasse la limite de ${FREE_MODEL_MAX_WORDS} mots pour le modèle gratuit.`);
+                    return;
+                }
+            }
+
             addMessageToChat('user', fullMessage);
             document.getElementById('userInput').value = '';
 
-            if (model !== 'gemini-1.0-pro' && !hasValidSubscription() && currentUser.credits <= 0) {
-                showNotification('Vous n\'avez plus de crédits. Veuillez acheter des crédits ou un forfait pour continuer.', 'error');
+            if (!hasEnoughCredits(model)) {
+                showPaymentNotification('Vous n\'avez plus de crédits. Veuillez acheter des crédits ou un forfait pour continuer.');
                 return;
             }
 
             try {
                 const response = await axios.post(`${API_BASE_URL}${model}:generateContent?key=${API_KEY}`, {
-                    contents: [{ parts: [{ text: fullMessage }] }]
+                    contents: [{ parts: [{ text: currentConversation.map(msg => msg.content).join('\n') + '\n' + fullMessage }] }]
                 });
 
-                const aiResponse = response.data.candidates[0].content.parts[0].text;
-                addMessageToChat('ai', aiResponse);
+                let aiResponse = response.data.candidates[0].content.parts[0].text;
 
-                if (model !== 'gemini-1.0-pro' && !hasValidSubscription()) {
-                    currentUser.credits--;
-                    updateUserCredits();
+                // Tronquer la réponse si nécessaire pour le modèle gratuit
+                if (model === 'gemini-1.0-pro') {
+                    const words = aiResponse.split(/\s+/);
+                    if (words.length > FREE_MODEL_MAX_RESPONSE) {
+                        aiResponse = words.slice(0, FREE_MODEL_MAX_RESPONSE).join(' ') + '...';
+                        showNotification(`La réponse a été tronquée à ${FREE_MODEL_MAX_RESPONSE} mots.`, 'info');
+                    }
                 }
 
+                addMessageToChat('ai', aiResponse);
+
+                await updateCredits(model);
                 removePinnedFile();
+                saveConversation();
             } catch (error) {
                 console.error('Erreur:', error);
                 showNotification('Erreur lors de la génération de la réponse.', 'error');
             }
+        }
+
+        function hasEnoughCredits(model) {
+            if (hasValidSubscription()) return true;
+            if (model === 'gemini-1.0-pro') return currentUser.freeCredits > 0;
+            return currentUser.paidCredits > 0;
+        }
+
+        async function updateCredits(model) {
+            if (hasValidSubscription()) return;
+            if (model === 'gemini-1.0-pro') {
+                currentUser.freeCredits--;
+                document.getElementById('freeCredits').textContent = currentUser.freeCredits;
+            } else {
+                currentUser.paidCredits--;
+                document.getElementById('paidCredits').textContent = currentUser.paidCredits;
+            }
+            await syncUserData();
         }
 
         function addMessageToChat(sender, message) {
@@ -556,6 +701,8 @@
 
             messageContainer.appendChild(messageElement);
             messageContainer.scrollTop = messageContainer.scrollHeight;
+
+            currentConversation.push({ sender, content: message });
         }
 
         function copyResponse(button) {
@@ -652,13 +799,6 @@
             return new Date() < new Date(currentUser.subscriptionEndDate);
         }
 
-        async function updateUserCredits() {
-            await db.ref('users/' + currentUser.username).update({
-                credits: currentUser.credits
-            });
-            document.getElementById('credits').textContent = currentUser.credits;
-        }
-
         function buySubscription() {
             const subscriptionType = document.getElementById('subscriptionSelect').value;
             if (!subscriptionType) {
@@ -702,13 +842,9 @@
             currentUser.subscription = subscriptionType;
             currentUser.subscriptionEndDate = endDate.toISOString();
 
-            await db.ref('users/' + currentUser.username).update({
-                subscription: subscriptionType,
-                subscriptionEndDate: endDate.toISOString()
-            });
+            await syncUserData();
 
             document.getElementById('subscription').textContent = subscriptionType;
-            saveUserToLocalStorage(currentUser);
         }
 
         function buyCredits() {
@@ -746,12 +882,9 @@
         }
 
         async function addCreditsToUser(amount) {
-            currentUser.credits += amount;
-            await db.ref('users/' + currentUser.username).update({
-                credits: currentUser.credits
-            });
-            document.getElementById('credits').textContent = currentUser.credits;
-            saveUserToLocalStorage(currentUser);
+            currentUser.paidCredits += amount;
+            await syncUserData();
+            document.getElementById('paidCredits').textContent = currentUser.paidCredits;
         }
 
         function showNotification(message, type) {
@@ -771,6 +904,27 @@
             }, 100);
         }
 
+        function showPaymentNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification error';
+            notification.innerHTML = `
+                ${message}<br>
+                <button onclick="buySubscription()">Acheter un abonnement</button>
+                <button onclick="buyCredits()">Acheter des crédits</button>
+            `;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('show');
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        notification.remove();
+                    }, 300);
+                }, 10000); // Afficher pendant 10 secondes
+            }, 100);
+        }
+
         function toggleTheme() {
             const body = document.body;
             const currentTheme = body.getAttribute('data-theme');
@@ -787,40 +941,68 @@
 
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');
-            sidebar.classList.toggle('hidden');
+            const chatContainer = document.querySelector('.chat-container');
+            sidebar.classList.toggle('visible');
+            chatContainer.classList.toggle('sidebar-visible');
         }
 
-        // Fonction pour lire le contenu des fichiers
-        function readFileContent(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (event) => resolve(event.target.result);
-                reader.onerror = (error) => reject(error);
-                reader.readAsText(file);
+        function saveConversation() {
+            if (!currentUser) return;
+            const conversationId = Date.now().toString();
+            conversations[conversationId] = currentConversation;
+            localStorage.setItem(`conversations_${currentUser.username}`, JSON.stringify(conversations));
+            updateConversationHistory();
+        }
+
+        function loadConversationHistory() {
+            if (!currentUser) return;
+            const savedConversations = localStorage.getItem(`conversations_${currentUser.username}`);
+            if (savedConversations) {
+                conversations = JSON.parse(savedConversations);
+                updateConversationHistory();
+            }
+        }
+
+        function updateConversationHistory() {
+            const historyContainer = document.getElementById('conversationHistory');
+            historyContainer.innerHTML = '<h3>Historique des conversations</h3>';
+            Object.keys(conversations).forEach(id => {
+                const conversation = conversations[id];
+                const element = document.createElement('div');
+                element.className = 'conversation-item';
+                element.textContent = `Conversation du ${new Date(parseInt(id)).toLocaleString()}`;
+                element.onclick = () => loadConversation(id);
+                historyContainer.appendChild(element);
             });
         }
 
-        // Modification de la fonction handleFileUpload pour lire le contenu du fichier
-        async function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                try {
-                    const content = await readFileContent(file);
-                    pinnedFile = {
-                        name: file.name,
-                        content: content
-                    };
-                    const pinnedFileElement = document.getElementById('pinnedFile');
-                    pinnedFileElement.innerHTML = `
-                        <span>${file.name}</span>
-                        <button onclick="removePinnedFile()"><i class="fas fa-times"></i></button>
-                    `;
-                    pinnedFileElement.classList.remove('hidden');
-                } catch (error) {
-                    console.error('Erreur lors de la lecture du fichier:', error);
-                    showNotification('Erreur lors de la lecture du fichier.', 'error');
-                }
-            }
+        function loadConversation(id) {
+            currentConversation = conversations[id];
+            const messageContainer = document.getElementById('messageContainer');
+            messageContainer.innerHTML = '';
+            currentConversation.forEach(message => {
+                addMessageToChat(message.sender, message.content);
+            });
+        }
+
+        async function syncUserData() {
+            if (!currentUser) return;
+            const userRef = db.ref('users/' + currentUser.username);
+            await userRef.update({
+                freeCredits: currentUser.freeCredits,
+                paidCredits: currentUser.paidCredits,
+                subscription: currentUser.subscription,
+                subscriptionEndDate: currentUser.subscriptionEndDate,
+                lastFreeCreditsReset: currentUser.lastFreeCreditsReset
+            });
+            saveUserToLocalStorage(currentUser);
+        }
+
+        // Fonction pour ajuster la hauteur du textarea
+        function adjustTextareaHeight() {
+            const textarea = document.getElementById('userInput');
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
         }
 
         // Initialisation au chargement de la page
@@ -829,6 +1011,7 @@
             if (savedUser) {
                 currentUser = savedUser;
                 updateUIForLoggedInUser();
+                resetFreeCreditsIfNeeded();
             } else {
                 updateUIForLoggedOutUser();
             }
@@ -854,6 +1037,18 @@
             // Appel initial et ajout d'un écouteur d'événement pour le redimensionnement de la fenêtre
             adjustInputWidth();
             window.addEventListener('resize', adjustInputWidth);
+
+            // Ajout d'un écouteur d'événement pour ajuster la hauteur du textarea
+            userInput.addEventListener('input', adjustTextareaHeight);
+
+            // Ajout d'un écouteur d'événement pour vérifier l'accès au modèle
+            document.getElementById('modelSelect').addEventListener('change', checkModelAccess);
+
+            // Gestion de l'affichage de la barre latérale sur les appareils mobiles
+            if (window.innerWidth <= 768) {
+                document.querySelector('.sidebar').classList.remove('visible');
+                document.querySelector('.chat-container').classList.remove('sidebar-visible');
+            }
         };
 
         // Ajout d'un écouteur d'événement pour le chargement des ressources

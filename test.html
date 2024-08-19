@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test de l'API Gemini Vision</title>
+    <title>Test de l'API Claude</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
     <style>
         body {
@@ -12,73 +12,111 @@
             margin: 0 auto;
             padding: 20px;
         }
-        input, textarea, button {
-            display: block;
+        textarea, input[type="file"] {
             width: 100%;
             margin-bottom: 10px;
+        }
+        button {
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
         }
         #response {
             white-space: pre-wrap;
             background-color: #f0f0f0;
             padding: 10px;
-            border-radius: 5px;
+            margin-top: 20px;
+        }
+        #imagePreview {
+            max-width: 100%;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>Test de l'API Gemini Vision</h1>
+    <h1>Test de l'API Claude</h1>
+    
+    <h2>Entrée de texte</h2>
+    <textarea id="textInput" rows="5" placeholder="Entrez votre texte ici"></textarea>
+    
+    <h2>Téléchargement d'image</h2>
     <input type="file" id="imageInput" accept="image/*">
-    <textarea id="prompt" rows="3" placeholder="Entrez votre requête ici"></textarea>
-    <button onclick="analyzeImage()">Analyser l'image</button>
+    <img id="imagePreview" src="" alt="Aperçu de l'image" style="display: none;">
+    
+    <h2>Sélection du modèle</h2>
+    <select id="modelSelect">
+        <option value="claude-3-5-sonnet-20240620">Claude 3.5 Sonnet</option>
+        <option value="claude-3-opus-20240229">Claude 3 Opus</option>
+        <option value="claude-3-haiku-20240307">Claude 3 Haiku</option>
+    </select>
+    
+    <br><br>
+    <button onclick="sendRequest()">Envoyer la requête</button>
+    
+    <h2>Réponse</h2>
     <div id="response"></div>
 
     <script>
-        const API_KEY = 'AIzaSyB3umTE3n2d5gwKzOmJz4ss1pFZMR8_vOE';
-        const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent';
+        const apiKey = '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';
+        let base64Image = '';
 
-        async function analyzeImage() {
-            const imageInput = document.getElementById('imageInput');
-            const prompt = document.getElementById('prompt').value;
+        document.getElementById('imageInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    base64Image = e.target.result.split(',')[1];
+                    document.getElementById('imagePreview').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        async function sendRequest() {
+            const textInput = document.getElementById('textInput').value;
+            const modelSelect = document.getElementById('modelSelect').value;
             const responseDiv = document.getElementById('response');
 
-            if (!imageInput.files[0]) {
-                alert('Veuillez sélectionner une image');
-                return;
+            const messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        { "type": "text", "text": textInput }
+                    ]
+                }
+            ];
+
+            if (base64Image) {
+                messages[0].content.push({
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": "image/jpeg",
+                        "data": base64Image
+                    }
+                });
             }
 
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const base64Image = e.target.result.split(',')[1];
+            try {
+                const response = await axios.post('https://api.anthropic.com/v1/messages', {
+                    model: modelSelect,
+                    max_tokens: 1024,
+                    messages: messages
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': apiKey,
+                        'anthropic-version': '2023-06-01'
+                    }
+                });
 
-                const requestData = {
-                    contents: [{
-                        parts: [
-                            { text: prompt },
-                            {
-                                inline_data: {
-                                    mime_type: imageInput.files[0].type,
-                                    data: base64Image
-                                }
-                            }
-                        ]
-                    }]
-                };
-
-                try {
-                    const response = await axios.post(API_URL, requestData, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${API_KEY}`
-                        }
-                    });
-
-                    responseDiv.textContent = response.data.candidates[0].content.parts[0].text;
-                } catch (error) {
-                    console.error('Erreur:', error);
-                    responseDiv.textContent = 'Une erreur s\'est produite lors de l\'analyse de l\'image.';
-                }
-            };
-            reader.readAsDataURL(imageInput.files[0]);
+                responseDiv.textContent = JSON.stringify(response.data, null, 2);
+            } catch (error) {
+                responseDiv.textContent = `Erreur: ${error.response ? JSON.stringify(error.response.data, null, 2) : error.message}`;
+            }
         }
     </script>
 </body>

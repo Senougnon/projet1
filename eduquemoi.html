@@ -14,7 +14,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
-    <style>
+<style>
         :root {
             --primary-color: #4a90e2;
             --secondary-color: #50c878;
@@ -395,7 +395,7 @@
             <h3>Modèles</h3>
             <select id="modelSelect" onchange="checkModelAccess()">
                 <optgroup label="Modèle gratuit">
-                    <option value="gemini-1.0-pro">Gemini 1.0 Pro</option>
+                    <option value="gemini-1.0-pro" selected>Gemini 1.0 Pro</option>
                 </optgroup>
                 <optgroup label="Modèles avancés">
                     <option value="gemini-pro">Gemini Pro</option>
@@ -407,19 +407,17 @@
 
             <h3>Forfaits illimités</h3>
             <select id="subscriptionSelect">
-                <option value="">Sélectionnez un forfait</option>
-                <option value="24h">24 heures</option>
+                <option value="24h" selected>24 heures</option>
                 <option value="3d">3 jours</option>
                 <option value="7d">7 jours</option>
                 <option value="30d">30 jours</option>
                 <option value="3m">3 mois</option>
             </select>
             <button onclick="buySubscription()">Acheter le forfait</button>
-
+        
             <h3>Acheter des crédits</h3>
             <select id="creditSelect">
-                <option value="">Sélectionnez un pack</option>
-                <option value="100">100 crédits</option>
+                <option value="100" selected>100 crédits</option>
                 <option value="500">500 crédits</option>
                 <option value="1000">1000 crédits</option>
             </select>
@@ -474,19 +472,19 @@
     </div>
 
     <script>
-        const API_KEY = 'AIzaSyB3umTE3n2d5gwKzOmJz4ss1pFZMR8_vOE';
-        const API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
-        let currentUser = null;
-        let pinnedFile = null;
-        let currentConversation = [];
-        let conversations = {};
-        const FREE_CREDITS_PER_DAY = 10;
-        const FREE_MODEL_MAX_WORDS = 50;
-        const FREE_MODEL_MAX_RESPONSE = 100;
+       const API_KEY = 'AIzaSyB3umTE3n2d5gwKzOmJz4ss1pFZMR8_vOE';
+const API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
+let currentUser = null;
+let pinnedFile = null;
+let currentConversation = [];
+let conversations = {};
+const FREE_CREDITS_PER_DAY = 10;
+const FREE_MODEL_MAX_WORDS = 50;
+const FREE_MODEL_MAX_RESPONSE = 100;
 
-        // Configuration Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyCvizcYorGDPN3GXqma0opp7wAiMkaCt64",
+// Configuration Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyCvizcYorGDPN3GXqma0opp7wAiMkaCt64",
   authDomain: "gemini-bb56e.firebaseapp.com",
   databaseURL: "https://gemini-bb56e-default-rtdb.firebaseio.com",
   projectId: "gemini-bb56e",
@@ -494,641 +492,768 @@
   messagingSenderId: "277143630015",
   appId: "1:277143630015:web:78736f2cf52d29495d160a",
   measurementId: "G-CSN292219J"
+};
+
+// Initialiser Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+function showLoginModal() {
+    document.getElementById('loginModal').style.display = 'block';
+}
+
+function showRegisterModal() {
+    document.getElementById('registerModal').style.display = 'block';
+}
+
+function closeModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+}
+
+function updateUIForLoggedInUser() {
+    document.getElementById('loginBtn').classList.add('hidden');
+    document.getElementById('registerBtn').classList.add('hidden');
+    document.getElementById('logoutBtn').classList.remove('hidden');
+    document.getElementById('userInfo').classList.remove('hidden');
+    document.getElementById('username').textContent = currentUser.username;
+    document.getElementById('freeCredits').textContent = currentUser.freeCredits;
+    document.getElementById('paidCredits').textContent = currentUser.paidCredits;
+    document.getElementById('subscription').textContent = currentUser.subscription || 'Aucun';
+    loadConversationHistory();
+}
+
+function updateUIForLoggedOutUser() {
+    document.getElementById('loginBtn').classList.remove('hidden');
+    document.getElementById('registerBtn').classList.remove('hidden');
+    document.getElementById('logoutBtn').classList.add('hidden');
+    document.getElementById('userInfo').classList.add('hidden');
+    document.getElementById('conversationHistory').innerHTML = '<h3>Historique des conversations</h3>';
+}
+
+function storeLoginInfo(username, password) {
+    localStorage.setItem('eduqueMoiUsername', username);
+    localStorage.setItem('eduqueMoiPassword', password);
+}
+
+function getStoredLoginInfo() {
+    return {
+        username: localStorage.getItem('eduqueMoiUsername'),
+        password: localStorage.getItem('eduqueMoiPassword')
+    };
+}
+
+function clearLoginInfo() {
+    localStorage.removeItem('eduqueMoiUsername');
+    localStorage.removeItem('eduqueMoiPassword');
+}
+
+async function register() {
+    const username = document.getElementById('registerUsername').value;
+    const password = document.getElementById('registerPassword').value;
+    
+    if (!username || !password) {
+        showNotification('Veuillez remplir tous les champs.', 'error');
+        return;
+    }
+
+    try {
+        const userRef = db.ref('users/' + username);
+        const snapshot = await userRef.once('value');
+        if (snapshot.exists()) {
+            showNotification('Ce nom d\'utilisateur existe déjà.', 'error');
+            return;
+        }
+        
+        const now = new Date();
+        await userRef.set({
+            password: password,
+            freeCredits: FREE_CREDITS_PER_DAY,
+            paidCredits: 0,
+            subscription: null,
+            subscriptionEndDate: null,
+            lastFreeCreditsReset: now.toISOString()
+        });
+        
+        currentUser = { 
+            username, 
+            freeCredits: FREE_CREDITS_PER_DAY, 
+            paidCredits: 0, 
+            subscription: null, 
+            subscriptionEndDate: null,
+            lastFreeCreditsReset: now.toISOString()
         };
+        updateUIForLoggedInUser();
+        showNotification('Inscription réussie !', 'success');
+        closeModal('registerModal');
+        storeLoginInfo(username, password);
+    } catch (error) {
+        console.error('Erreur lors de l\'inscription:', error);
+        showNotification('Erreur lors de l\'inscription. Veuillez réessayer.', 'error');
+    }
+}
 
-        // Initialiser Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+async function login(username, password) {
+    if (!username || !password) {
+        username = document.getElementById('loginUsername').value;
+        password = document.getElementById('loginPassword').value;
+    }
+    
+    if (!username || !password) {
+        showNotification('Veuillez remplir tous les champs.', 'error');
+        return;
+    }
 
-        function showLoginModal() {
-            document.getElementById('loginModal').style.display = 'block';
+    try {
+        const userRef = db.ref('users/' + username);
+        const snapshot = await userRef.once('value');
+        if (snapshot.exists() && snapshot.val().password === password) {
+            const userData = snapshot.val();
+            currentUser = { 
+                username, 
+                freeCredits: userData.freeCredits,
+                paidCredits: userData.paidCredits,
+                subscription: userData.subscription,
+                subscriptionEndDate: userData.subscriptionEndDate,
+                lastFreeCreditsReset: userData.lastFreeCreditsReset
+            };
+            await resetFreeCreditsIfNeeded();
+            updateUIForLoggedInUser();
+            showNotification('Connexion réussie !', 'success');
+            closeModal('loginModal');
+            storeLoginInfo(username, password);
+        } else {
+            showNotification('Nom d\'utilisateur ou mot de passe incorrect.', 'error');
         }
+    } catch (error) {
+        console.error('Erreur lors de la connexion:', error);
+        showNotification('Erreur lors de la connexion. Veuillez réessayer.', 'error');
+    }
+}
 
-        function showRegisterModal() {
-            document.getElementById('registerModal').style.display = 'block';
-        }
+function logout() {
+    if (currentUser) {
+        syncUserData();
+    }
+    currentUser = null;
+    updateUIForLoggedOutUser();
+    showNotification('Déconnexion réussie.', 'success');
+    clearLoginInfo();
+}
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
+async function resetFreeCreditsIfNeeded() {
+    const now = new Date();
+    const lastReset = new Date(currentUser.lastFreeCreditsReset);
+    if (now.getTime() - lastReset.getTime() >= 24 * 60 * 60 * 1000) {
+        currentUser.freeCredits = FREE_CREDITS_PER_DAY;
+        currentUser.lastFreeCreditsReset = now.toISOString();
+        await syncUserData();
+        document.getElementById('freeCredits').textContent = currentUser.freeCredits;
+    }
+}
 
-        function updateUIForLoggedInUser() {
-            document.getElementById('loginBtn').classList.add('hidden');
-            document.getElementById('registerBtn').classList.add('hidden');
-            document.getElementById('logoutBtn').classList.remove('hidden');
-            document.getElementById('userInfo').classList.remove('hidden');
-            document.getElementById('username').textContent = currentUser.username;
-            document.getElementById('freeCredits').textContent = currentUser.freeCredits;
-            document.getElementById('paidCredits').textContent = currentUser.paidCredits;
-            document.getElementById('subscription').textContent = currentUser.subscription || 'Aucun';
-            loadConversationHistory();
-        }
+function checkModelAccess() {
+    const selectedModel = document.getElementById('modelSelect').value;
+    if (selectedModel !== 'gemini-1.0-pro' && !hasValidSubscription() && currentUser.paidCredits <= 0) {
+        showPaymentNotification('Ce modèle nécessite un abonnement ou des crédits payants.');
+        document.getElementById('modelSelect').value = 'gemini-1.0-pro';
+    }
+}
 
-        function updateUIForLoggedOutUser() {
-            document.getElementById('loginBtn').classList.remove('hidden');
-            document.getElementById('registerBtn').classList.remove('hidden');
-            document.getElementById('logoutBtn').classList.add('hidden');
-            document.getElementById('userInfo').classList.add('hidden');
-            document.getElementById('conversationHistory').innerHTML = '<h3>Historique des conversations</h3>';
-        }
+// Modifiez la fonction sendMessage
+async function sendMessage() {
+    console.log("Début de sendMessage");
+    console.log("État de l'utilisateur:", currentUser);
 
-        async function register() {
-            const username = document.getElementById('registerUsername').value;
-            const password = document.getElementById('registerPassword').value;
-            
-            if (!username || !password) {
-                showNotification('Veuillez remplir tous les champs.', 'error');
-                return;
-            }
+    if (!currentUser) {
+        showNotification('Veuillez vous connecter pour envoyer des messages.', 'error');
+        return;
+    }
 
-            try {
-                const userRef = db.ref('users/' + username);
-                const snapshot = await userRef.once('value');
-                if (snapshot.exists()) {
-                    showNotification('Ce nom d\'utilisateur existe déjà.', 'error');
-                    return;
-                }
-                
-                const now = new Date();
-                await userRef.set({
-                    password: password,
-                    freeCredits: FREE_CREDITS_PER_DAY,
-                    paidCredits: 0,
-                    subscription: null,
-                    subscriptionEndDate: null,
-                    lastFreeCreditsReset: now.toISOString()
-                });
-                
-                currentUser = { 
-                    username, 
-                    freeCredits: FREE_CREDITS_PER_DAY, 
-                    paidCredits: 0, 
-                    subscription: null, 
-                    subscriptionEndDate: null,
-                    lastFreeCreditsReset: now.toISOString()
-                };
-                updateUIForLoggedInUser();
-                showNotification('Inscription réussie !', 'success');
-                closeModal('registerModal');
-            } catch (error) {
-                console.error('Erreur lors de l\'inscription:', error);
-                showNotification('Erreur lors de l\'inscription. Veuillez réessayer.', 'error');
-            }
-        }
+    const userInput = document.getElementById('userInput').value;
+    const model = document.getElementById('modelSelect').value;
 
-        async function login() {
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            if (!username || !password) {
-                showNotification('Veuillez remplir tous les champs.', 'error');
-                return;
-            }
+    console.log("Modèle sélectionné:", model);
+    console.log("Entrée utilisateur:", userInput);
 
-            try {
-                const userRef = db.ref('users/' + username);
-                const snapshot = await userRef.once('value');
-                if (snapshot.exists() && snapshot.val().password === password) {
-                    const userData = snapshot.val();
-                    currentUser = { 
-                        username, 
-                        freeCredits: userData.freeCredits,
-                        paidCredits: userData.paidCredits,
-                        subscription: userData.subscription,
-                        subscriptionEndDate: userData.subscriptionEndDate,
-                        lastFreeCreditsReset: userData.lastFreeCreditsReset
-                    };
-                    await resetFreeCreditsIfNeeded();
-                    updateUIForLoggedInUser();
-                    showNotification('Connexion réussie !', 'success');
-                    closeModal('loginModal');
-                } else {
-                    showNotification('Nom d\'utilisateur ou mot de passe incorrect.', 'error');
-                }
-            } catch (error) {
-                console.error('Erreur lors de la connexion:', error);
-                showNotification('Erreur lors de la connexion. Veuillez réessayer.', 'error');
-            }
-        }
+    if (!userInput && !pinnedFile) {
+        showNotification('Veuillez entrer un message ou joindre un fichier.', 'error');
+        return;
+    }
 
-        async function logout() {
-            if (currentUser) {
-                await syncUserData(); // Synchroniser les données avant la déconnexion
-            }
-            currentUser = null;
-            updateUIForLoggedOutUser();
-            showNotification('Déconnexion réussie.', 'success');
-        }
+    let fullMessage = userInput;
+    if (pinnedFile) {
+        fullMessage = `[Contenu du fichier joint: ${pinnedFile.content}]\n\n${userInput}`;
+    }
 
-        async function resetFreeCreditsIfNeeded() {
-            const now = new Date();
-            const lastReset = new Date(currentUser.lastFreeCreditsReset);
-            if (now.getTime() - lastReset.getTime() >= 24 * 60 * 60 * 1000) {
-                currentUser.freeCredits = FREE_CREDITS_PER_DAY;
-                currentUser.lastFreeCreditsReset = now.toISOString();
-                await syncUserData();
-                document.getElementById('freeCredits').textContent = currentUser.freeCredits;
-            }
-        }
-
-        function checkModelAccess() {
-            const selectedModel = document.getElementById('modelSelect').value;
-            if (selectedModel !== 'gemini-1.0-pro' && !hasValidSubscription() && currentUser.paidCredits <= 0) {
-                showPaymentNotification('Ce modèle nécessite un abonnement ou des crédits payants.');
-                document.getElementById('modelSelect').value = 'gemini-1.0-pro';
-            }
-        }
-
-        async function sendMessage() {
-            if (!currentUser) {
-                showNotification('Veuillez vous connecter pour envoyer des messages.', 'error');
-                return;
-            }
-
-            const userInput = document.getElementById('userInput').value;
-            const model = document.getElementById('modelSelect').value;
-
-            if (!userInput && !pinnedFile) {
-                showNotification('Veuillez entrer un message ou joindre un fichier.', 'error');
-                return;
-            }
-
-            let fullMessage = userInput;
-            if (pinnedFile) {
-                fullMessage = `[Contenu du fichier joint: ${pinnedFile.content}]\n\n${userInput}`;
-            }
-
-            // Vérification des limites pour le modèle gratuit
-            if (model === 'gemini-1.0-pro') {
-                const wordCount = fullMessage.split(/\s+/).length;
-                if (wordCount > FREE_MODEL_MAX_WORDS) {
-                    showPaymentNotification(`Le message dépasse la limite de ${FREE_MODEL_MAX_WORDS} mots pour le modèle gratuit.`);
-                    return;
-                }
-            }
-
-            addMessageToChat('user', fullMessage);
-            document.getElementById('userInput').value = '';
-
-            if (!hasEnoughCredits(model)) {
-                showPaymentNotification('Vous n\'avez plus de crédits. Veuillez acheter des crédits ou un forfait pour continuer.');
-                return;
-            }
-
-            try {
-                const response = await axios.post(`${API_BASE_URL}${model}:generateContent?key=${API_KEY}`, {
-                    contents: [{ parts: [{ text: currentConversation.map(msg => msg.content).join('\n') + '\n' + fullMessage }] }]
-                });
-
-                let aiResponse = response.data.candidates[0].content.parts[0].text;
-
-                // Tronquer la réponse si nécessaire pour le modèle gratuit
-                if (model === 'gemini-1.0-pro') {
-                    const words = aiResponse.split(/\s+/);
-                    if (words.length > FREE_MODEL_MAX_RESPONSE) {
-                        aiResponse = words.slice(0, FREE_MODEL_MAX_RESPONSE).join(' ') + '...';
-                        showNotification(`La réponse a été tronquée à ${FREE_MODEL_MAX_RESPONSE} mots.`, 'info');
-                    }
-                }
-
-                addMessageToChat('ai', aiResponse);
-
-                await updateCredits(model);
-                removePinnedFile();
-                saveConversation();
-            } catch (error) {
-                console.error('Erreur:', error);
-                showNotification('Erreur lors de la génération de la réponse.', 'error');
-            }
-        }
-
-        function hasEnoughCredits(model) {
-            if (hasValidSubscription()) return true;
-            if (model === 'gemini-1.0-pro') return currentUser.freeCredits > 0;
-            return currentUser.paidCredits > 0;
-        }
-
-        async function updateCredits(model) {
-    if (hasValidSubscription()) return;
     if (model === 'gemini-1.0-pro') {
-        currentUser.freeCredits--;
+        const wordCount = fullMessage.split(/\s+/).length;
+        if (wordCount > FREE_MODEL_MAX_WORDS) {
+            showPaymentNotification(`Le message dépasse la limite de ${FREE_MODEL_MAX_WORDS} mots pour le modèle gratuit.`);
+            return;
+        }
+    }
+
+    addMessageToChat('user', fullMessage);
+    document.getElementById('userInput').value = '';
+
+    if (!hasEnoughCredits(model)) {
+        showPaymentNotification('Vous n\'avez plus de crédits. Veuillez acheter des crédits ou un forfait pour continuer.');
+        return;
+    }
+
+    try {
+        console.log("Envoi de la requête à l'API Gemini");
+        console.log("URL de l'API:", `${API_BASE_URL}${model}:generateContent?key=${API_KEY}`);
+        console.log("Contenu de la requête:", {
+            contents: [{ parts: [{ text: currentConversation.map(msg => msg.content).join('\n') + '\n' + fullMessage }] }]
+        });
+
+        const response = await axios.post(`${API_BASE_URL}${model}:generateContent?key=${API_KEY}`, {
+            contents: [{ parts: [{ text: currentConversation.map(msg => msg.content).join('\n') + '\n' + fullMessage }] }]
+        });
+
+        console.log("Réponse de l'API reçue:", response.data);
+
+        let aiResponse = response.data.candidates[0].content.parts[0].text;
+
+        if (model === 'gemini-1.0-pro') {
+            const words = aiResponse.split(/\s+/);
+            if (words.length > FREE_MODEL_MAX_RESPONSE) {
+                aiResponse = words.slice(0, FREE_MODEL_MAX_RESPONSE).join(' ') + '...';
+                showNotification(`La réponse a été tronquée à ${FREE_MODEL_MAX_RESPONSE} mots.`, 'info');
+            }
+        }
+
+        addMessageToChat('ai', aiResponse);
+
+        await updateCredits(model);
+        removePinnedFile();
+        saveConversation();
+    } catch (error) {
+        console.error('Erreur détaillée lors de la génération de la réponse:', error);
+        if (error.response) {
+            console.error('Statut de la réponse:', error.response.status);
+            console.error('Données de la réponse:', error.response.data);
+            console.error('En-têtes de la réponse:', error.response.headers);
+        } else if (error.request) {
+            console.error('Requête sans réponse:', error.request);
+        } else {
+            console.error('Erreur de configuration de la requête:', error.message);
+        }
+        showNotification(`Erreur lors de la génération de la réponse: ${error.message}. Veuillez réessayer.`, 'error');
+    }
+    console.log("Fin de sendMessage");
+}
+
+// Ajoutez cette fonction pour vérifier l'état de l'API
+async function checkApiStatus() {
+    try {
+        const response = await axios.get(`${API_BASE_URL}models?key=${API_KEY}`);
+        console.log("Statut de l'API Gemini:", response.status);
+        console.log("Modèles disponibles:", response.data);
+    } catch (error) {
+        console.error("Erreur lors de la vérification du statut de l'API:", error);
+    }
+}
+
+function hasEnoughCredits(model) {
+    if (hasValidSubscription()) return true;
+    if (model === 'gemini-1.0-pro') return currentUser.freeCredits > 0;
+    return currentUser.paidCredits > 0;
+}
+
+// Modifiez également la fonction updateCredits pour s'assurer que les crédits ne sont jamais undefined
+async function updateCredits(model) {
+    if (hasValidSubscription()) return;
+    
+    if (model === 'gemini-1.0-pro') {
+        currentUser.freeCredits = Math.max(0, (currentUser.freeCredits || 0) - 1);
         document.getElementById('freeCredits').textContent = currentUser.freeCredits;
     } else {
-        currentUser.paidCredits--;
+        currentUser.paidCredits = Math.max(0, (currentUser.paidCredits || 0) - 1);
         document.getElementById('paidCredits').textContent = currentUser.paidCredits;
     }
+    
     await syncUserData();
 }
 
-        function addMessageToChat(sender, message) {
-            const messageContainer = document.getElementById('messageContainer');
-            const messageElement = document.createElement('div');
-            messageElement.classList.add('message', sender === 'user' ? 'user-message' : 'ai-message');
-            messageElement.textContent = message;
+function addMessageToChat(sender, message) {
+    const messageContainer = document.getElementById('messageContainer');
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message', sender === 'user' ? 'user-message' : 'ai-message');
+    
+    if (sender === 'ai') {
+        message = message.replace(/\*\*/g, '\n');
+        messageElement.textContent = message;
 
-            if (sender === 'ai') {
-                const actionsElement = document.createElement('div');
-                actionsElement.classList.add('message-actions');
-                actionsElement.innerHTML = `
-                    <button onclick="copyResponse(this)"><i class="fas fa-copy"></i></button>
-                    <button onclick="exportResponse(this, 'word')"><i class="fas fa-file-word"></i></button>
-                    <button onclick="exportResponse(this, 'pdf')"><i class="fas fa-file-pdf"></i></button>
-                    <button onclick="shareResponse(this)"><i class="fas fa-share-alt"></i></button>
-                `;
-                messageElement.appendChild(actionsElement);
-            }
+        const actionsElement = document.createElement('div');
+        actionsElement.classList.add('message-actions');
+        actionsElement.innerHTML = `
+            <button onclick="copyResponse(this)"><i class="fas fa-copy"></i></button>
+            <button onclick="exportResponse(this, 'word')"><i class="fas fa-file-word"></i></button>
+            <button onclick="exportResponse(this, 'pdf')"><i class="fas fa-file-pdf"></i></button>
+            <button onclick="shareResponse(this)"><i class="fas fa-share-alt"></i></button>
+        `;
+        messageElement.appendChild(actionsElement);
+    } else {
+        messageElement.textContent = message;
+    }
 
-            messageContainer.appendChild(messageElement);
-            messageContainer.scrollTop = messageContainer.scrollHeight;
+    messageContainer.appendChild(messageElement);
+    messageContainer.scrollTop = messageContainer.scrollHeight;
 
-            currentConversation.push({ sender, content: message });
-        }
+    currentConversation.push({ sender, content: message });
+}
 
-        function copyResponse(button) {
-            const responseText = button.closest('.message').textContent;
-            navigator.clipboard.writeText(responseText).then(() => {
-                showNotification('Réponse copiée dans le presse-papiers', 'success');
-            });
-        }
+function copyResponse(button) {
+    const responseText = button.closest('.message').textContent;
+    navigator.clipboard.writeText(responseText).then(() => {
+        showNotification('Réponse copiée dans le presse-papiers', 'success');
+    });
+}
 
-        async function exportResponse(button, format) {
-            const responseText = button.closest('.message').textContent;
-            if (format === 'word') {
-                const blob = await generateWordDoc(responseText);
-                saveAs(blob, "response.docx");
-            } else if (format === 'pdf') {
-                const blob = await generatePDF(responseText);
-                saveAs(blob, "response.pdf");
-            }
-            showNotification(`Export en ${format.toUpperCase()} réussi`, 'success');
-        }
+async function exportResponse(button, format) {
+    const responseText = button.closest('.message').textContent;
+    if (format === 'word') {
+        const blob = await generateWordDoc(responseText);
+        saveAs(blob, "response.docx");
+    } else if (format === 'pdf') {
+        const blob = await generatePDF(responseText);
+        saveAs(blob, "response.pdf");
+    }
+    showNotification(`Export en ${format.toUpperCase()} réussi`, 'success');
+}
 
-        async function generateWordDoc(text) {
-            const content = `
-                <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-                <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-                    <w:body>
-                        <w:p>
-                            <w:pPr>
-                                <w:pStyle w:val ="Heading1"/>
-                            </w:pPr>
-                            <w:r>
-                                <w:t>Réponse d'Eduque moi</w:t>
-                            </w:r>
-                        </w:p>
-                        <w:p>
-                            <w:r>
-                                <w:t>${text}</w:t>
-                            </w:r>
-                        </w:p>
-                    </w:body>
-                </w:document>
-            `;
-            const zip = new PizZip();
-            zip.file("word/document.xml", content);
-            const blob = await zip.generateAsync({type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
-            return blob;
-        }
+async function generateWordDoc(text) {
+    const content = `
+        <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+        <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+            <w:body>
+                <w:p>
+                    <w:pPr>
+                        <w:pStyle w:val="Heading1"/>
+                    </w:pPr>
+                    <w:r>
+                        <w:t>Réponse d'Eduque moi</w:t>
+                    </w:r>
+                </w:p>
+                <w:p>
+                    <w:r>
+                        <w:t>${text}</w:t>
+                    </w:r>
+                </w:p>
+            </w:body>
+        </w:document>
+    `;
+    const zip = new PizZip();
+    zip.file("word/document.xml", content);
+    const blob = await zip.generateAsync({type: "blob", mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"});
+    return blob;
+}
 
-        function generatePDF(text) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            // Ajout du titre
-            doc.setFontSize(18);
-            doc.text("Réponse d'Eduque moi", 20, 20);
-            
-            // Ajout du contenu
-            doc.setFontSize(12);
-            const splitText = doc.splitTextToSize(text, 170);
-            doc.text(splitText, 20, 30);
-            
-            return doc.output('blob');
-        }
+function generatePDF(text) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    doc.setFontSize(18);
+    doc.text("Réponse d'Eduque moi", 20, 20);
+    
+    doc.setFontSize(12);
+    const splitText = doc.splitTextToSize(text, 170);
+    doc.text(splitText, 20, 30);
+    
+    return doc.output('blob');
+}
 
-        function shareResponse(button) {
-            const responseText = button.closest('.message').textContent;
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Réponse de Eduque moi',
-                    text: responseText
-                }).then(() => {
-                    showNotification('Partage réussi', 'success');
-                }).catch((error) => {
-                    console.error('Erreur lors du partage:', error);
-                    showNotification('Erreur lors du partage', 'error');
-                });
-            } else {
-                showNotification('Le partage n\'est pas pris en charge sur votre appareil', 'error');
-            }
-        }
-
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    pinnedFile = {
-                        name: file.name,
-                        content: e.target.result
-                    };
-                    const pinnedFileElement = document.getElementById('pinnedFile');
-                    pinnedFileElement.innerHTML = `
-                        <span>${file.name}</span>
-                        <button onclick="removePinnedFile()"><i class="fas fa-times"></i></button>
-                    `;
-                    pinnedFileElement.classList.remove('hidden');
-                };
-                reader.readAsText(file);
-            }
-        }
-
-        function removePinnedFile() {
-            pinnedFile = null;
-            const pinnedFileElement = document.getElementById('pinnedFile');
-            pinnedFileElement.innerHTML = '';
-            pinnedFileElement.classList.add('hidden');
-        }
-
-        function hasValidSubscription() {
-            if (!currentUser.subscription || !currentUser.subscriptionEndDate) return false;
-            return new Date() < new Date(currentUser.subscriptionEndDate);
-        }
-
-        function buySubscription() {
-            const subscriptionType = document.getElementById('subscriptionSelect').value;
-            if (!subscriptionType) {
-                showNotification('Veuillez sélectionner un forfait.', 'error');
-                return;
-            }
-
-            const subscriptionPrices = {
-                '24h': 500, '3d': 1000, '7d': 2000, '30d': 5000, '3m': 12000
-            };
-
-            const price = subscriptionPrices[subscriptionType];
-
-            var fedaPayInstance = FedaPay.init({
-                public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
-                transaction: {
-                    amount: price,
-                    description: `Achat d'un forfait ${subscriptionType} pour Eduque moi`
-                },
-                customer: {
-                    email: 'client@example.com'
-                },
-                onComplete: function(response) {
-                    if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
-                        activateSubscription(subscriptionType);
-                        showNotification(`Forfait ${subscriptionType} activé avec succès !`, 'success');
-                    } else {
-                        showNotification('Le paiement a été annulé ou a échoué.', 'error');
-                    }
-                }
-            });
-            fedaPayInstance.open();
-        }
-
-        async function activateSubscription(subscriptionType) {
-            const durations = { '24h': 1, '3d': 3, '7d': 7, '30d': 30, '3m': 90 };
-            const days = durations[subscriptionType];
-            const endDate = new Date();
-            endDate.setDate(endDate.getDate() + days);
-
-            currentUser.subscription = subscriptionType;
-            currentUser.subscriptionEndDate = endDate.toISOString();
-
-            await syncUserData();
-
-            document.getElementById('subscription').textContent = subscriptionType;
-        }
-
-        function buyCredits() {
-            const creditAmount = document.getElementById('creditSelect').value;
-            if (!creditAmount) {
-                showNotification('Veuillez sélectionner un pack de crédits.', 'error');
-                return;
-            }
-
-            const creditPrices = {
-                '100': 1000, '500': 4500, '1000': 8000
-            };
-
-            const price = creditPrices[creditAmount];
-
-            var fedaPayInstance = FedaPay.init({
-                public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
-                transaction: {
-                    amount: price,
-                    description: `Achat de ${creditAmount} crédits pour Eduque moi`
-                },
-                customer: {
-                    email: 'client@example.com'
-                },
-                onComplete: function(response) {
-                    if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
-                        addCreditsToUser(parseInt(creditAmount));
-                        showNotification(`${creditAmount} crédits ont été ajoutés à votre compte.`, 'success');
-                    } else {
-                        showNotification('Le paiement a été annulé ou a échoué.', 'error');
-                    }
-                }
-            });
-            fedaPayInstance.open();
-        }
-
-        async function addCreditsToUser(amount) {
-            currentUser.paidCredits += amount;
-            await syncUserData();
-            document.getElementById('paidCredits').textContent = currentUser.paidCredits;
-        }
-
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.textContent = message;
-            notification.className = `notification ${type}`;
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.classList.add('show');
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 300);
-                }, 3000);
-            }, 100);
-        }
-
-        function showPaymentNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification error';
-            notification.innerHTML = `
-                ${message}<br>
-                <button onclick="buySubscription()">Acheter un abonnement</button>
-                <button onclick="buyCredits()">Acheter des crédits</button>
-            `;
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.classList.add('show');
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                    setTimeout(() => {
-                        notification.remove();
-                    }, 300);
-                }, 10000); // Afficher pendant 10 secondes
-            }, 100);
-        }
-
-        function toggleTheme() {
-            const body = document.body;
-            const currentTheme = body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            body.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeIcon(newTheme);
-        }
-
-        function updateThemeIcon(theme) {
-            const themeToggle = document.querySelector('.theme-toggle i');
-            themeToggle.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const chatContainer = document.querySelector('.chat-container');
-            sidebar.classList.toggle('visible');
-            chatContainer.classList.toggle('sidebar-visible');
-        }
-
-        function saveConversation() {
-            if (!currentUser) return;
-            const conversationId = Date.now().toString();
-            conversations[conversationId] = currentConversation;
-            localStorage.setItem(`conversations_${currentUser.username}`, JSON.stringify(conversations));
-            updateConversationHistory();
-        }
-
-        function loadConversationHistory() {
-            if (!currentUser) return;
-            const savedConversations = localStorage.getItem(`conversations_${currentUser.username}`);
-            if (savedConversations) {
-                conversations = JSON.parse(savedConversations);
-                updateConversationHistory();
-            }
-        }
-
-        function updateConversationHistory() {
-            const historyContainer = document.getElementById('conversationHistory');
-            historyContainer.innerHTML = '<h3>Historique des conversations</h3>';
-            Object.keys(conversations).forEach(id => {
-                const conversation = conversations[id];
-                const element = document.createElement('div');
-                element.className = 'conversation-item';
-                element.textContent = `Conversation du ${new Date(parseInt(id)).toLocaleString()}`;
-                element.onclick = () => loadConversation(id);
-                historyContainer.appendChild(element);
-            });
-        }
-
-        function loadConversation(id) {
-            currentConversation = conversations[id];
-            const messageContainer = document.getElementById('messageContainer');
-            messageContainer.innerHTML = '';
-            currentConversation.forEach(message => {
-                addMessageToChat(message.sender, message.content);
-            });
-        }
-
-        async function syncUserData() {
-            if (!currentUser) return;
-            const userRef = db.ref('users/' + currentUser.username);
-            await userRef.update({
-                freeCredits: currentUser.freeCredits,
-                paidCredits: currentUser.paidCredits,
-                subscription: currentUser.subscription,
-                subscriptionEndDate: currentUser.subscriptionEndDate,
-                lastFreeCreditsReset: currentUser.lastFreeCreditsReset
-            });
-        }
-
-        // Fonction pour ajuster la hauteur du textarea
-        function adjustTextareaHeight() {
-            const textarea = document.getElementById('userInput');
-            textarea.style.height = 'auto';
-            textarea.style.height = textarea.scrollHeight + 'px';
-        }
-
-        // Initialisation au chargement de la page
-        window.onload = function() {
-            const savedUser = getUserFromLocalStorage();
-            if (savedUser) {
-                currentUser = savedUser;
-                updateUIForLoggedInUser();
-                resetFreeCreditsIfNeeded();
-            } else {
-                updateUIForLoggedOutUser();
-            }
-
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            document.body.setAttribute('data-theme', savedTheme);
-            updateThemeIcon(savedTheme);
-
-            // Ajustement du champ de saisie pour qu'il prenne toute la largeur disponible
-            const inputContainer = document.querySelector('.input-container');
-            const userInput = document.getElementById('userInput');
-            const fileLabel = document.querySelector('.file-label');
-            const sendButton = inputContainer.querySelector('button');
-
-            function adjustInputWidth() {
-                const containerWidth = inputContainer.offsetWidth;
-                const fileLabelWidth = fileLabel.offsetWidth;
-                const sendButtonWidth = sendButton.offsetWidth;
-                const padding = 20; // Ajustez selon vos besoins
-                userInput.style.width = `${containerWidth - fileLabelWidth - sendButtonWidth - padding}px`;
-            }
-
-            // Appel initial et ajout d'un écouteur d'événement pour le redimensionnement de la fenêtre
-            adjustInputWidth();
-            window.addEventListener('resize', adjustInputWidth);
-
-            // Ajout d'un écouteur d'événement pour ajuster la hauteur du textarea
-            userInput.addEventListener('input', adjustTextareaHeight);
-
-            // Ajout d'un écouteur d'événement pour vérifier l'accès au modèle
-            document.getElementById('modelSelect').addEventListener('change', checkModelAccess);
-
-            // Gestion de l'affichage de la barre latérale sur les appareils mobiles
-            if (window.innerWidth <= 768) {
-                document.querySelector('.sidebar').classList.remove('visible');
-                document.querySelector('.chat-container').classList.remove('sidebar-visible');
-            }
-
-            // Synchronisation en temps réel avec Firebase
-            if (currentUser) {
-                const userRef = db.ref('users/' + currentUser.username);
-                userRef.on('value', (snapshot) => {
-                    const userData = snapshot.val();
-                    if (userData) {
-                        currentUser = {
-                            ...currentUser,
-                            freeCredits: userData.freeCredits,
-                            paidCredits: userData.paidCredits,
-                            subscription: userData.subscription,
-                            subscriptionEndDate: userData.subscriptionEndDate,
-                            lastFreeCreditsReset: userData.lastFreeCreditsReset
-                        };
-                        updateUIForLoggedInUser();
-                    }
-                });
-            }
-        };
-
-        // Ajout d'un écouteur d'événement pour le chargement des ressources
-        window.addEventListener('load', function() {
-            document.body.classList.add('loaded');
+function shareResponse(button) {
+    const responseText = button.closest('.message').textContent;
+    if (navigator.share) {
+        navigator.share({
+            title: 'Réponse de Eduque moi',
+            text: responseText
+        }).then(() => {
+            showNotification('Partage réussi', 'success');
+        }).catch((error) => {
+            console.error('Erreur lors du partage:', error);
+            showNotification('Erreur lors du partage', 'error');
         });
+    } else {
+        showNotification('Le partage n\'est pas pris en charge sur votre appareil', 'error');
+    }
+}
+
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            pinnedFile = {
+                name: file.name,
+                content: e.target.result
+            };
+            const pinnedFileElement = document.getElementById('pinnedFile');
+            pinnedFileElement.innerHTML = `
+                <span>${file.name}</span>
+                <button onclick="removePinnedFile()"><i class="fas fa-times"></i></button>
+            `;
+            pinnedFileElement.classList.remove('hidden');
+        };
+        reader.readAsText(file);
+    }
+}
+
+function removePinnedFile() {
+    pinnedFile = null;
+    const pinnedFileElement = document.getElementById('pinnedFile');
+    pinnedFileElement.innerHTML = '';
+    pinnedFileElement.classList.add('hidden');
+}
+
+function hasValidSubscription() {
+    if (!currentUser.subscription || !currentUser.subscriptionEndDate) return false;
+    return new Date() < new Date(currentUser.subscriptionEndDate);
+}
+
+function buySubscription() {
+    const subscriptionType = document.getElementById('subscriptionSelect').value;
+    if (!subscriptionType) {
+        showNotification('Veuillez sélectionner un forfait.', 'error');
+        return;
+    }
+
+    const subscriptionPrices = {
+        '24h': 500, '3d': 1000, '7d': 2000, '30d': 5000, '3m': 12000
+    };
+
+    const price = subscriptionPrices[subscriptionType];
+
+    var fedaPayInstance = FedaPay.init({
+        public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
+        transaction: {
+            amount: price,
+            description: `Achat d'un forfait ${subscriptionType} pour Eduque moi`
+        },
+        customer: {
+            email: 'client@example.com'
+        },
+        onComplete: function(response) {
+            if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
+                activateSubscription(subscriptionType);
+                showNotification(`Forfait ${subscriptionType} activé avec succès !`, 'success');
+            } else {
+                showNotification('Le paiement a été annulé ou a échoué.', 'error');
+            }
+        }
+    });
+    fedaPayInstance.open();
+}
+
+async function activateSubscription(subscriptionType) {
+    const durations = { '24h': 1, '3d': 3, '7d': 7, '30d': 30, '3m': 90 };
+    const days = durations[subscriptionType];
+    const endDate = new Date();
+    endDate.setDate(endDate.getDate() + days);
+
+    currentUser.subscription = subscriptionType;
+    currentUser.subscriptionEndDate = endDate.toISOString();
+
+    await syncUserData();
+
+    document.getElementById('subscription').textContent = subscriptionType;
+}
+
+function buyCredits() {
+    const creditAmount = document.getElementById('creditSelect').value;
+    if (!creditAmount) {
+        showNotification('Veuillez sélectionner un pack de crédits.', 'error');
+        return;
+    }
+
+    const creditPrices = {
+        '100': 1000, '500': 4500, '1000': 8000
+    };
+
+    const price = creditPrices[creditAmount];
+
+    var fedaPayInstance = FedaPay.init({
+        public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
+        transaction: {
+            amount: price,
+            description: `Achat de ${creditAmount} crédits pour Eduque moi`
+        },
+        customer: {
+            email: 'client@example.com'
+        },
+        onComplete: function(response) {
+            if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
+                addCreditsToUser(parseInt(creditAmount));
+                showNotification(`${creditAmount} crédits ont été ajoutés à votre compte.`, 'success');
+            } else {
+                showNotification('Le paiement a été annulé ou a échoué.', 'error');
+            }
+        }
+    });
+    fedaPayInstance.open();
+}
+
+async function addCreditsToUser(amount) {
+    currentUser.paidCredits += amount;
+    await syncUserData();
+    document.getElementById('paidCredits').textContent = currentUser.paidCredits;
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    notification.className = `notification ${type}`;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.classList.add('show');
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 3000);
+    }, 100);
+}
+
+function showPaymentNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification error';
+    notification.innerHTML = `
+        ${message}<br>
+        <button onclick="buySubscription()">Acheter un abonnement</button>
+        <button onclick="buyCredits()">Acheter des crédits</button>
+    `;
+    document.body.appendChild(notification);
+
+    setTimeout(() => {
+        notification.classList.add('show');
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 10000); // Afficher pendant 10 secondes
+    }, 100);
+}
+
+function toggleTheme() {
+    const body = document.body;
+    const currentTheme = body.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    body.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+}
+
+function updateThemeIcon(theme) {
+    const themeToggle = document.querySelector('.theme-toggle i');
+    themeToggle.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+}
+
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    const chatContainer = document.querySelector('.chat-container');
+    sidebar.classList.toggle('visible');
+    chatContainer.classList.toggle('sidebar-visible');
+}
+
+function saveConversation() {
+    if (!currentUser) return;
+    const conversationId = Date.now().toString();
+    conversations[conversationId] = currentConversation;
+    localStorage.setItem(`conversations_${currentUser.username}`, JSON.stringify(conversations));
+    updateConversationHistory();
+}
+
+function loadConversationHistory() {
+    if (!currentUser) return;
+    const savedConversations = localStorage.getItem(`conversations_${currentUser.username}`);
+    if (savedConversations) {
+        conversations = JSON.parse(savedConversations);
+        updateConversationHistory();
+    }
+}
+
+function updateConversationHistory() {
+    const historyContainer = document.getElementById('conversationHistory');
+    historyContainer.innerHTML = '<h3>Historique des conversations</h3>';
+    Object.keys(conversations).forEach(id => {
+        const conversation = conversations[id];
+        const element = document.createElement('div');
+        element.className = 'conversation-item';
+        element.textContent = `Conversation du ${new Date(parseInt(id)).toLocaleString()}`;
+        element.onclick = () => loadConversation(id);
+        historyContainer.appendChild(element);
+    });
+}
+
+function loadConversation(id) {
+    currentConversation = conversations[id];
+    const messageContainer = document.getElementById('messageContainer');
+    messageContainer.innerHTML = '';
+    currentConversation.forEach(message => {
+        addMessageToChat(message.sender, message.content);
+    });
+}
+
+// Modifiez la fonction syncUserData pour éviter d'envoyer des valeurs undefined
+async function syncUserData() {
+    if (!currentUser) return;
+
+    // Créez un objet avec seulement les propriétés non-undefined
+    const updateData = {
+        freeCredits: currentUser.freeCredits || 0,
+        paidCredits: currentUser.paidCredits || 0,
+        lastFreeCreditsReset: currentUser.lastFreeCreditsReset || new Date().toISOString()
+    };
+
+    // Ajoutez subscription et subscriptionEndDate seulement s'ils sont définis
+    if (currentUser.subscription) {
+        updateData.subscription = currentUser.subscription;
+    }
+    if (currentUser.subscriptionEndDate) {
+        updateData.subscriptionEndDate = currentUser.subscriptionEndDate;
+    }
+
+    const userRef = db.ref('users/' + currentUser.username);
+    try {
+        await userRef.update(updateData);
+        console.log("Données utilisateur mises à jour avec succès:", updateData);
+    } catch (error) {
+        console.error("Erreur lors de la mise à jour des données utilisateur:", error);
+        showNotification("Erreur lors de la mise à jour de votre profil. Veuillez réessayer.", 'error');
+    }
+}
+
+function adjustTextareaHeight() {
+    const textarea = document.getElementById('userInput');
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+}
+
+// Modifiez la fonction attemptAutoLogin
+async function attemptAutoLogin() {
+    const storedInfo = getStoredLoginInfo();
+    if (storedInfo.username && storedInfo.password) {
+        try {
+            const userRef = db.ref('users/' + storedInfo.username);
+            const snapshot = await userRef.once('value');
+            if (snapshot.exists() && snapshot.val().password === storedInfo.password) {
+                const userData = snapshot.val();
+                currentUser = { 
+                    username: storedInfo.username, 
+                    freeCredits: userData.freeCredits,
+                    paidCredits: userData.paidCredits,
+                    subscription: userData.subscription,
+                    subscriptionEndDate: userData.subscriptionEndDate,
+                    lastFreeCreditsReset: userData.lastFreeCreditsReset
+                };
+                await resetFreeCreditsIfNeeded();
+                updateUIForLoggedInUser();
+                console.log('Connexion automatique réussie');
+            } else {
+                clearLoginInfo();
+                console.log('Échec de la connexion automatique : informations invalides');
+            }
+        } catch (error) {
+            console.error('Erreur lors de la connexion automatique:', error);
+            clearLoginInfo();
+        }
+    }
+}
+
+window.onload = async function() {
+    await attemptAutoLogin();
+    
+    if (currentUser) {
+        // Vérifiez et corrigez les données utilisateur
+        if (currentUser.freeCredits === undefined) currentUser.freeCredits = 0;
+        if (currentUser.paidCredits === undefined) currentUser.paidCredits = 0;
+        if (currentUser.subscription === undefined) currentUser.subscription = null;
+        if (currentUser.subscriptionEndDate === undefined) currentUser.subscriptionEndDate = null;
+        if (currentUser.lastFreeCreditsReset === undefined) currentUser.lastFreeCreditsReset = new Date().toISOString();
+        
+        await syncUserData();
+    }
+
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.body.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+
+    const inputContainer = document.querySelector('.input-container');
+    const userInput = document.getElementById('userInput');
+    const fileLabel = document.querySelector('.file-label');
+    const sendButton = inputContainer.querySelector('button');
+
+    function adjustInputWidth() {
+        const containerWidth = inputContainer.offsetWidth;
+        const fileLabelWidth = fileLabel.offsetWidth;
+        const sendButtonWidth = sendButton.offsetWidth;
+        const padding = 20;
+        userInput.style.width = `${containerWidth - fileLabelWidth - sendButtonWidth - padding}px`;
+    }
+
+    adjustInputWidth();
+    window.addEventListener('resize', adjustInputWidth);
+
+    userInput.addEventListener('input', adjustTextareaHeight);
+
+    document.getElementById('modelSelect').addEventListener('change', checkModelAccess);
+
+    if (window.innerWidth <= 768) {
+        document.querySelector('.sidebar').classList.remove('visible');
+        document.querySelector('.chat-container').classList.remove('sidebar-visible');
+    }
+
+    if (currentUser) {
+        const userRef = db.ref('users/' + currentUser.username);
+        userRef.on('value', (snapshot) => {
+            const userData = snapshot.val();
+            if (userData) {
+                currentUser = {
+                    ...currentUser,
+                    freeCredits: userData.freeCredits,
+                    paidCredits: userData.paidCredits,
+                    subscription: userData.subscription,
+                    subscriptionEndDate: userData.subscriptionEndDate,
+                    lastFreeCreditsReset: userData.lastFreeCreditsReset
+                };
+                updateUIForLoggedInUser();
+            }
+        });
+    }
+
+    if (currentUser) {
+        loadConversationHistory();
+    }
+
+    initModals();
+
+    document.body.classList.add('loaded');
+};
+
+function initModals() {
+    const modals = document.querySelectorAll('.modal');
+    const closeButtons = document.querySelectorAll('.close');
+
+    closeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            button.closest('.modal').style.display = 'none';
+        });
+    });
+
+    window.addEventListener('click', (event) => {
+        modals.forEach(modal => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
+}
     </script>
 </body>
 </html>

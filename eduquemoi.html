@@ -9,6 +9,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.worker.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.29.0/docxtemplater.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PizZip/3.0.6/pizzip.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -470,6 +472,7 @@
         </div>
     </div>
 
+
     <script>
        const API_KEY = 'AIzaSyB3umTE3n2d5gwKzOmJz4ss1pFZMR8_vOE';
 const API_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
@@ -859,7 +862,18 @@ function generatePDF(text) {
     
     doc.setFontSize(12);
     const splitText = doc.splitTextToSize(text, 170);
-    doc.text(splitText, 20, 30);
+    
+    let y = 30;
+    const pageHeight = doc.internal.pageSize.height;
+    
+    for (let i = 0; i < splitText.length; i++) {
+        if (y > pageHeight - 20) {
+            doc.addPage();
+            y = 20;
+        }
+        doc.text(splitText[i], 20, y);
+        y += 7;
+    }
     
     return doc.output('blob');
 }
@@ -881,23 +895,61 @@ function shareResponse(button) {
     }
 }
 
-function handleFileUpload(event) {
+// Ajoutez cette fonction pour charger le PDF
+async function loadPDF(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+    const numPages = pdf.numPages;
+    let fullText = '';
+
+    for (let i = 1; i <= numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str).join(' ');
+        fullText += pageText + '\n\n';
+    }
+
+    return fullText;
+}
+
+// Modifiez la fonction handleFileUpload comme suit
+async function handleFileUpload(event) {
     const file = event.target.files[0];
     if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            pinnedFile = {
-                name: file.name,
-                content: e.target.result
-            };
-            const pinnedFileElement = document.getElementById('pinnedFile');
-            pinnedFileElement.innerHTML = `
-                <span>${file.name}</span>
-                <button onclick="removePinnedFile()"><i class="fas fa-times"></i></button>
-            `;
-            pinnedFileElement.classList.remove('hidden');
+        let content = '';
+        if (file.type === 'application/pdf') {
+            content = await loadPDF(file);
+        } else {
+            const reader = new FileReader();
+            content = await new Promise((resolve) => {
+                reader.onload = (e) => resolve(e.target.result);
+                reader.readAsText(file);
+            });
+        }
+
+        pinnedFile = {
+            name: file.name,
+            content: content
         };
-        reader.readAsText(file);
+
+        const pinnedFileElement = document.getElementById('pinnedFile');
+        pinnedFileElement.innerHTML = `
+            <span>${file.name}</span>
+            <button onclick="removePinnedFile()"><i class="fas fa-times"></i></button>
+        `;
+        pinnedFileElement.classList.remove('hidden');
+
+        // Ajoutez cette partie pour afficher le contenu du PDF
+        const pdfContent = document.getElementById('pdf-content');
+        if (pdfContent) {
+            pdfContent.textContent = content;
+        }
+
+        // Vous pouvez également ajouter un résumé ou d'autres fonctionnalités ici
+        const summary = document.getElementById('summary');
+        if (summary) {
+            summary.textContent = `Le fichier ${file.name} contient ${content.length} caractères.`;
+        }
     }
 }
 
@@ -1254,5 +1306,6 @@ function initModals() {
     });
 }
     </script>
+    
 </body>
 </html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de l'API Gemini Vision</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        input, textarea, button {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        #response {
+            white-space: pre-wrap;
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test de l'API Gemini Vision</h1>
+    <input type="file" id="imageInput" accept="image/*">
+    <textarea id="prompt" rows="3" placeholder="Entrez votre requête ici"></textarea>
+    <button onclick="analyzeImage()">Analyser l'image</button>
+    <div id="response"></div>
+
+    <script>
+        const API_KEY = 'AIzaSyB3umTE3n2d5gwKzOmJz4ss1pFZMR8_vOE';
+        const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent';
+
+        async function analyzeImage() {
+            const imageInput = document.getElementById('imageInput');
+            const prompt = document.getElementById('prompt').value;
+            const responseDiv = document.getElementById('response');
+
+            if (!imageInput.files[0]) {
+                alert('Veuillez sélectionner une image');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const base64Image = e.target.result.split(',')[1];
+
+                const requestData = {
+                    contents: [{
+                        parts: [
+                            { text: prompt },
+                            {
+                                inline_data: {
+                                    mime_type: imageInput.files[0].type,
+                                    data: base64Image
+                                }
+                            }
+                        ]
+                    }]
+                };
+
+                try {
+                    const response = await axios.post(API_URL, requestData, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${API_KEY}`
+                        }
+                    });
+
+                    responseDiv.textContent = response.data.candidates[0].content.parts[0].text;
+                } catch (error) {
+                    console.error('Erreur:', error);
+                    responseDiv.textContent = 'Une erreur s\'est produite lors de l\'analyse de l\'image.';
+                }
+            };
+            reader.readAsDataURL(imageInput.files[0]);
+        }
+    </script>
+</body>
+</html>

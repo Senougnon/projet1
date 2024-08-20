@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Achat de tickets WiFi zone</title>
+    <script src="https://cdn.fedapay.com/checkout.js?v=1.1.7"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getDatabase, ref, get, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3RqnjgqrZE8M3DYRE-LvX2DDDOLfVEsI",
+  authDomain: "fnmcwifi.firebaseapp.com",
+  databaseURL: "https://fnmcwifi-default-rtdb.firebaseio.com",
+  projectId: "fnmcwifi",
+  storageBucket: "fnmcwifi.appspot.com",
+  messagingSenderId: "544746759759",
+  appId: "1:544746759759:web:f28f7e0ba691e007122c3a",
+  measurementId: "G-GC6MV1MJKR"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        async function getTicketCategories() {
+            const ticketsRef = ref(db, 'TicketsTotal');
+            const snapshot = await get(ticketsRef);
+            if (snapshot.exists()) {
+                return snapshot.val();
+            } else {
+                console.log("No ticket categories available");
+                return {};
+            }
+        }
+
+        async function createTicketTable() {
+            const categories = await getTicketCategories();
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <tr>
+                    <th>Catégorie</th>
+                    <th>Prix (FCFA)</th>
+                    <th>Action</th>
+                </tr>
+            `;
+
+            for (const [category, data] of Object.entries(categories)) {
+                const price = data.prix[0]; // Prendre le premier prix de la liste
+                const lienPaiement = data.lienPaiement;
+                const row = table.insertRow();
+                row.innerHTML = `
+                    <td>${category}</td>
+                    <td>${price}</td>
+                    <td><button onclick="initPayment('${category}', ${price}, '${lienPaiement}')">Payer</button></td>
+                `;
+            }
+
+            document.body.appendChild(table);
+        }
+
+        window.initPayment = function(category, amount, lienPaiement) {
+            var fedaPayInstance = FedaPay.init({
+                public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
+                transaction: {
+                    amount: amount,
+                    description: `Achat de ticket ${category}`
+                },
+                customer: {
+                    email: 'client@example.com'
+                },
+                onComplete: function(response) {
+                    var notification = document.getElementById('notification');
+                    if (response.reason === FedaPay.DIALOG_DISMISSED) {
+                        notification.textContent = "Paiement annulé.";
+                        notification.className = "error";
+                    } else if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
+                        notification.textContent = "Paiement réussi ! Récupération du ticket...";
+                        notification.className = "success";
+                        getTicket(category);
+                    }
+                    notification.style.display = "block";
+                    setTimeout(() => notification.style.display = "none", 5000);
+                }
+            });
+            fedaPayInstance.open();
+        };
+
+        async function getTicket(category) {
+            const ticketsRef = ref(db, `TicketsTotal/${category}`);
+            const snapshot = await get(ticketsRef);
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                const motDePasse = data.motDePasse[0];
+                const utilisateur = data.utilisateur[0];
+                const prix = data.prix[0];
+                const ticket = {motDePasse, utilisateur, prix};
+                
+                displayTicket(ticket, category);
+                
+                // Stockage du ticket vendu
+                await storeTicketVendu(ticket);
+                
+                // Mise à jour de la base de données
+                await updateDatabase(category, data);
+            } else {
+                console.log("No tickets available");
+                document.getElementById('notification').textContent = "Désolé, plus de tickets disponibles pour cette catégorie.";
+            }
+        }
+
+        async function storeTicketVendu(ticket) {
+            const ticketsVendusRef = ref(db, 'TicketsVendus');
+            await push(ticketsVendusRef, {
+                password: ticket.motDePasse,
+                price: ticket.prix,
+                user: ticket.utilisateur
+            });
+            console.log("Ticket vendu stocké avec succès");
+        }
+
+        async function updateDatabase(category, data) {
+            const updatedData = {
+                lienPaiement: data.lienPaiement,
+                motDePasse: data.motDePasse.slice(1),
+                prix: data.prix.slice(1),
+                utilisateur: data.utilisateur.slice(1)
+            };
+
+            // Mise à jour de la base de données avec les données réorganisées
+            await set(ref(db, `TicketsTotal/${category}`), updatedData);
+
+            console.log("Database updated successfully");
+        }
+
+        function displayTicket(ticket, category) {
+            const modal = document.getElementById('ticketModal');
+            const ticketInfo = document.getElementById('ticket-info');
+            ticketInfo.innerHTML = `
+                <h2>Votre ticket ${category}</h2>
+                <p><strong>Utilisateur:</strong> ${ticket.utilisateur}</p>
+                <p><strong>Mot de passe:</strong> ${ticket.motDePasse}</p>
+                <p><strong>Prix:</strong> ${ticket.prix} FCFA</p>
+                <div class="button-container">
+                    <button onclick="downloadTicketAsJPG()">Télécharger en JPG</button>
+                    <button onclick="downloadTicketAsCSV()">Télécharger en CSV</button>
+                    <button onclick="downloadTicketAsPDF()">Télécharger en PDF</button>
+                </div>
+            `;
+            modal.style.display = "block";
+        }
+
+        window.closeModal = function() {
+            document.getElementById('ticketModal').style.display = "none";
+        }
+
+        window.downloadTicketAsJPG = function() {
+            html2canvas(document.getElementById('ticket-info')).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'ticket.jpg';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        };
+
+        window.downloadTicketAsCSV = function() {
+            const ticket = document.getElementById('ticket-info');
+            const data = ticket.innerText.split('\n').map(line => line.split(': ')).map(parts => parts.join(','));
+            const csv = data.join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'ticket.csv';
+            link.click();
+        };
+
+        window.downloadTicketAsPDF = function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text(document.getElementById('ticket-info').innerText, 10, 10);
+            doc.save('ticket.pdf');
+        };
+
+        document.addEventListener('DOMContentLoaded', createTicketTable);
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        table {
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #notification {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+        }
+        .success { background-color: #4CAF50; }
+        .error { background-color: #f44336; }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 5px;
+            position: relative;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        #ticket-info {
+            text-align: center;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="notification"></div>
+    <div id="ticketModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="ticket-info"></div>
+        </div>
+    </div>
+</body>
+</html>

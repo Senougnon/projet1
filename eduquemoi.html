@@ -447,7 +447,83 @@
 .conversation-item:hover .delete-icon {
     opacity: 1;
 }
-        
+.file-support {
+    background-color: var(--input-background);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.file-support.hidden {
+    display: none;
+}
+
+.pinned-file {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--input-area-color);
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.file-content {
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: var(--input-area-color);
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 0.9em;
+}
+
+.file-label {
+    cursor: pointer;
+    margin-left: 10px;
+    color: var(--button-color);
+}
+
+.file-input {
+    display: none;
+}      
+/* Nouveaux styles pour le mode clair */
+[data-theme="light"] .user-info-card {
+    color: #333; /* Couleur de texte par défaut pour le mode clair */
+}
+
+[data-theme="light"] .user-details #username {
+    color: #0066cc; /* Bleu pour le nom d'utilisateur en mode clair */
+    font-weight: bold;
+}
+
+[data-theme="light"] .user-details #freeCredits,
+[data-theme="light"] .user-details #paidCredits {
+    color: #006600; /* Vert pour les crédits en mode clair */
+}
+
+[data-theme="light"] .user-details #subscription {
+    color: #cc6600; /* Orange pour le forfait en mode clair */
+}
+
+/* Styles pour le mode sombre (pour référence) */
+[data-theme="dark"] .user-info-card {
+    color: #e0e0e0; /* Couleur de texte par défaut pour le mode sombre */
+}
+
+[data-theme="dark"] .user-details #username {
+    color: #4da6ff; /* Bleu clair pour le nom d'utilisateur en mode sombre */
+    font-weight: bold;
+}
+
+[data-theme="dark"] .user-details #freeCredits,
+[data-theme="dark"] .user-details #paidCredits {
+    color: #66ff66; /* Vert clair pour les crédits en mode sombre */
+}
+
+[data-theme="dark"] .user-details #subscription {
+    color: #ffa64d; /* Orange clair pour le forfait en mode sombre */
+}
     </style>
 </head>
 <body>
@@ -474,7 +550,7 @@
                 <h3>Informations utilisateur</h3>
                 <div class="user-details">
                     <p><i class="fas fa-user"></i> <span id="username">Sidoine</span></p>
-                    <p><i class="fas fa-coins"></i> Crédits gratuits: <span id="freeCredits">0</span></p>
+                    <p><i class="fas fa-coins"></i> Crédits offerts: <span id="freeCredits">0</span></p>
                     <p><i class="fas fa-dollar-sign"></i> Crédits payants: <span id="paidCredits">0</span></p>
                     <p><i class="fas fa-calendar-alt"></i> Forfait: <span id="subscription">Aucun</span></p>
                 </div>
@@ -504,7 +580,8 @@
         
             <h3>Acheter des crédits</h3>
             <select id="creditSelect">
-                <option value="100" selected>100 crédits</option>
+                <option value="10" selected>10 crédits</option>
+                <option value="100">100 crédits</option>
                 <option value="500">500 crédits</option>
                 <option value="1000">1000 crédits</option>
             </select>
@@ -523,7 +600,10 @@
 
         <div class="chat-container">
             <div id="messageContainer" class="message-container"></div>
-            <div id="pinnedFile" class="pinned-file hidden"></div>
+            <div id="fileSupport" class="file-support hidden">
+                <div id="pinnedFile" class="pinned-file"></div>
+                <div id="fileContent" class="file-content"></div>
+            </div>
             <div class="input-container">
                 <textarea id="userInput" placeholder="Tapez votre message ici..." rows="1"></textarea>
                 <label for="fileInput" class="file-label">
@@ -1026,30 +1106,29 @@ async function handleFileUpload(event) {
             content: content
         };
 
+        const fileSupport = document.getElementById('fileSupport');
         const pinnedFileElement = document.getElementById('pinnedFile');
+        const fileContentElement = document.getElementById('fileContent');
+
         pinnedFileElement.innerHTML = `
             <span>${file.name}</span>
             <button onclick="removePinnedFile()"><i class="fas fa-times"></i></button>
         `;
-        pinnedFileElement.classList.remove('hidden');
-
-        const pdfContent = document.getElementById('pdf-content');
-        if (pdfContent) {
-            pdfContent.textContent = content;
-        }
-
-        const summary = document.getElementById('summary');
-        if (summary) {
-            summary.textContent = `Le fichier ${file.name} contient ${content.length} caractères.`;
-        }
+        fileContentElement.textContent = content.substring(0, 500) + (content.length > 500 ? '...' : '');
+        
+        fileSupport.classList.remove('hidden');
     }
 }
 
 function removePinnedFile() {
     pinnedFile = null;
+    const fileSupport = document.getElementById('fileSupport');
     const pinnedFileElement = document.getElementById('pinnedFile');
+    const fileContentElement = document.getElementById('fileContent');
+
     pinnedFileElement.innerHTML = '';
-    pinnedFileElement.classList.add('hidden');
+    fileContentElement.textContent = '';
+    fileSupport.classList.add('hidden');
 }
 
 function hasValidSubscription() {
@@ -1065,7 +1144,7 @@ function buySubscription() {
     }
 
     const subscriptionPrices = {
-        '24h': 500, '3d': 1000, '7d': 2000, '30d': 5000, '3m': 12000
+        '24h': 500, '3d': 1200, '7d': 2400, '30d': 8000, '3m': 20000
     };
 
     const price = subscriptionPrices[subscriptionType];
@@ -1113,7 +1192,7 @@ function buyCredits() {
     }
 
     const creditPrices = {
-        '100': 1000, '500': 4500, '1000': 8000
+       '10': 200, '100': 1000, '500': 4500, '1000': 8000
     };
 
     const price = creditPrices[creditAmount];

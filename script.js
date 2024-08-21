@@ -8,7 +8,6 @@ const FREE_CREDITS_PER_DAY = 10;
 const FREE_MODEL_MAX_WORDS = 50;
 const FREE_MODEL_MAX_RESPONSE = 100;
 
-
 // Configuration Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyCvizcYorGDPN3GXqma0opp7wAiMkaCt64",
@@ -28,7 +27,71 @@ const db = firebase.database();
 let prompts = {};
 let pinnedPrompt = null;
 
-// Nouvelle fonction pour initialiser une discussion
+// Fonction pour vérifier et mettre à jour le statut de l'abonnement
+async function checkSubscriptionStatus() {
+    if (!currentUser || !currentUser.subscriptionEndDate) return;
+
+    const now = new Date();
+    const endDate = new Date(currentUser.subscriptionEndDate);
+
+    if (now > endDate) {
+        currentUser.subscription = null;
+        currentUser.subscriptionEndDate = null;
+        await syncUserData();
+        showNotification("Votre abonnement a expiré.", 'info');
+        updateUIForLoggedInUser();
+    } else if (now > new Date(endDate.getTime() - 3 * 24 * 60 * 60 * 1000)) {
+        // Notification 3 jours avant l'expiration
+        const daysLeft = Math.ceil((endDate - now) / (24 * 60 * 60 * 1000));
+        showNotification(`Votre abonnement expire dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''}.`, 'warning');
+    }
+}
+
+// Fonction pour générer une facture en PDF
+function generateInvoicePDF(transaction) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    doc.setFontSize(18);
+    doc.text("Facture Eduque moi", 105, 20, null, null, "center");
+    
+    doc.setFontSize(12);
+    doc.text(`Facture pour : ${currentUser.username}`, 20, 40);
+    doc.text(`Date : ${new Date().toLocaleDateString()}`, 20, 50);
+    doc.text(`Description : ${transaction.description}`, 20, 60);
+    doc.text(`Montant : ${transaction.amount} FCFA`, 20, 70);
+    doc.text(`Numéro de transaction : ${transaction.id}`, 20, 80);
+    
+    return doc;
+}
+
+// Fonction pour afficher la fenêtre flottante des détails de la facture
+function showInvoiceDetails(transaction) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2>Détails de la facture</h2>
+            <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+            <p><strong>Description:</strong> ${transaction.description}</p>
+            <p><strong>Montant:</strong> ${transaction.amount} FCFA</p>
+            <p><strong>Numéro de transaction:</strong> ${transaction.id}</p>
+            <button id="downloadInvoice">Télécharger la facture en PDF</button>
+            <button id="closeModal">Fermer</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById('downloadInvoice').addEventListener('click', () => {
+        const doc = generateInvoicePDF(transaction);
+        doc.save(`facture_${transaction.id}.pdf`);
+    });
+
+    document.getElementById('closeModal').addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+}
+
 function initializeNewDiscussion() {
     currentConversation = [];
     const messageContainer = document.getElementById('messageContainer');
@@ -220,34 +283,28 @@ async function sendMessage() {
     let displayMessage = userInput;
     let fullMessage = userInput;
 
-    // Gestion du fichier épinglé
     if (pinnedFile) {
         fullMessage = `[Contenu du fichier joint: ${pinnedFile.content}]\n\n${fullMessage}`;
         displayMessage = `[Fichier joint: ${pinnedFile.name}]\n\n${displayMessage}`;
     }
 
-    // Gestion du prompt épinglé
     if (pinnedPrompt) {
         fullMessage = `${pinnedPrompt.content}\n\n${fullMessage}`;
         displayMessage = `[Prompt: ${pinnedPrompt.title}]\n\n${displayMessage}`;
     }
 
-    // Affichage du message de l'utilisateur dans le chat
     addMessageToChat('user', displayMessage);
     document.getElementById('userInput').value = '';
 
     try {
-        // Préparation du contexte de la conversation
         const conversationContext = currentConversation.map(msg => msg.content).join('\n');
         
-        // Envoi de la requête à l'API
         const response = await axios.post(`${API_BASE_URL}${model}:generateContent?key=${API_KEY}`, {
             contents: [{ parts: [{ text: conversationContext + '\n' + fullMessage }] }]
         });
 
         let aiResponse = response.data.candidates[0].content.parts[0].text;
 
-        // Traitement de la réponse en fonction du modèle
         let messageElement;
         if (model === 'gemini-1.0-pro') {
             const words = aiResponse.split(/\s+/);
@@ -263,7 +320,6 @@ async function sendMessage() {
             messageElement = addMessageToChat('ai', aiResponse);
         }
 
-        // Mise à jour des crédits et nettoyage
         await updateCredits(model);
         removePinnedFile();
         removePinnedPrompt();
@@ -452,7 +508,6 @@ async function reduceFileSize(file, maxSizeInMB) {
                     let quality = 0.7;
                     const maxSize = maxSizeInMB * 1024 * 1024;
 
-                    // Réduire progressivement la qualité et la taille jusqu'à ce que le fichier soit assez petit
                     while (true) {
                         canvas.width = width;
                         canvas.height = height;
@@ -487,8 +542,6 @@ async function reduceFileSize(file, maxSizeInMB) {
             reader.readAsDataURL(file);
         });
     } else if (file.type === 'application/pdf') {
-        // Pour les PDF, nous ne pouvons pas facilement réduire la taille
-        // Nous retournons simplement le fichier original
         console.warn("La réduction de taille n'est pas prise en charge pour les PDF");
         return file;
     } else {
@@ -507,7 +560,6 @@ async function handleFileUpload(event) {
             ocrResultElement.textContent = '';
         }
 
-        // Vérifier la taille du fichier
         const fileSizeInMB = file.size / (1024 * 1024);
         let processedFile = file;
         if (fileSizeInMB > 1) {
@@ -574,12 +626,12 @@ async function handleFileUpload(event) {
 }
 
 async function performOCR(file) {
-    const apiKey = 'K84184304788957'; // Remplacez par votre clé API réelle
+    const apiKey = 'K84184304788957';
     const apiUrl = 'https://api.ocr.space/parse/image';
 
     const formData = new FormData();
     formData.append('apikey', apiKey);
-    formData.append('language', 'eng'); // Vous pouvez ajuster la langue si nécessaire
+    formData.append('language', 'eng');
     formData.append('isOverlayRequired', 'false');
     formData.append('file', file);
 
@@ -627,7 +679,7 @@ function buySubscription() {
     }
 
     const subscriptionPrices = {
-        '24h': 500, '3d': 1200, '7d': 2400, '30d': 8000, '3m': 20000
+        '24h': 1, '3d': 1200, '7d': 2400, '30d': 8000, '3m': 20000
     };
 
     const price = subscriptionPrices[subscriptionType];
@@ -643,7 +695,13 @@ function buySubscription() {
         },
         onComplete: function(response) {
             if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
+                const transaction = {
+                    id: response.id,
+                    description: `Achat d'un forfait ${subscriptionType} pour Eduque moi`,
+                    amount: price
+                };
                 activateSubscription(subscriptionType);
+                showInvoiceDetails(transaction);
                 showNotification(`Forfait ${subscriptionType} activé avec succès !`, 'success');
             } else {
                 showNotification('Le paiement a été annulé ou a échoué.', 'error');
@@ -691,7 +749,13 @@ function buyCredits() {
         },
         onComplete: function(response) {
             if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
+                const transaction = {
+                    id: response.id,
+                    description: `Achat de ${creditAmount} crédits pour Eduque moi`,
+                    amount: price
+                };
                 addCreditsToUser(parseInt(creditAmount));
+                showInvoiceDetails(transaction);
                 showNotification(`${creditAmount} crédits ont été ajoutés à votre compte.`, 'success');
             } else {
                 showNotification('Le paiement a été annulé ou a échoué.', 'error');
@@ -752,6 +816,9 @@ function toggleTheme() {
     body.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
     updateThemeIcon(newTheme);
+    
+    // Mise à jour de la métadonnée color-scheme
+    document.querySelector('meta[name="color-scheme"]').setAttribute('content', newTheme);
 }
 
 function updateThemeIcon(theme) {
@@ -957,7 +1024,6 @@ function togglePromptList() {
     const modal = document.getElementById('promptListModal');
     modal.style.display = "block";
     loadPromptCategories();
-
 }
 
 function loadPromptCategories() {
@@ -986,7 +1052,7 @@ function loadPromptsForCategory(category) {
         if (prompt.category === category) {
             const promptElement = document.createElement('div');
             promptElement.className = 'prompt-item';
-            promptElement.textContent = prompt.title; // Affiche uniquement le titre
+            promptElement.textContent = prompt.title;
             promptElement.onclick = () => selectPrompt(id, prompt);
             promptListElement.appendChild(promptElement);
         }
@@ -1004,16 +1070,7 @@ function closePromptModal() {
     document.getElementById('promptListModal').style.display = 'none';
     showNotification('Liste des prompts masquée', 'info');
 }
-// N'oubliez pas d'ajouter un event listener pour le bouton de fermeture
-document.querySelector('.close').addEventListener('click', closePromptModal);
 
-// Fermez également la modal si l'utilisateur clique en dehors
-window.onclick = function(event) {
-    const modal = document.getElementById('promptListModal');
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-}
 function updatePinnedPromptDisplay() {
     const pinnedPromptContainer = document.getElementById('pinnedPrompt');
     
@@ -1033,7 +1090,6 @@ function removePinnedPrompt() {
     updatePinnedPromptDisplay();
 }
 
-// Mise à jour de la fonction window.onload
 window.onload = async function() {
     await attemptAutoLogin();
     
@@ -1051,7 +1107,6 @@ window.onload = async function() {
     document.body.setAttribute('data-theme', savedTheme);
     updateThemeIcon(savedTheme);
 
-    // Configuration de l'interface utilisateur
     setupUIEventListeners();
 
     if (currentUser) {
@@ -1065,12 +1120,13 @@ window.onload = async function() {
 
     restoreAppState();
 
-    // Initialiser une nouvelle discussion
     initializeNewDiscussion();
 
     document.body.classList.add('loaded');
+
+    setInterval(checkSubscriptionStatus, 3600000);
 };
-// Fonction pour configurer les écouteurs d'événements de l'interface utilisateur
+
 function setupUIEventListeners() {
     const inputContainer = document.querySelector('.input-container');
     const userInput = document.getElementById('userInput');
@@ -1194,4 +1250,105 @@ function restoreAppState() {
     }
 }
 
+// Fonction pour mettre à jour régulièrement l'interface utilisateur
+function updateUI() {
+    if (currentUser) {
+        document.getElementById('freeCredits').textContent = currentUser.freeCredits;
+        document.getElementById('paidCredits').textContent = currentUser.paidCredits;
+        document.getElementById('subscription').textContent = currentUser.subscription || 'Aucun';
+    }
+}
+
+// Appel de updateUI toutes les 5 minutes
+setInterval(updateUI, 300000);
+
+// Fonction pour vérifier et mettre à jour le statut de l'abonnement
+async function checkSubscriptionStatus() {
+    if (!currentUser || !currentUser.subscriptionEndDate) return;
+
+    const now = new Date();
+    const endDate = new Date(currentUser.subscriptionEndDate);
+
+    if (now > endDate) {
+        currentUser.subscription = null;
+        currentUser.subscriptionEndDate = null;
+        await syncUserData();
+        showNotification("Votre abonnement a expiré.", 'info');
+        updateUIForLoggedInUser();
+    } else if (now > new Date(endDate.getTime() - 3 * 24 * 60 * 60 * 1000)) {
+        // Notification 3 jours avant l'expiration
+        const daysLeft = Math.ceil((endDate - now) / (24 * 60 * 60 * 1000));
+        showNotification(`Votre abonnement expire dans ${daysLeft} jour${daysLeft > 1 ? 's' : ''}.`, 'warning');
+    }
+}
+
+// Fonction pour générer une facture en PDF
+function generateInvoicePDF(transaction) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    
+    doc.setFontSize(18);
+    doc.text("Facture Eduque moi", 105, 20, null, null, "center");
+    
+    doc.setFontSize(12);
+    doc.text(`Facture pour : ${currentUser.username}`, 20, 40);
+    doc.text(`Date : ${new Date().toLocaleDateString()}`, 20, 50);
+    doc.text(`Description : ${transaction.description}`, 20, 60);
+    doc.text(`Montant : ${transaction.amount} FCFA`, 20, 70);
+    doc.text(`Numéro de transaction : ${transaction.id}`, 20, 80);
+    
+    return doc;
+}
+
+// Fonction pour afficher la fenêtre flottante des détails de la facture
+function showInvoiceDetails(transaction) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h2>Détails de la facture</h2>
+            <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+            <p><strong>Description:</strong> ${transaction.description}</p>
+            <p><strong>Montant:</strong> ${transaction.amount} FCFA</p>
+            <p><strong>Numéro de transaction:</strong> ${transaction.id}</p>
+            <button id="downloadInvoice">Télécharger la facture en PDF</button>
+            <button id="closeModal">Fermer</button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById('downloadInvoice').addEventListener('click', () => {
+        const doc = generateInvoicePDF(transaction);
+        doc.save(`facture_${transaction.id}.pdf`);
+    });
+
+    document.getElementById('closeModal').addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+}
+
+// Assurez-vous également d'appeler cette fonction au chargement de la page
+window.addEventListener('DOMContentLoaded', (event) => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.body.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+    document.querySelector('meta[name="color-scheme"]').setAttribute('content', savedTheme);
+});
+
+// Initialisation
 checkApiStatusRegularly();
+
+// Exportation des fonctions et variables nécessaires
+window.showLoginModal = showLoginModal;
+window.showRegisterModal = showRegisterModal;
+window.login = login;
+window.register = register;
+window.logout = logout;
+window.sendMessage = sendMessage;
+window.buySubscription = buySubscription;
+window.buyCredits = buyCredits;
+window.toggleTheme = toggleTheme;
+window.toggleSidebar = toggleSidebar;
+window.createNewConversation = createNewConversation;
+window.handleFileUpload = handleFileUpload;
+window.togglePromptList = togglePromptList;

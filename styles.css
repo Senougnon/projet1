@@ -1,3 +1,9 @@
+/* Ajoutez ceci au début de votre fichier CSS */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+    }
+}
 :root {
     --primary-color: #4a90e2;
     --secondary-color: #50c878;
@@ -13,7 +19,8 @@
     --ai-message-color: #e8f5e9;
 }
 
-[data-theme="dark"] {
+/* Modifiez votre sélecteur de thème sombre comme suit */
+:root[data-theme="dark"], [data-theme="dark"] {
     --primary-color: #ffffff;
     --secondary-color: #d3d3d3;
     --background-color: #080808;
@@ -27,6 +34,7 @@
     --user-message-color: #282828;
     --ai-message-color: #303030;
 }
+
 [data-theme="dark"] .header {
     background-color: #ffffff;
     color: #000000;
@@ -47,8 +55,6 @@
 [data-theme="dark"] .header .theme-toggle:hover {
     background-color: #333333;
 }
-
-
 
 body, html {
     font-family: 'Poppins', sans-serif;
@@ -547,8 +553,7 @@ button:hover {
 }
 
 [data-theme="light"] .user-details #freeCredits,
-[data-theme="light"] .user-details #paidCredits {
-    color: #006600;
+[data-theme="light"] .user-details #paidCredits {color: #006600;
 }
 
 [data-theme="light"] .user-details #subscription {
@@ -799,6 +804,7 @@ button:hover {
         break-inside: avoid;
     }
 }
+
 .ocr-result {
     background-color: #f0f0f0;
     border: 1px solid #ddd;
@@ -811,4 +817,75 @@ button:hover {
 
 .ocr-result.hidden {
     display: none;
+}
+
+/* Styles pour la fenêtre flottante de facture */
+.invoice-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--background-color);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 1002;
+    max-width: 500px;
+    width: 90%;
+}
+
+.invoice-modal h2 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+}
+
+.invoice-modal p {
+    margin-bottom: 10px;
+}
+
+.invoice-modal button {
+    margin-top: 15px;
+    padding: 8px 15px;
+    background-color: var(--button-color);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.invoice-modal button:hover {
+    background-color: var(--hover-color);
+}
+
+/* Styles pour l'overlay de la fenêtre flottante */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1001;
+}
+
+/* Ajustements pour le responsive design */
+@media (max-width: 600px) {
+    .invoice-modal {
+        width: 95%;
+        padding: 15px;
+    }
+
+    .invoice-modal h2 {
+        font-size: 1.2em;
+    }
+
+    .invoice-modal p {
+        font-size: 0.9em;
+    }
+
+    .invoice-modal button {
+        font-size: 0.9em;
+        padding: 6px 12px;
+    }
 }

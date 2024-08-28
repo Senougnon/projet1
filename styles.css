@@ -119,12 +119,6 @@ body, html {
     background-color: var(--hover-color);
 }
 
-.main-container {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-    margin-top: 30px;
-}
 
 .sidebar {
     width: 260px;
@@ -151,12 +145,11 @@ body, html {
 }
 
 .message-container {
-    flex: 1;
-    overflow-y: auto;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-}
+    width: 100%;
+    max-width: 800px; /* ou la largeur maximale souhaitée */
+    margin: 0 auto;
+  }
+  
 
 .input-container {
     display: flex;
@@ -224,13 +217,17 @@ button:hover {
 }
 
 .message {
-    margin-bottom: 15px;
-    padding: 15px;
-    border-radius: 10px;
-    max-width: 80%;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    word-wrap: break-word;
-}
+    width: 100%;
+    min-width: 250px; /* largeur minimale pour éviter un rétrécissement excessif */
+    margin-bottom: 10px;
+    box-sizing: border-box;
+  }
+  
+  @media (max-width: 600px) {
+    .message {
+      width: 90%; /* légèrement plus étroit sur les petits écrans */
+    }
+  }
 
 .user-message {
     background-color: var(--user-message-color);
@@ -1205,3 +1202,233 @@ button:hover {
     [data-theme="dark"] .file-name {
         color: #ccc;
     }
+
+ /* Styles cybernétiques optimisés pour les messages de chat */
+
+:root {
+    --primary-color: #4a90e2;
+    --secondary-color: #50c878;
+    --background-color: #f5f7fa;
+    --text-color: #333333;
+    --border-color: #e0e0e0;
+    --glow-color: rgba(74, 144, 226, 0.5);
+    --user-message-color: #e1f5fe;
+    --ai-message-color: #e8f5e9;
+    --input-background: #ffffff;
+    --button-color: #4a90e2;
+    --hover-color: #3a7bc8;
+}
+
+[data-theme="dark"] {
+    --primary-color: #61dafb;
+    --secondary-color: #50c878;
+    --background-color: #1a1a1a;
+    --text-color: #ffffff;
+    --border-color: #444444;
+    --glow-color: rgba(97, 218, 251, 0.5);
+    --user-message-color: #1e3a5f;
+    --ai-message-color: #1e3b2f;
+    --input-background: #2c2c2c;
+    --button-color: #61dafb;
+    --hover-color: #4fa8c7;
+}
+
+/* Styles optimisés pour l'interface de conversation */
+.message-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    max-width: 80%;
+    margin-bottom: 20px;
+    padding: 12px 16px;
+    border-radius: 18px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.user-message {
+    align-self: flex-end;
+    background-color: var(--user-message-color);
+    border-bottom-right-radius: 4px;
+}
+
+.ai-message {
+    align-self: flex-start;
+    background-color: var(--ai-message-color);
+    border-bottom-left-radius: 4px;
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.85em;
+}
+
+.message-sender {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.message-timestamp {
+    color: var(--text-color);
+    opacity: 0.6;
+}
+
+.message-content {
+    font-size: 1em;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.message-actions {
+    position: absolute;
+    right: 8px;
+    bottom: -30px;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.message:hover .message-actions {
+    opacity: 1;
+}
+
+.message-actions button {
+    background: var(--background-color);
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 1em;
+    padding: 4px;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.message-actions button:hover {
+    background-color: var(--hover-color);
+}
+
+/* Styles pour le thème sombre */
+[data-theme="dark"] .message {
+    box-shadow: 0 1px 3px rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .message-actions button {
+    background: var(--sidebar-color);
+}
+
+[data-theme="dark"] .message-actions button:hover {
+    background-color: var(--hover-color);
+}
+
+/* Animation subtile pour les nouveaux messages */
+@keyframes messageAppear {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message {
+    animation: messageAppear 0.3s ease-out;
+}
+
+
+/* Ajustements pour la structure principale */
+.main-container {
+    display: flex;
+    height: calc(100vh - 30px); /* Soustraire la hauteur de l'en-tête */
+    margin-top: 30px; /* Espace pour l'en-tête */
+}
+
+.sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    z-index: 1001; /* Assurez-vous que la sidebar est au-dessus de la barre de saisie */
+}
+
+.chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.message-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    padding-bottom: 70px; /* Espace pour la barre de saisie */
+}
+
+/* Styles pour la barre de saisie flexible */
+.input-area {
+    position: fixed;
+    bottom: 0;
+    left: 260px; /* Largeur du menu latéral */
+    right: 0;
+    background-color: var(--background-color);
+    border-top: 1px solid var(--border-color);
+    padding: 10px;
+    z-index: 1000;
+    transition: left 0.3s ease; /* Transition douce lors de l'ouverture/fermeture du menu */
+}
+
+.input-container {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    background-color: var(--input-area-color);
+    border-radius: 10px;
+    padding: 10px;
+}
+
+#userInput {
+    flex-grow: 1;
+    border: none;
+    background-color: transparent;
+    color: var(--text-color);
+    font-size: 1em;
+    padding: 10px;
+    outline: none;
+    resize: none;
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+/* Ajustements pour le mode sombre */
+[data-theme="dark"] .input-area {
+    background-color: var(--background-color);
+    border-top-color: var(--border-color);
+}
+
+/* Ajustements pour les appareils mobiles et le menu fermé */
+@media (max-width: 768px) {
+    .input-area {
+        left: 0;
+        padding: 5px;
+    }
+    
+    .input-container {
+        padding: 5px;
+    }
+}
+
+/* Classe à ajouter lorsque le menu est fermé */
+.sidebar-closed .input-area {
+    left: 0;
+}

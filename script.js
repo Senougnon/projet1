@@ -569,49 +569,55 @@ async function updateCredits(model, requiredCredits) {
     await syncUserData();
 }
 
+// Mise à jour de la fonction addMessageToChat pour inclure la classe message-content
 function addMessageToChat(sender, message) {
     const messageContainer = document.getElementById('messageContainer');
     const messageElement = document.createElement('div');
     messageElement.classList.add('message', sender === 'user' ? 'user-message' : 'ai-message');
     
-    if (sender === 'ai') {
-        message = message.replace(/\*\*/g, '\n');
-        
-        const textElement = document.createElement('div');
-        messageElement.appendChild(textElement);
-
-        animateResponse(textElement, message);
-
-        const actionsElement = document.createElement('div');
-        actionsElement.classList.add('message-actions');
-        actionsElement.innerHTML = `
-            <button onclick="copyResponse(this.parentNode.parentNode)"><i class="fas fa-copy"></i></button>
-            <button onclick="exportResponse(this.parentNode.parentNode, 'word')"><i class="fas fa-file-word"></i></button>
-            <button onclick="exportResponse(this.parentNode.parentNode, 'pdf')"><i class="fas fa-file-pdf"></i></button>
-            <button onclick="shareResponse(this.parentNode.parentNode)"><i class="fas fa-share-alt"></i></button>
-        `;
-        messageElement.appendChild(actionsElement);
-    } else {
-        messageElement.textContent = message;
-    }
+    const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    let username = currentUser && currentUser.username ? currentUser.username : "Invité";
+    
+    const modelSelect = document.getElementById('modelSelect');
+    const selectedOption = modelSelect.options[modelSelect.selectedIndex];
+    const activeModel = selectedOption ? selectedOption.text : "Modèle inconnu";
+    
+    messageElement.innerHTML = `
+        <div class="message-header">
+            <span class="message-sender">${sender === 'user' ? username : activeModel}</span>
+            <span class="message-timestamp">${currentTime}</span>
+        </div>
+        <div class="message-content">${message}</div>
+        <div class="message-actions">
+            <button onclick="copyResponse(this.closest('.message'))" title="Copier"><i class="fas fa-copy"></i></button>
+            <button onclick="exportResponse(this.closest('.message'), 'word')" title="Exporter en Word"><i class="fas fa-file-word"></i></button>
+            <button onclick="exportResponse(this.closest('.message'), 'pdf')" title="Exporter en PDF"><i class="fas fa-file-pdf"></i></button>
+            <button onclick="shareResponse(this.closest('.message'))" title="Partager"><i class="fas fa-share-alt"></i></button>
+        </div>
+    `;
 
     messageContainer.appendChild(messageElement);
     messageContainer.scrollTop = messageContainer.scrollHeight;
 
-    currentConversation.push({ sender, content: message });
-
     return messageElement;
 }
 
+// Fonction pour obtenir le contenu du message
+function getMessageContent(messageElement) {
+    return messageElement.querySelector('.message-content').textContent;
+}
+
+
 function copyResponse(messageElement) {
-    const responseText = messageElement.querySelector('div:first-child').textContent;
+    const responseText = getMessageContent(messageElement);
     navigator.clipboard.writeText(responseText).then(() => {
         showNotification('Réponse copiée dans le presse-papiers', 'success');
     });
 }
 
 async function exportResponse(messageElement, format) {
-    const responseText = messageElement.querySelector('div:first-child').textContent;
+    const responseText = getMessageContent(messageElement);
     if (format === 'word') {
         const blob = await generateWordDoc(responseText);
         saveAs(blob, "response.docx");
@@ -675,7 +681,7 @@ function generatePDF(text) {
 }
 
 function shareResponse(messageElement) {
-    const responseText = messageElement.querySelector('div:first-child').textContent;
+    const responseText = getMessageContent(messageElement);
     if (navigator.share) {
         navigator.share({
             title: 'Réponse de Eduque moi',

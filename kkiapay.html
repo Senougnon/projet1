@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement avec KKiapay</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #0095ff;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #notification {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .error {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Paiement avec KKiapay</h1>
+        <button id="payButton" class="kkiapay-button">Payer</button>
+        <div id="notification"></div>
+    </div>
+
+    <script src="https://cdn.kkiapay.me/k.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const payButton = document.getElementById('payButton');
+            const notification = document.getElementById('notification');
+
+            function showNotification(message, isSuccess) {
+                notification.textContent = message;
+                notification.className = isSuccess ? 'success' : 'error';
+                notification.style.display = 'block';
+            }
+
+            function openKkiapayWidget() {
+                openKkiapayWidget({
+                    amount: "1",
+                    position: "center",
+                    callback: "https://votresite.com/callback",
+                    data: "customData",
+                    theme: "#0095ff",
+                    sandbox: true,
+                    key: "43e7f2a6f99693efba3c59f2ee6d613c601f9beb", // Remplacez par votre clé API
+                    phone: "97000000", // Optionnel : numéro de téléphone pré-rempli
+                    name: "Client Test", // Optionnel : nom du client
+                    email: "client@test.com", // Optionnel : email du client
+                    paymentmethod: "momo" // Optionnel : pour autoriser uniquement le paiement mobile money
+                });
+            }
+
+            payButton.addEventListener('click', openKkiapayWidget);
+
+            // Écouteur pour le succès du paiement
+            addSuccessListener(response => {
+                console.log(response);
+                showNotification('Paiement réussi !', true);
+            });
+
+            // Écouteur pour l'échec du paiement
+            addFailedListener(error => {
+                console.error(error);
+                showNotification('Échec du paiement. Veuillez réessayer.', false);
+            });
+        });
+    </script>
+</body>
+</html>

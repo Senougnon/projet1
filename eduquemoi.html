@@ -6,10 +6,13 @@
     <meta name="color-scheme" content="light dark">
     <title>Eduque moi</title>
     <link rel="stylesheet" href="styles.css">
+     <!-- ... autres balises head ... -->
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/css/shepherd.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/js/shepherd.min.js"></script>
     <script src="https://cdn.fedapay.com/checkout.js?v=1.1.7"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -69,13 +72,17 @@
                     <option value="gemini-1.5-flash" selected>Gemini 1.5 Flash</option>
                 </optgroup>
                 <optgroup label="Modèles avancés">
+                    <option value="gemini-1.5-pro-002">Gemini 1.5 Pro 002</option>
+                    <option value="gemini-1.5-flash-002">Gemini 1.5 Flash 002</option>
+                    <option value="gemini-1.5-pro-001">Gemini 1.5 Pro 001</option>
                     <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
                     <option value="gemini-1.5-pro-latest">Gemini 1.5 Pro Latest</option>
+
                 </optgroup>
                 <optgroup label="Modèles beta">
                     <option value="gemini-1.5-pro-exp-0827">Gemini 1.5 Pro Exp 0827</option>
                     <option value="gemini-1.5-flash-exp-0827">Gemini 1.5 Flash Exp 0827</option>
-                    <option value="gemini-1.5-flash-8b-exp-0827">Gemini 1.5 Flash 8B Exp 0827</option>
+                    <option value="gemini-1.5-flash-8b-exp-0924">Gemini 1.5 Flash 8B Exp 0924</option>
                 </optgroup>
             </select>
 

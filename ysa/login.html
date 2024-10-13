@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title id="title"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="theme-color" content="#2484ac" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <link rel="stylesheet" href="style.css">
+    <!-- Start WOWSlider.com HEAD section -->
+    <link rel="stylesheet" type="text/css" href="engine1/style.css" />
+    <script type="text/javascript" src="engine1/jquery.js"></script>
+    <!-- End WOWSlider.com HEAD section -->
+    <style>
+        /* Styles généraux */
+        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;600&display=swap');
+
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #8BC34A;
+            --accent-color: #FFC107;
+            --bg-color: #E8F5E9;
+            --text-color: #1B5E20;
+            --border-radius: 15px;
+        }
+
+        .login-form button {
+            padding: 12px;
+            border: none;
+            border-radius: var(--border-radius);
+            background: var(--primary-color);
+            color: #FFFFFF;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-form button::after {
+            content: ' ';
+            position: absolute;
+            top: 50%;
+            left: -30px;
+            transform: translateY(-50%);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .login-form button:hover::after {
+            left: calc(100% + 10px);
+        }
+
+        .info {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .info.alert {
+            color: var(--accent-color);
+        }
+
+        .pricing {
+            flex: 1;
+            min-width: 300px;
+            margin-left: 40px;
+        }
+
+        .pricing h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .price-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .price-item {
+            background: #FFFFFF;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .price-item::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 40px;
+            height: 40px;
+            background: var(--secondary-color);
+            border-radius: 50%;
+            opacity: 0.2;
+            transition: all 0.3s ease;
+        }
+
+        .price-item:hover::before {
+            transform: scale(10);
+            opacity: 0.1;
+        }
+
+        .price-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .price-item h3 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .price-item p {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+
+        .menu-button, .contact-button {
+            position: fixed;
+            padding: 12px 24px;
+            border: none;
+            background: var(--primary-color);
+            color: #FFFFFF;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .menu-button {
+            top: 20px;
+            left: 20px;
+        }
+
+        .contact-button {
+            top: 20px;
+            right: 20px;
+        }
+
+        .contact-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, #8BC34A, #FFC107, #4CAF50);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .contact-button:hover::before {
+            transform: translateX(0);
+        }
+
+        .menu-button:hover, .contact-button:hover {
+            background: var(--secondary-color);
+            transform: scale(1.05);
+        }
+
+        .locations, .products {
+            margin-top: 60px;
+        }
+
+        .locations h2, .products h2 {
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .location-list, .product-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .location-item, .product-item {
+            background: #FFFFFF;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            flex: 1 1 200px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .location-item::before, .product-item::before {
+            content: ' ';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 1.5rem;
+            opacity: 0.2;
+            transition: all 0.3s ease;
+        }
+
+        .location-item:hover::before, .product-item:hover::before {
+            transform: rotate(15deg) scale(1.2);
+            opacity: 1;
+        }
+
+        .location-item:hover, .product-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animation de pulsation pour le bouton */
+        .attention-pulse {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        .delay-4 { animation-delay: 0.8s; }
+
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            .pricing {
+                margin-left: 0;
+                margin-top: 40px;
+            }
+        }
+    </style>
+</head>
+
+<body class="background" onload="voucher()">
+    $(if chap-id)
+    <form name="sendin" action="$(link-login-only)" method="post">
+        <input type="hidden" name="username" />
+        <input type="hidden" name="password" />
+        <input type="hidden" name="dst" value="$(link-orig)" />
+        <input type="hidden" name="popup" value="true" />
+    </form>
+
+    <script type="text/javascript" src="md5.js"></script>
+    <script type="text/javascript">
+        function doLogin() {
+            document.sendin.username.value = document.login.username.value;
+            document.sendin.password.value = hexMD5('$(chap-id)' + document.login.password.value +
+                '$(chap-challenge)');
+            document.sendin.submit();
+            return false;
+        }
+    </script>
+    $(endif)
+
+    <div id="main" class="main">
+
+        <div class="box">
+            <img src="01.png" alt="Logo" style="width:30%; height:auto; border-radius: 10px; margin-bottom: -50px;" />
+            <h3 class="animate-charcter"><i>YSA WIFI ZONE</i></h3>
+            <h2>
+                <marquee bgcolor="#A6DFE6"><i>Surfez en Haut Débit 24H/7 Tel:95 94 14 24</i></marquee>
+            </h2>
+        </div>
+        <!--Start of Tawk.to Script-->
+<script type="text/javascript">
+    var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+    (function(){
+    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+    s1.async=true;
+    s1.src='https://embed.tawk.to/66b7ec6e0cca4f8a7a746614/1i4v774il';
+    s1.charset='UTF-8';
+    s1.setAttribute('crossorigin','*');
+    s0.parentNode.insertBefore(s1,s0);
+    })();
+</script>
+       <!--End of Tawk.to Script-->
+
+        <div class="box">
+         <button class="contact-button attention-pulse" onclick="window.location.href='Pagedepaiement.html'"><i>Payer un ticket Par MOMO</i></button> <div class="main-content"></div><div>
+
+            <button id="btnmem" class="small-button" onclick="member();"><i class="icon icon-user-circle-o">&#xf2be;</i>
+                Se connecter</button>
+        </div>
+
+        <div class="box" id="infologin">
+        </div>
+        <form autocomplete="off" name="login" action="$(link-login-only)" method="post" $(if chap-id)
+            onSubmit="return doLogin()" $(endif)>
+            <input type="hidden" name="dst" value="$(link-orig)" />
+            <input type="hidden" name="popup" value="true" />
+            <input class="username" name="username" type="text" value="$(username)" />
+            <input class="password" name="password" placeholder="Taper Password" type="hidden" />
+            <button class="button" type="submit"><i class="icon icon-login">&#xe803;</i> Validation</button>
+        </form>
+
+        <!-- $(if trial == 'yes')
+        <div class="box">50Mo Gratuit Disponible <a style="text-decoration: underline; color:#2484ac;"
+                href="$(link-login-only)?dst=$(link-orig-esc)&amp;username=T-$(mac-esc)">Par ici</a></div>
+        $(endif)-->
+
+        <!-- Start slidersection -->
+        <div id="wowslider-container1">
+                        <div class="ws_script" style="position:absolute;left:-99%"><a href="">jquery
+                    slideshow</a> YSA WIFI ZONE</div>
+            <div class="ws_shadow"></div>
+        </div>
+        <script type="text/javascript" src="engine1/wowslider.js"></script>
+        <script type="text/javascript" src="engine1/script.js"></script>
+        <!-- End slider-->
+
+        $(if error)<div class="notice">$(error)</div>$(endif)
+
+        <table class="table">
+            <caption style="font-size: 20px; font-weight: bold; margin-bottom:5px;"><i>Forfaits Volumes Journaliers</i>
+            </caption>
+            <tr>
+                <th>Volumes</th>
+                <th>Prix</th>
+                <th>Validité</th>
+            </tr>
+            <tr>
+                <td>750-Mo</td>
+                <td>100 Fcfa</td>
+                <td>1 Jour</td>
+            </tr>
+            <tr>
+                <td>2-Go</td>
+                <td>200 Fcfa</td>
+                <td>3-Jours</td>
+            </tr>
+            <tr>
+                <td>5-Go</td>
+                <td>500 Fcfa</td>
+                <td>14 jours</td>
+            </tr>
+
+            <table class="table">
+                <caption style="font-size: 20px; font-weight: bold; margin-bottom:5px;"><i>Forfaits Horaires</i>
+                </caption>
+                <tr>
+                    <th>Heures</th>
+                    <th>Prix</th>
+                    <th>Validités</th>
+                <tr>
+                    <td>1-Heure</td>
+                    <td>150 Fcfa</td>
+                    <td>2-Jours</td>
+                </tr>
+                <tr>
+                    <td>3-Heures</td>
+                    <td>300 Fcfa</td>
+                    <td>3-Jours</td>
+                </tr>
+                <tr>
+                    <td>8-Heures</td>
+                    <td>500 Fcfa</td>
+                    <td>14-Jours</td>
+                </tr>
+                       <table class="table">
+                <caption style="font-size: 20px; font-weight: bold; margin-bottom:5px;"><i>Forfaits Ilimités</i>
+                </caption>
+                <tr>
+            <i><th>Période</th>
+                <th>Prix</th>
+                <th>Validités</th>
+            <tr>
+                <td>Semaine</td>
+                <td>1000 Fcfa</td>
+                <td>07-Jour</td>
+            </tr>
+            <tr>
+                <td>Mois</td>
+                <td>4000 Fcfa</td>
+                <td>30-Jours</td>
+            </tr>
+        </table></i>
+            <div>
+                <!--Nos services
+
+                    <table class="table">
+                        <caption style="font-size: 20px; font-weight: bold; margin-bottom:5px;">Nos Services</caption>
+                        <tr>
+                            <th>- vente de Wifi Zone</th>
+
+                        </tr>
+                        <tr>
+                            <th>- vente de Wifi Zone</th>
+
+                        </tr>
+                        <tr>
+                            <th>- vente de Wifi Zone</th>
+
+                        </tr>
+                    </table>
+
+                 Newcode teste
+                <p style="font-size: 20px; font-weight: bold; margin-top: auto; margin-bottom: auto;">Nos Services</p>
+                <div class="accordionMenu">-->
+
+                    <!-- 2nd menu
+                    <input type="radio" name="trg1" id="acc2">
+                    <label for="acc2">Formations</label>
+                    <div class="content">
+                        <div class="inner">
+                            - Formaation en Informatique <br>
+                            - Vente,Activation et recharge des cartes VISA <br>
+                            - Imprimerie et burautique <br>
+                            - Vente de kits canal+ <br>
+                            - Vente des robes et sacs dames <br>
+                            - Encadrement et suivie des candidats <br>
+                            - Achat et vente de parcelles <br>
+                        </div>
+
+                </div>
+
+               <!-- <i>Site Web <a style="color:#2484ac; text-decoration:underline;" href=""></a>Notre site Web ici</i><br>-->
+                <i>Whatsapp <a style="color:#2484ac; text-decoration:underline;"
+                        href="https://wa.me/message/K343RDQXHFYEC1">95 94 14 24</a></i><br>
+                        <i>télégramme <a style="color:#2484ac; text-decoration:underline;"
+                            href="https://t.me/yirousa">Canal YIROUSA</a></i><br>
+
+            </div>
+
+            <!--Systeme de Messagerie-->
+            <script>
+                window.intergramId = "Votre identifiant de chat unique";
+                window.intergramCustomizations = {
+                    titleClosed: 'Messagerie',
+                    titleOpen: '😃 Bonjour !',
+                    introMessage: 'Bonjour à nouveau, Que puivons-vous faire pour vous ?', //Message de Bienvenue
+                    autoResponse: 'un instant svp...', //Auto reponse
+                    autoNoResponse: "Tous nos agents sont actuellement occupés veuillez patienter +229 95 94 14 24", //Message en cas d'absence ( 1 minute de silence )
+                    mainColor: "#a80303", //Pour changer la couleur 'red', 'rgb(255,87,34)', etc
+                    alwaysUseFloatingButton: true //Changez (false) en (true) pour utilisez le bouton flottant mobile
+                };
+            </script>
+            <script id="intergram" type="text/javascript" src="t.me/yirousa"></script>
+            <!--Fin Systeme de Messagerie-->
+            <!--/Newcode teste-->
+    </div>
+    <div class="box" style="color:#2484ac;">
+        <i>Copyright &copy; ETS YIROUSA @</i>
+        <!-- ETS YIROUSA en Action-->
+    </div>
+
+    <script type="text/javascript">
+        var hostname = window.location.hostname;
+        document.getElementById('title').innerHTML = hostname + "ysa.wifi";
+        document.login.username.focus();
+
+        var infologin = document.getElementById('infologin');
+
+        // login page 2 mode by ETS YIROUSA
+        var username = document.login.username;
+        var password = document.login.password;
+
+        username.placeholder = "Code";
+
+        // set password = username
+        function setpass() {
+            var user = username.value
+            //user = user.toLowerCase();
+            username.value = user;
+            password.value = user;
+        }
+
+        username.onkeyup = setpass;
+
+        // change to voucher mode
+        function voucher() {
+            username.focus();
+            username.onkeyup = setpass;
+            username.placeholder = "Taper votre Code Unique";
+            username.style = "border-radius:3px;"
+            password.type = "hidden";
+
+        }
+
+        // change to member mode
+        function member() {
+            username.focus();
+            username.onkeyup = "";
+            username.placeholder = "Taper Username";
+            username.style = "border-radius:3px 3px 0px 0px;"
+            password.type = "password";
+        }
+    </script>
+
+
+
+</body>
+
+</html>

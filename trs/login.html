@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title id="title"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="theme-color" content="#3B5998" />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+        $(if chap-id)
+        <form name="sendin" action="$(link-login-only)" method="post">
+            <input type="hidden" name="username" />
+            <input type="hidden" name="password" />
+            <input type="hidden" name="dst" value="$(link-orig)" />
+            <input type="hidden" name="popup" value="true" />
+        </form>
+
+        <script type="text/javascript" src="md5.js"></script>
+        <script type="text/javascript">
+            function doLogin() {
+                document.sendin.username.value = document.login.username.value;
+                document.sendin.password.value = hexMD5('$(chap-id)' + document.login.password.value +
+                    '$(chap-challenge)');
+                document.sendin.submit();
+                return false;
+            }
+        </script>
+        $(endif)
+
+        <div id="main" class="main">
+            
+            <div class="box">
+                <img src="img/logo.png" alt="kemangi 41" style="border-radius: 10px; width:300px; height:auto;"/>
+            </div>
+            <hr width="280"; height="10px";>
+<div class="box">
+                <button id="btnvrc" class="small-button" onclick="voucher();"><i class="icon icon-ticket"></i> Ticket</button>
+                <button id="btnmem" class="small-button" onclick="member();"><i class="icon icon-user-circle-o"></i> Compte</button>
+                <button class="small-button" onclick="window.location.href='Pay.html';"><i class="fas fa-credit-card"></i> Payer un ticket</button>            </div>
+
+
+            <div class="box" id="infologin">
+            </div>
+            <form autocomplete="off" name="login" action="$(link-login-only)" method="post" $(if chap-id) onSubmit="return doLogin()"
+                $(endif)>
+                <input type="hidden" name="dst" value="$(link-orig)" />
+                <input type="hidden" name="popup" value="true" />
+                <input class="username" name="username" type="text" value="$(username)" />
+                <input class="password" name="password" placeholder="Password" type="hidden" />
+
+                <button class="button" type="submit"><i class="icon icon-login">&#xe803;</i> Connexion</button>
+
+            </form>
+
+       <!-- $(if trial == 'yes')
+            <div class="box"> testez notre haut debit GRATUITEMENT <a style="text-decoration: underline; color:#fff;" href="$(link-login-only)?dst=$(link-orig-esc)&amp;username=T-$(mac-esc)"> <br><button>
+  Clique-ici
+</button></a></div>
+            $(endif)
+-->
+            $(if error)<div class="notice">$(error)</div>$(endif)
+<img src="img/1.gif" alt="kemangi 41" style="border-radius: 10px; width:300px; height:auto;">  <br> 
+           
+ <table class="table" ;>
+                    <tr>
+                        <th>Temps</th>
+                        <th>Validité</th>
+                        <th>Prix</th>
+
+                        
+                    </tr>
+
+                       </tr>   
+
+                       
+                    </tr>
+                        <td>3H</td>
+                        <td>24H</td>
+                        <td>100F</td>
+                    </tr> 
+                    </tr>      
+                        <td>12H</td>
+                        <td>24H</td>
+                        <td>200F</td>
+                    </tr>
+                    </tr>
+                        <td>24H</td>
+                        <td>24H</td>
+                        <td>300F</td>
+                    </tr>
+                    <tr>
+                        <td>3 JOURS</td>
+                        <td>3 JOURS</td>
+                        <td>500F</td>
+                    </tr>
+                     <tr>
+                        <td>1 SEMAINE </td>
+                        <td>7 JOURS</td>
+                        <td>1000F</td>
+                    </tr>
+                        <td>1 MOIS </td>
+                        <td>30 JOURS</td>
+                        <td>3000F</td>
+                    </tr>
+                       </tr>
+                           
+                </table>
+                <br />
+                <div>
+                </table>
+</div>
+
+                <div class="box" style="color:#000;">
+            
+        </div>
+                   
+MERCI POUR VOTRE FIDELITE. 
+A BIENTOT !!!  <!--<br> <th>𝐀𝐓𝐓𝐄𝐍𝐓𝐈𝐎𝐍 𝐏𝐀𝐒🙀𝐈𝐂𝐈😳</th>👉🏾<a href="https://wifi-business-trs.start.page"><img src="img/button.jpg" style="border-radius: 10px; width:35px; height:auto; margin-top: -35px;"></a> 
+  
+                      <a href="tel:(+229): 62703216 / 43267334" color:#000;"> </a>
+                  </div>
+
+-->
+<script type="text/javascript">
+var hostname = window.location.hostname;
+document.getElementById('title').innerHTML = hostname  + " > login";
+
+document.login.username.focus();
+
+var infologin = document.getElementById('infologin');
+infologin.innerHTML = "Entrez le code du ticket, puis cliquez sur connexion";
+
+// login page 2 mode by Laksamadi Guko
+var username = document.login.username;
+var password = document.login.password;
+
+username.placeholder = "Entrez svp le code";
+
+// set password = username
+function setpass() {
+    var user = username.value
+    //user = user.toLowerCase();
+    username.value = user;
+    password.value = user;
+}
+
+username.onkeyup = setpass;
+
+// change to voucher mode
+function voucher() {
+    username.focus();
+    username.onkeyup = setpass;
+    username.placeholder = "Kode Voucher";
+    username.style = "border-radius:3px;"
+    password.type = "hidden";
+    infologin.innerHTML = "Saisissez le code du ticket, puis cliquez sur connexion.";
+}
+
+// change to member mode
+function member() {
+    username.focus();
+    username.onkeyup = "";
+    username.placeholder = "Username";
+    username.style = "border-radius:3px 3px 0px 0px;"
+    password.type = "password";
+    infologin.innerHTML = "Saisissez votre nom d'utilisateur et votre mot de passe, puis cliquez sur connexion.";
+}
+</script>
+  <div class="progress-container">
+    <div class="progress-bar" id="progressbar"></div>
+  </div>
+
+<script>
+//<![CDATA[
+window.addEventListener("scroll", myFunction);
+
+function myFunction() {
+  var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+  var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  var scrolled = (winScroll / height) * 100;
+  document.getElementById("progressbar").style.width = scrolled + "%";
+}
+//]]>
+</script>
+<script>
+var acc = document.getElementsByClassName("accordion");
+var i;
+
+for (i = 0; i < acc.length; i++) {
+  acc[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var panel = this.nextElementSibling;
+    if (panel.style.maxHeight){
+      panel.style.maxHeight = null;
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + "px";
+    } 
+  });
+}
+</script>
+
+
+</body>
+
+</html>

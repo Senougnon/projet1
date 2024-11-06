@@ -1,104 +1,94 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paiement avec KKiapay</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-        }
-        .container {
-            text-align: center;
-            background-color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        button {
-            background-color: #0095ff;
-            border: none;
-            color: white;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        #notification {
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 5px;
-            display: none;
-        }
-        .success {
-            background-color: #dff0d8;
-            color: #3c763d;
-        }
-        .error {
-            background-color: #f2dede;
-            color: #a94442;
-        }
-    </style>
+<title>Recraft Image Generator</title>
+<style>
+body {
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#imageContainer {
+  width: 512px; /* Adjust as needed */
+  height: 512px; /* Adjust as needed */
+  border: 1px solid #ccc;
+  margin-top: 20px;
+}
+img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Paiement avec KKiapay</h1>
-        <button id="payButton" class="kkiapay-button">Payer</button>
-        <div id="notification"></div>
-    </div>
+  <h1>Recraft Image Generator</h1>
 
-    <script src="https://cdn.kkiapay.me/k.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const payButton = document.getElementById('payButton');
-            const notification = document.getElementById('notification');
+  <input type="text" id="prompt" placeholder="Enter prompt">
+  <select id="style">
+    <option value="realistic_image">Realistic Image</option>
+    <option value="digital_illustration">Digital Illustration</option>
+    <option value="vector_illustration">Vector Illustration</option>
+    <option value="icon">Icon</option>
+  </select>
+  <select id="size">
+    <option value="1024x1024">1024x1024</option>
+    <option value="1365x1024">1365x1024</option>
+    <option value="1024x1365">1024x1365</option>
+    <!-- Add other sizes -->
+  </select>
+  <button onclick="generateImage()">Generate</button>
 
-            function showNotification(message, isSuccess) {
-                notification.textContent = message;
-                notification.className = isSuccess ? 'success' : 'error';
-                notification.style.display = 'block';
-            }
+  <div id="imageContainer"></div>
 
-            function openKkiapayWidget() {
-                openKkiapayWidget({
-                    amount: "1",
-                    position: "center",
-                    callback: "https://votresite.com/callback",
-                    data: "customData",
-                    theme: "#0095ff",
-                    sandbox: false,
-                    key: "43e7f2a6f99693efba3c59f2ee6d613c601f9beb", // Remplacez par votre clé API
-                    phone: "97000000", // Optionnel : numéro de téléphone pré-rempli
-                    name: "Client Test", // Optionnel : nom du client
-                    email: "client@test.com", // Optionnel : email du client
-                    paymentmethod: "momo" // Optionnel : pour autoriser uniquement le paiement mobile money
-                });
-            }
+<script>
+const apiKey = 'aJE0agNtftcETLBX5EBJhoy2CKvMVfA7SSr6bqsAydjrWl7imvzLHG7E90jp7Rjs'; // Replace with your actual API key
+const apiUrl = 'https://external.api.recraft.ai/v1/images/generations';
 
-            payButton.addEventListener('click', openKkiapayWidget);
+async function generateImage() {
+  const prompt = document.getElementById('prompt').value;
+  const style = document.getElementById('style').value;
+  const size = document.getElementById('size').value;
 
-            // Écouteur pour le succès du paiement
-            addSuccessListener(response => {
-                console.log(response);
-                showNotification('Paiement réussi !', true);
-            });
 
-            // Écouteur pour l'échec du paiement
-            addFailedListener(error => {
-                console.error(error);
-                showNotification('Échec du paiement. Veuillez réessayer.', false);
-            });
-        });
-    </script>
+  const headers = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${apiKey}`,
+  };
+
+  const body = {
+    prompt: prompt,
+    style: style,
+    size: size, // Include size in the request
+  };
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json(); // Get error details
+      throw new Error(`API Error: ${response.status} - ${errorData.error.message}`); // Throw error with details
+    }
+
+
+    const data = await response.json();
+    const imageUrl = data.data[0].url;
+
+    const imageContainer = document.getElementById('imageContainer');
+    imageContainer.innerHTML = `<img src="${imageUrl}" alt="${prompt}">`;
+
+  } catch (error) {
+    console.error(error); // Log the detailed error
+    const imageContainer = document.getElementById('imageContainer');
+    imageContainer.innerHTML = `<p style="color: red;">${error.message}</p>`; // Display error to user
+  }
+}
+
+</script>
 </body>
 </html>

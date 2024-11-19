@@ -2,690 +2,611 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Convertisseur de numéros - Bénin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Convertisseur GSM Bénin</title>
     <style>
+        :root {
+            --primary-color: #1a73e8;
+            --success-color: #34a853;
+            --warning-color: #fbbc04;
+            --error-color: #ea4335;
+            --background-color: #f8f9fa;
+            --surface-color: #ffffff;
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --spacing-unit: 16px;
+            --border-radius: 12px;
+            --safe-area-inset-top: env(safe-area-inset-top, 0px);
+            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         body {
-            line-height: 1.6;
-            padding: 20px;
-            background-color: #f0f2f5;
-            color: #333;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding: calc(var(--spacing-unit) + var(--safe-area-inset-top)) var(--spacing-unit) calc(var(--spacing-unit) + var(--safe-area-inset-bottom));
+            -webkit-font-smoothing: antialiased;
         }
 
-        .container {
-            max-width: 900px;
+        .app-container {
+            max-width: 600px;
             margin: 0 auto;
-            background-color: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        h1, h2 {
-            color: #1a73e8;
-            margin-bottom: 1rem;
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: var(--surface-color);
+            padding: var(--spacing-unit);
+            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
             text-align: center;
+            margin-bottom: var(--spacing-unit);
+            color: var(--primary-color);
         }
 
-        .info-box {
-            background-color: #e3f2fd;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid #1a73e8;
+        .info-banner {
+            background-color: rgba(26,115,232,0.1);
+            padding: var(--spacing-unit);
+            border-radius: var(--border-radius);
+            margin-bottom: var(--spacing-unit);
+            font-size: 0.9rem;
+            border-left: 4px solid var(--primary-color);
         }
 
-        .warning-box {
-            background-color: #fff3e0;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            border-left: 4px solid #ff9800;
-        }
-
-        .tabs {
+        .nav-tabs {
             display: flex;
-            margin-bottom: 1.5rem;
-            border-bottom: 2px solid #e0e0e0;
-            gap: 10px;
+            gap: 8px;
+            margin-bottom: var(--spacing-unit);
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
         }
 
-        .tab {
-            padding: 12px 24px;
-            cursor: pointer;
-            border: none;
-            background: none;
-            font-size: 16px;
-            color: #666;
-            transition: all 0.3s ease;
-            border-bottom: 2px solid transparent;
-            margin-bottom: -2px;
-        }
-
-        .tab:hover {
-            color: #1a73e8;
-            background-color: #f5f5f5;
-        }
-
-        .tab.active {
-            color: #1a73e8;
-            border-bottom: 2px solid #1a73e8;
-        }
-
-        .tab-content {
+        .nav-tabs::-webkit-scrollbar {
             display: none;
-            animation: fadeIn 0.3s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .input-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #555;
-            font-weight: 500;
-        }
-
-        textarea {
-            width: 100%;
-            min-height: 150px;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            line-height: 1.6;
-            resize: vertical;
-            transition: border-color 0.3s ease;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: #1a73e8;
-            box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
-        }
-
-        .file-drop-zone {
-            border: 2px dashed #ddd;
-            border-radius: 8px;
-            padding: 2rem;
-            text-align: center;
-            margin-bottom: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background-color: #fafafa;
-        }
-
-        .file-drop-zone:hover {
-            border-color: #1a73e8;
-            background-color: #f8f9fa;
-        }
-
-        .file-drop-zone.dragover {
-            border-color: #1a73e8;
-            background-color: #e3f2fd;
-        }
-
-        button {
-            background-color: #1a73e8;
-            color: white;
-            padding: 12px 24px;
+        .tab-button {
+            flex: 1;
+            min-width: max-content;
+            padding: 12px 20px;
             border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
+            border-radius: 20px;
+            background-color: transparent;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
             font-weight: 500;
             transition: all 0.3s ease;
-            display: inline-flex;
+            white-space: nowrap;
+        }
+
+        .tab-button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .content-card {
+            background-color: var(--surface-color);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-unit);
+            margin-bottom: var(--spacing-unit);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .action-button {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 24px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 1rem;
+            font-weight: 500;
+            margin: 8px 0;
+            display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        button:hover {
-            background-color: #1557b0;
-            transform: translateY(-1px);
+        .action-button:active {
+            transform: scale(0.98);
         }
 
-        button:active {
-            transform: translateY(0);
+        .secondary-button {
+            background-color: var(--success-color);
+        }
+
+        .outline-button {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
         }
 
         .contact-list {
-            max-height: 400px;
+            max-height: 60vh;
             overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            margin: 1rem 0;
-            background-color: white;
+            -webkit-overflow-scrolling: touch;
+            margin: var(--spacing-unit) 0;
+            border-radius: var(--border-radius);
+            background-color: var(--surface-color);
         }
 
         .contact-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             padding: 12px 16px;
-            border-bottom: 1px solid #eee;
-            transition: background-color 0.3s ease;
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
-        .contact-item:hover {
-            background-color: #f5f5f5;
+        .contact-checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 2px solid var(--primary-color);
+            appearance: none;
+            -webkit-appearance: none;
+            position: relative;
+            cursor: pointer;
         }
 
-        .contact-item:last-child {
-            border-bottom: none;
+        .contact-checkbox:checked {
+            background-color: var(--primary-color);
+        }
+
+        .contact-checkbox:checked::after {
+            content: "✓";
+            position: absolute;
+            color: white;
+            font-size: 16px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .contact-info {
             flex: 1;
         }
 
-        .contact-status {
+        .contact-name {
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .contact-number {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
             padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.875rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
             font-weight: 500;
         }
 
         .status-warning {
-            background-color: #fff3e0;
-            color: #f57c00;
+            background-color: rgba(251,188,4,0.1);
+            color: var(--warning-color);
         }
 
         .status-success {
-            background-color: #e8f5e9;
-            color: #2e7d32;
+            background-color: rgba(52,168,83,0.1);
+            color: var(--success-color);
         }
 
-        .result {
-            margin-top: 1.5rem;
-        }
-
-        .stats {
-            margin-top: 1rem;
-            padding: 1rem;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-        }
-
-        .stats ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-        }
-
-        .stats li {
-            margin: 0.5rem 0;
+        .floating-action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--surface-color);
+            padding: var(--spacing-unit);
+            padding-bottom: calc(var(--spacing-unit) + var(--safe-area-inset-bottom));
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
             display: flex;
-            justify-content: space-between;
-            padding: 0.5rem;
-            background-color: white;
-            border-radius: 4px;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 1000;
         }
 
-        .progress-container {
-            margin: 1rem 0;
+        .selection-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
         }
 
         .progress-bar {
             width: 100%;
-            height: 6px;
-            background-color: #e0e0e0;
-            border-radius: 3px;
+            height: 4px;
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 2px;
             overflow: hidden;
+            margin: 8px 0;
         }
 
         .progress-fill {
             height: 100%;
-            background-color: #1a73e8;
+            background-color: var(--primary-color);
             width: 0%;
             transition: width 0.3s ease;
         }
 
-        .export-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 1rem;
-            flex-wrap: wrap;
+        @media (display-mode: standalone) {
+            body {
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: env(safe-area-inset-bottom);
+            }
         }
 
-        .export-buttons button {
-            flex: 1;
-            min-width: 200px;
+        .textarea-container {
+            position: relative;
+            margin: var(--spacing-unit) 0;
         }
 
-        .secondary-button {
-            background-color: #34a853;
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            line-height: 1.5;
+            resize: none;
         }
 
-        .secondary-button:hover {
-            background-color: #2d8a46;
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(26,115,232,0.1);
         }
 
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 1rem 0;
-            padding: 8px;
-            background-color: #f5f5f5;
-            border-radius: 4px;
+        .file-drop-zone {
+            border: 2px dashed rgba(0,0,0,0.1);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-unit);
+            text-align: center;
+            margin: var(--spacing-unit) 0;
         }
 
-        .checkbox-container input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
+        .file-drop-zone.dragover {
+            border-color: var(--primary-color);
+            background-color: rgba(26,115,232,0.05);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Convertisseur de numéros GSM Bénin</h1>
-        
-        <div class="info-box">
-            <p><strong>Information :</strong> Conversion des numéros de téléphone du Bénin au nouveau format (ajout de 01).</p>
-            <p>Exemple : +22960374877 → +2290160374877</p>
+    <div class="app-container">
+        <div class="header">
+            <h1>Convertisseur GSM Bénin</h1>
+            <div class="info-banner">
+                <strong>Nouveau format :</strong> Ajout du préfixe "01"<br>
+                Ex: +22960374877 → +2290160374877
+            </div>
+
+            <div class="nav-tabs">
+                <button class="tab-button active" onclick="switchTab('phone')">
+                    Contacts
+                </button>
+                <button class="tab-button" onclick="switchTab('manual')">
+                    Saisie
+                </button>
+                <button class="tab-button" onclick="switchTab('import')">
+                    Import
+                </button>
+            </div>
         </div>
 
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('manual')">Saisie manuelle</button>
-            <button class="tab" onclick="switchTab('import')">Importer fichier</button>
-            <button class="tab" onclick="switchTab('phone')">Contacts téléphone</button>
+<!-- Tab Contents -->
+<div id="phone-tab" class="tab-content active">
+    <div class="content-card">
+        <button class="action-button" onclick="requestContacts()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            Charger mes contacts
+        </button>
+
+        <div class="selection-controls" id="selectionControls" style="display: none;">
+            <label class="checkbox-container">
+                <input type="checkbox" id="selectAll" onclick="toggleSelectAll()">
+                Tout sélectionner
+            </label>
+            <span id="selectedCount">0 sélectionné</span>
         </div>
 
-        <div id="manual-tab" class="tab-content active">
-            <div class="input-group">
-                <label for="input">Collez vos numéros (un par ligne) :</label>
-                <textarea id="input" placeholder="Exemple :
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <div id="contactsStatus"></div>
+        <div class="contact-list" id="contactsList"></div>
+    </div>
+</div>
+
+<div id="manual-tab" class="tab-content">
+    <div class="content-card">
+        <div class="textarea-container">
+            <textarea id="input" placeholder="Entrez vos numéros (un par ligne)
+Exemple :
 +22960374877
 +22997123456
 60374877"></textarea>
-                <button onclick="convertNumbers()">Convertir les numéros</button>
-            </div>
         </div>
+        <button class="action-button" onclick="convertNumbers()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 3h5v5"></path>
+                <path d="M4 20L21 3"></path>
+                <path d="M21 16v5h-5"></path>
+                <path d="M15 15l6 6"></path>
+                <path d="M4 4l5 5"></path>
+            </svg>
+            Convertir
+        </button>
+    </div>
+</div>
 
-        <div id="import-tab" class="tab-content">
-            <div class="file-drop-zone" id="dropZone" onclick="triggerFileInput()">
-                <p>Glissez-déposez vos fichiers ici ou cliquez pour sélectionner</p>
-                <p><small>Formats supportés : CSV, VCF (vCard)</small></p>
-                <input type="file" id="fileInput" accept=".csv,.vcf" style="display: none" onchange="handleFiles(this.files)">
-            </div>
-        </div>
-
-        <div id="phone-tab" class="tab-content">
-            <div class="input-group">
-                <div class="warning-box">
-                    <p>Cette fonctionnalité nécessite un appareil mobile compatible et une connexion sécurisée (HTTPS).</p>
-                </div>
-                <button onclick="requestContacts()">Accéder aux contacts du téléphone</button>
-                <div class="checkbox-container">
-                    <input type="checkbox" id="autoReplace" checked>
-                    <label for="autoReplace">Remplacer automatiquement les contacts après conversion</label>
-                </div>
-                <div class="progress-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressBar"></div>
-                    </div>
-                </div>
-                <div id="contactsStatus"></div>
-                <div class="contact-list" id="contactsList"></div>
-            </div>
-        </div>
-
-        <div class="result">
-            <label for="output">Résultats :</label>
-            <textarea id="output" readonly></textarea>
-            <div class="export-buttons">
-                <button onclick="copyToClipboard()">Copier les résultats</button>
-                <button class="secondary-button" onclick="exportCSV()">Exporter en CSV</button>
-                <button class="secondary-button" onclick="exportVCard()">Exporter en VCard</button>
-            </div>
-            <div class="stats" id="stats"></div>
+<div id="import-tab" class="tab-content">
+    <div class="content-card">
+        <div class="file-drop-zone" id="dropZone" onclick="triggerFileInput()">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+                <polyline points="13 2 13 9 20 9"></polyline>
+            </svg>
+            <p>Touchez pour importer</p>
+            <p><small>CSV, VCF (vCard)</small></p>
+            <input type="file" id="fileInput" accept=".csv,.vcf" style="display: none" onchange="handleFiles(this.files)">
         </div>
     </div>
+</div>
 
-    <script>
-        // Gestion des onglets
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.getElementById(tabName + '-tab').classList.add('active');
-            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
-        }
+<!-- Results Section -->
+<div class="content-card" id="resultsCard" style="display: none;">
+    <h2>Résultats</h2>
+    <div class="textarea-container">
+        <textarea id="output" readonly></textarea>
+    </div>
+    <div id="stats"></div>
+</div>
 
-        // Gestion du drag & drop
-        const dropZone = document.getElementById('dropZone');
+<!-- Floating Action Bar -->
+<div class="floating-action-bar" id="actionBar" style="display: none;">
+    <button class="action-button" id="updateContactsBtn" onclick="updateSelectedContacts()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 9l-7 7-7-7"></path>
+        </svg>
+        Mettre à jour les contacts
+        <span id="updateCount"></span>
+    </button>
+    <div class="export-options">
+        <button class="action-button outline-button" onclick="exportVCard()">
+            Exporter en VCard
+        </button>
+        <button class="action-button outline-button" onclick="copyToClipboard()">
+            Copier les numéros
+        </button>
+    </div>
+</div>
+</div>
 
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, preventDefaults, false);
-        });
+<script>
+let selectedContacts = new Set();
+let allContacts = [];
 
-        function preventDefaults(e) {
-            e.preventDefault();
-            e.stopPropagation();
-        }
-
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropZone.addEventListener(eventName, highlight, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropZone.addEventListener(eventName, unhighlight, false);
-        });
-
-        function highlight(e) {
-            dropZone.classList.add('dragover');
-        }
-
-        function unhighlight(e) {
-            dropZone.classList.remove('dragover');
-        }
-
-        dropZone.addEventListener('drop', handleDrop, false);
-
-        function triggerFileInput() {
-            document.getElementById('fileInput').click();
-        }
-
-        // Traitement des fichiers
-        function handleDrop(e) {
-            const files = e.dataTransfer.files;
-            handleFiles(files);
-        }
-
-        function handleFiles(files) {
-            const file = files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const content = e.target.result;
-                if (file.name.toLowerCase().endsWith('.csv')) {
-                    parseCSV(content);
-                } else if (file.name.toLowerCase().endsWith('.vcf')) {
-                    parseVCard(content);
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function parseCSV(content) {
-            const lines = content.split('\n');
-            const numbers = [];
-            
-            lines.forEach(line => {
-                const columns = line.split(',');
-                columns.forEach(col => {
-                    const trimmed = col.trim().replace(/["']/g, '');
-                    if (trimmed.match(/^\+?(?:229)?\d{8,}$/)) {
-                        numbers.push(trimmed);
-                    }
-                });
-            });
-
-            document.getElementById('input').value = numbers.join('\n');
-            convertNumbers();
-        }
-
-        function parseVCard(content) {
-            const numbers = [];
-            const vcardRegex = /TEL[^:]*:([\+\d\s\-\(\)]+)/g;
-            let match;
-
-            while ((match = vcardRegex.exec(content)) !== null) {
-                const number = match[1].replace(/[\s\-\(\)]/g, '');
-                if (number.match(/^\+?(?:229)?\d{8,}$/)) {
-                    numbers.push(number);
-                }
-            }
-
-            document.getElementById('input').value = numbers.join('\n');
-            convertNumbers();
-        }
-
-        // Conversion des numéros
-        function convertNumbers() {
-            const input = document.getElementById('input').value;
-            const lines = input.split('\n').filter(line => line.trim());
-            const converted = [];
-            let invalidNumbers = 0;
-            let convertedCount = 0;
-            let alreadyConverted = 0;
-
-lines.forEach(line => {
-    const trimmed = line.trim();
-    if (!trimmed) return;
-
-    if (trimmed.includes('01')) {
-        alreadyConverted++;
-        converted.push(trimmed);
-        return;
-    }
-
-    let number = trimmed;
-    
-    if (number.startsWith('+229')) {
-        convertedCount++;
-        converted.push(number.slice(0, 4) + '01' + number.slice(4));
-    }
-    else if (number.length === 8) {
-        convertedCount++;
-        converted.push('+22901' + number);
-    }
-    else if (number.startsWith('229')) {
-        convertedCount++;
-        converted.push('+' + number.slice(0, 3) + '01' + number.slice(3));
-    }
-    else {
-        invalidNumbers++;
-        converted.push(number + ' (Format invalide)');
-    }
-});
-
-document.getElementById('output').value = converted.join('\n');
-document.getElementById('stats').innerHTML = `
-    <p>Statistiques :</p>
-    <ul>
-        <li>Numéros traités : ${lines.length}</li>
-        <li>Numéros convertis : ${convertedCount}</li>
-        <li>Déjà au nouveau format : ${alreadyConverted}</li>
-        <li>Formats invalides : ${invalidNumbers}</li>
-    </ul>
-`;
+// Gestion des onglets
+function switchTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(tabName + '-tab').style.display = 'block';
+    document.querySelector(`.tab-button[onclick="switchTab('${tabName}')"]`).classList.add('active');
 }
 
-// Gestion des contacts du téléphone
+// Gestion des contacts
 async function requestContacts() {
-try {
-    // Vérifier la disponibilité de l'API Contacts
-    if (!('contacts' in navigator && 'ContactsManager' in window)) {
-        throw new Error("L'API Contacts n'est pas disponible sur votre appareil");
+    try {
+        // Vérifier la disponibilité de l'API Contacts
+        if (!('contacts' in navigator && 'ContactsManager' in window)) {
+            throw new Error("L'API Contacts n'est pas disponible");
+        }
+
+        const props = ['tel', 'name'];
+        const opts = {multiple: true};
+
+        const contacts = await navigator.contacts.select(props, opts);
+        processPhoneContacts(contacts);
+        
+        // Afficher les contrôles de sélection et la barre d'action
+        document.getElementById('selectionControls').style.display = 'flex';
+        document.getElementById('actionBar').style.display = 'block';
+    } catch (error) {
+        showError("Impossible d'accéder aux contacts", error.message);
     }
-
-    const props = ['tel', 'name'];
-    const opts = {multiple: true};
-
-    const contacts = await navigator.contacts.select(props, opts);
-    processPhoneContacts(contacts);
-} catch (error) {
-    document.getElementById('contactsStatus').innerHTML = `
-        <div class="warning-box">
-            <p>Erreur : ${error.message}</p>
-            <p>Cette fonctionnalité nécessite :</p>
-            <ul>
-                <li>Un appareil mobile récent</li>
-                <li>Un navigateur compatible</li>
-                <li>Une connexion HTTPS</li>
-            </ul>
-        </div>
-    `;
-}
 }
 
 function processPhoneContacts(contacts) {
-const statusDiv = document.getElementById('contactsStatus');
-const listDiv = document.getElementById('contactsList');
-const progressBar = document.getElementById('progressBar');
-
-if (!contacts.length) {
-    statusDiv.innerHTML = '<div class="warning-box">Aucun contact sélectionné</div>';
-    return;
-}
-
-statusDiv.innerHTML = `<div class="info-box">${contacts.length} contacts trouvés</div>`;
-listDiv.innerHTML = '';
-
-const processed = contacts.map(contact => {
-    const numbers = contact.tel.map(tel => {
-        let number = tel.replace(/[\s\-\(\)]/g, '');
-        
-        if (number.startsWith('+229')) {
-            return number.includes('01') ? number : number.slice(0, 4) + '01' + number.slice(4);
-        } else if (number.length === 8) {
-            return '+22901' + number;
-        } else if (number.startsWith('229')) {
-            return '+' + number.slice(0, 3) + '01' + number.slice(3);
-        }
-        return number;
-    });
-
-    return {
-        name: contact.name ? contact.name[0] : 'Sans nom',
-        originalNumbers: contact.tel,
-        newNumbers: numbers,
-        changed: contact.tel.some((num, i) => num !== numbers[i])
-    };
-});
-
-// Afficher les résultats
-processed.forEach(contact => {
-    const div = document.createElement('div');
-    div.className = 'contact-item';
-    div.innerHTML = `
-        <div class="contact-info">
-            <strong>${contact.name}</strong>
-            <div>Original: ${contact.originalNumbers.join(', ')}</div>
-            <div>Nouveau: ${contact.newNumbers.join(', ')}</div>
-        </div>
-        <span class="contact-status ${contact.changed ? 'status-warning' : 'status-success'}">
-            ${contact.changed ? 'À convertir' : 'Déjà converti'}
-        </span>
-    `;
-    listDiv.appendChild(div);
-});
-
-if (document.getElementById('autoReplace').checked) {
-    replaceContacts(processed);
-}
-}
-
-async function replaceContacts(processed) {
-const statusDiv = document.getElementById('contactsStatus');
-const progressBar = document.querySelector('.progress-fill');
-
-try {
-    let progress = 0;
-    const total = processed.length;
-    
-    for (let i = 0; i < total; i++) {
-        progress = ((i + 1) / total) * 100;
-        progressBar.style.width = `${progress}%`;
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
-
-    // Préparer les données pour l'export
-    const exportData = processed.map(contact => ({
-        name: contact.name,
-        numbers: contact.newNumbers
+    allContacts = contacts.map(contact => ({
+        name: contact.name?.[0] || 'Sans nom',
+        tel: contact.tel,
+        id: Math.random().toString(36).substring(7),
+        newNumbers: contact.tel.map(convertNumber)
     }));
 
-    statusDiv.innerHTML += `
-        <div class="info-box">
-            <p>✓ Traitement terminé</p>
-            <p>Utilisez les boutons ci-dessous pour exporter vos contacts mis à jour.</p>
+    renderContacts();
+    updateSelectionCount();
+}
+
+function renderContacts() {
+    const listDiv = document.getElementById('contactsList');
+    listDiv.innerHTML = '';
+
+    allContacts.forEach(contact => {
+        const needsUpdate = contact.tel.some((num, i) => num !== contact.newNumbers[i]);
+        
+        const div = document.createElement('div');
+        div.className = 'contact-item';
+        div.innerHTML = `
+            <input type="checkbox" class="contact-checkbox" 
+                   data-id="${contact.id}"
+                   ${selectedContacts.has(contact.id) ? 'checked' : ''}
+                   onchange="toggleContact('${contact.id}')">
+            <div class="contact-info">
+                <div class="contact-name">${contact.name}</div>
+                <div class="contact-number">${contact.newNumbers.join(', ')}</div>
+            </div>
+            <span class="status-badge ${needsUpdate ? 'status-warning' : 'status-success'}">
+                ${needsUpdate ? 'À convertir' : 'OK'}
+            </span>
+        `;
+        listDiv.appendChild(div);
+    });
+}
+
+function toggleContact(id) {
+    if (selectedContacts.has(id)) {
+        selectedContacts.delete(id);
+    } else {
+        selectedContacts.add(id);
+    }
+    updateSelectionCount();
+}
+
+function toggleSelectAll() {
+    const selectAllCheckbox = document.getElementById('selectAll');
+    if (selectAllCheckbox.checked) {
+        allContacts.forEach(contact => selectedContacts.add(contact.id));
+    } else {
+        selectedContacts.clear();
+    }
+    renderContacts();
+    updateSelectionCount();
+}
+
+function updateSelectionCount() {
+    const count = selectedContacts.size;
+    document.getElementById('selectedCount').textContent = `${count} sélectionné${count > 1 ? 's' : ''}`;
+    document.getElementById('updateCount').textContent = count ? `(${count})` : '';
+    document.getElementById('updateContactsBtn').disabled = count === 0;
+}
+
+async function updateSelectedContacts() {
+    const progressBar = document.querySelector('.progress-fill');
+    const selectedContactsData = allContacts.filter(c => selectedContacts.has(c.id));
+    
+    try {
+        // Simuler la mise à jour (à adapter selon l'API réelle du système)
+        for (let i = 0; i < selectedContactsData.length; i++) {
+            const progress = ((i + 1) / selectedContactsData.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        // Préparation pour l'export
+        const vcard = generateVCard(selectedContactsData);
+        showSuccess("Contacts convertis avec succès");
+        
+        // Proposer l'export
+        downloadFile(vcard, 'contacts_convertis.vcf', 'text/vcard');
+    } catch (error) {
+        showError("Erreur lors de la mise à jour", error.message);
+    }
+}
+
+// Utilitaires
+function convertNumber(number) {
+    number = number.replace(/[\s\-\(\)]/g, '');
+    
+    if (number.includes('01')) return number;
+    
+    if (number.startsWith('+229')) {
+        return number.slice(0, 4) + '01' + number.slice(4);
+    } else if (number.length === 8) {
+        return '+22901' + number;
+    } else if (number.startsWith('229')) {
+        return '+' + number.slice(0, 3) + '01' + number.slice(3);
+    }
+    
+    return number;
+}
+
+function showError(title, message) {
+    document.getElementById('contactsStatus').innerHTML = `
+        <div class="error-box">
+            <strong>${title}</strong><br>
+            ${message}
         </div>
     `;
+}
 
-    // Mettre à jour la zone de résultats
-    document.getElementById('output').value = exportData
-        .map(contact => `${contact.name}: ${contact.numbers.join(', ')}`)
-        .join('\n');
-} catch (error) {
-    statusDiv.innerHTML += `
-        <div class="warning-box">
-            <p>Erreur lors de la mise à jour : ${error.message}</p>
-            <p>Veuillez utiliser les boutons d'export pour sauvegarder vos contacts convertis.</p>
+function showSuccess(message) {
+    document.getElementById('contactsStatus').innerHTML = `
+        <div class="success-box">
+            ${message}
         </div>
     `;
 }
-}
 
-// Fonctions d'export
-function copyToClipboard() {
-const output = document.getElementById('output');
-output.select();
-document.execCommand('copy');
-alert('Résultats copiés dans le presse-papier !');
-}
-
-function exportCSV() {
-const numbers = document.getElementById('output').value;
-const csv = 'Numéro\n' + numbers.split('\n').join('\n');
-downloadFile(csv, 'numeros_convertis.csv', 'text/csv');
-}
-
-function exportVCard() {
-const numbers = document.getElementById('output').value.split('\n');
-let vcard = '';
-
-numbers.forEach((line, index) => {
-    if (line.trim()) {
-        const [name, number] = line.includes(':') ? line.split(':') : ['Contact ' + (index + 1), line];
-        vcard += 'BEGIN:VCARD\n';
-        vcard += 'VERSION:3.0\n';
-        vcard += `FN:${name.trim()}\n`;
-        const nums = number.split(',');
-        nums.forEach(num => {
-            vcard += `TEL:${num.trim()}\n`;
+// Export functions
+function generateVCard(contacts) {
+    let vcard = '';
+    contacts.forEach(contact => {
+        vcard += 'BEGIN:VCARD\nVERSION:3.0\n';
+        vcard += `FN:${contact.name}\n`;
+        contact.newNumbers.forEach(num => {
+            vcard += `TEL;TYPE=CELL:${num}\n`;
         });
         vcard += 'END:VCARD\n';
-    }
-});
-
-downloadFile(vcard, 'contacts_convertis.vcf', 'text/vcard');
+    });
+    return vcard;
 }
 
 function downloadFile(content, filename, type) {
-const blob = new Blob([content], { type: type });
-const url = window.URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.href = url;
-a.download = filename;
-document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
-window.URL.revokeObjectURL(url);
+    const blob = new Blob([content], { type: type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
+
+function copyToClipboard() {
+    const output = document.getElementById('output');
+    output.select();
+    document.execCommand('copy');
+    showSuccess("Numéros copiés dans le presse-papier");
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+    // Start with phone contacts tab
+    switchTab('phone');
+});
 </script>
 </body>
 </html>

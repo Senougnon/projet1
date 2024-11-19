@@ -10,13 +10,11 @@
             --success-color: #34a853;
             --warning-color: #fbbc04;
             --error-color: #ea4335;
-            --danger-color: #dc3545;
             --background-color: #f8f9fa;
             --surface-color: #ffffff;
             --text-primary: #202124;
             --text-secondary: #5f6368;
             --spacing-unit: 0.5rem;
-            --safe-area-bottom: env(safe-area-inset-bottom);
         }
 
         * {
@@ -35,46 +33,42 @@
             min-height: 100vh;
             max-width: 100vw;
             overflow-x: hidden;
-            padding-bottom: var(--safe-area-bottom);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* App Container avec pull-to-refresh */
+        /* App Container */
         .container {
-            max-width: 100%;
+            max-width: 600px;
             margin: 0 auto;
             padding: 1rem;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
-        /* Header avec style iOS/Android */
+        /* Header */
         .header {
             padding: 1rem;
             background: var(--surface-color);
             border-radius: 16px;
             margin-bottom: 1rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .header h1 {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             color: var(--primary-color);
             text-align: center;
             margin-bottom: 0.5rem;
-            font-weight: 600;
         }
 
-        /* Info Banner amélioré */
+        /* Info Banner */
         .info-banner {
             background: #e3f2fd;
             padding: 1rem;
             border-radius: 12px;
             margin-bottom: 1rem;
             border-left: 4px solid var(--primary-color);
-            font-size: 0.95rem;
         }
 
-        /* Tabs style natif mobile */
+        /* Tabs */
         .tabs {
             display: flex;
             background: var(--surface-color);
@@ -84,29 +78,37 @@
             overflow-x: auto;
             scroll-snap-type: x mandatory;
             -webkit-overflow-scrolling: touch;
-            gap: 0.5rem;
         }
 
         .tab {
             flex: 1;
-            min-width: 100px;
-            padding: 0.75rem 0.5rem;
+            min-width: 120px;
+            padding: 0.75rem 1rem;
             border: none;
             background: none;
             color: var(--text-secondary);
-            font-weight: 600;
-            font-size: 0.9rem;
+            font-weight: 500;
             position: relative;
-            transition: all 0.3s;
-            border-radius: 8px;
+            transition: color 0.3s;
+            scroll-snap-align: start;
         }
 
         .tab.active {
             color: var(--primary-color);
-            background: rgba(26, 115, 232, 0.1);
         }
 
-        /* Panels avec animations tactiles */
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 1.5px;
+        }
+
+        /* Content Panels */
         .panel {
             display: none;
             background: var(--surface-color);
@@ -114,28 +116,30 @@
             padding: 1rem;
             margin-bottom: 1rem;
             animation: slideIn 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
         .panel.active {
             display: block;
         }
 
-        /* Contact List avec style natif */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Contact List */
         .contact-list {
-            max-height: calc(100vh - 250px);
+            max-height: 70vh;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            padding: 0.5rem;
         }
 
         .contact-item {
             display: flex;
             align-items: center;
             padding: 1rem;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 1px solid #eee;
             animation: fadeIn 0.3s ease;
-            position: relative;
         }
 
         .contact-avatar {
@@ -147,10 +151,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
+            font-weight: 500;
             margin-right: 1rem;
             flex-shrink: 0;
-            font-size: 1.2rem;
         }
 
         .contact-details {
@@ -159,9 +162,8 @@
         }
 
         .contact-name {
-            font-weight: 600;
+            font-weight: 500;
             margin-bottom: 0.25rem;
-            font-size: 1rem;
         }
 
         .contact-numbers {
@@ -169,135 +171,147 @@
             color: var(--text-secondary);
         }
 
-        /* Actions flottantes */
-        .floating-action-button {
-            position: fixed;
-            bottom: calc(var(--safe-area-bottom) + 1rem);
-            right: 1rem;
-            width: 56px;
-            height: 56px;
-            border-radius: 28px;
-            background: var(--primary-color);
-            color: white;
+        .contact-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-warning {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        /* Buttons */
+        .button {
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            width: 100%;
+            padding: 1rem;
             border: none;
-            z-index: 100;
-        }
-
-        /* Nouveaux styles pour les fonctionnalités ajoutées */
-        .contact-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .action-button {
-            padding: 0.5rem;
-            border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             background: var(--primary-color);
             color: white;
-            font-size: 0.8rem;
+            font-size: 1rem;
             font-weight: 500;
-            flex: 1;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
         }
 
-        .action-button.warning {
-            background: var(--warning-color);
+        .button:active {
+            transform: scale(0.98);
         }
 
-        .action-button.danger {
-            background: var(--danger-color);
+        .button.secondary {
+            background: var(--success-color);
         }
 
-        .invalid-contacts {
-            margin-top: 1rem;
+        /* Progress Bar */
+        .progress-bar {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Input Fields */
+        .input-area {
+            margin-bottom: 1rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
             padding: 1rem;
-            background: #ffebee;
-            border-radius: 8px;
-            border-left: 4px solid var(--danger-color);
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            font-size: 1rem;
+            resize: vertical;
+            margin-bottom: 1rem;
         }
 
-        .invalid-contact-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+        /* Bottom Sheet */
+        .bottom-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface-color);
+            border-radius: 20px 20px 0 0;
+            padding: 1rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
         }
 
+        .bottom-sheet.active {
+            transform: translateY(0);
+        }
+
+        /* Checkbox Styles */
         .checkbox-wrapper {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
             padding: 1rem;
-            background: rgba(0,0,0,0.05);
-            border-radius: 8px;
+            background: #f5f5f5;
+            border-radius: 12px;
             margin-bottom: 1rem;
-            font-size: 0.9rem;
         }
 
         .checkbox-wrapper input[type="checkbox"] {
+            margin-right: 0.5rem;
             width: 20px;
             height: 20px;
-            border-radius: 4px;
-            border: 2px solid var(--primary-color);
         }
 
-        /* Toast amélioré */
+        /* Toast Notifications */
         .toast {
             position: fixed;
-            bottom: calc(var(--safe-area-bottom) + 2rem);
+            bottom: 2rem;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.8);
             color: white;
             padding: 1rem 2rem;
             border-radius: 24px;
             font-weight: 500;
             z-index: 2000;
             opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            font-size: 0.9rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: opacity 0.3s ease;
         }
 
         .toast.visible {
             opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
         }
 
         @media (max-width: 380px) {
             .contact-avatar {
                 width: 40px;
                 height: 40px;
-                font-size: 1rem;
             }
             
-            .contact-name {
-                font-size: 0.95rem;
+            .button {
+                padding: 0.75rem;
             }
             
-            .contact-numbers {
-                font-size: 0.85rem;
-            }
-            
-            .action-button {
-                font-size: 0.75rem;
-                padding: 0.4rem;
+            .header h1 {
+                font-size: 1.25rem;
             }
         }
     </style>
@@ -318,49 +332,34 @@
             <button class="tab" onclick="switchTab('import')">Importer</button>
         </div>
 
-        <!-- Panneau manuel -->
+        <!-- Panneau de saisie manuelle -->
         <div id="manual-panel" class="panel active">
             <div class="input-area">
                 <textarea placeholder="Entrez vos numéros (un par ligne)&#10;Exemple:&#10;+22960374877&#10;97123456"></textarea>
-                <button class="action-button" onclick="convertManualNumbers()">Convertir</button>
+                <button class="button" onclick="convertManualNumbers()">Convertir</button>
             </div>
         </div>
 
-        <!-- Panneau contacts -->
+        <!-- Panneau des contacts -->
         <div id="contacts-panel" class="panel">
-            <button class="action-button" onclick="requestContacts()">
+            <button class="button" onclick="requestContacts()">
                 Accéder aux contacts
             </button>
-            
             <div class="checkbox-wrapper">
                 <input type="checkbox" id="autoUpdate" checked>
-                <label for="autoUpdate">Mise à jour automatique</label>
+                <label for="autoUpdate">Mettre à jour automatiquement</label>
             </div>
-
-            <div class="checkbox-wrapper">
-                <input type="checkbox" id="detectInvalid" checked>
-                <label for="detectInvalid">Détecter les numéros invalides</label>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
             </div>
-
-            <div id="invalid-contacts" class="invalid-contacts" style="display: none;">
-                <h3>Contacts non conformes</h3>
-                <div id="invalid-contacts-list"></div>
-                <button class="action-button danger" onclick="deleteInvalidContacts()">
-                    Supprimer les contacts sélectionnés
-                </button>
-            </div>
-
+            <div id="contacts-status"></div>
             <div class="contact-list" id="contacts-list"></div>
-
-            <button class="floating-action-button" onclick="showActions()">
-                +
-            </button>
         </div>
 
-        <!-- Panneau import -->
+        <!-- Panneau d'import -->
         <div id="import-panel" class="panel">
             <div class="file-upload-area">
-                <button class="action-button" onclick="triggerFileInput()">
+                <button class="button" onclick="triggerFileInput()">
                     Choisir un fichier
                 </button>
                 <input type="file" id="file-input" accept=".csv,.vcf" style="display: none">
@@ -369,17 +368,36 @@
         </div>
     </div>
 
-    <!-- Toast -->
+    <!-- Bottom Sheet pour les actions -->
+    <div class="bottom-sheet" id="actions-sheet">
+        <div class="bottom-sheet-header">
+            <h3>Actions disponibles</h3>
+            <button onclick="closeBottomSheet()">Fermer</button>
+        </div>
+        <div class="action-buttons">
+            <button class="button" onclick="updateContacts()">
+                Mettre à jour les contacts
+            </button>
+            <button class="button secondary" onclick="exportContacts('csv')">
+                Exporter en CSV
+            </button>
+            <button class="button secondary" onclick="exportContacts('vcf')">
+                Exporter en VCF
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
     <div class="toast" id="toast"></div>
 
     <script>
         // Variables globales
         let currentContacts = [];
         let processedContacts = [];
-        let invalidContacts = [];
 
         // Gestion des onglets
         function switchTab(tabId) {
+            // Mettre à jour les classes actives
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
             });
@@ -387,11 +405,12 @@
                 panel.classList.remove('active');
             });
 
+            // Activer l'onglet sélectionné
             document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
             document.getElementById(`${tabId}-panel`).classList.add('active');
         }
 
-        // Toast amélioré
+        // Gestion des notifications Toast
         function showToast(message, duration = 3000) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -402,300 +421,320 @@
             }, duration);
         }
 
-        // Validation et conversion des numéros
-        function validatePhoneNumber(number) {
-            const cleanNumber = number.replace(/[\s\-\(\)]/g, '');
-            
-            // Vérifier si c'est un numéro du Bénin
-            if (!cleanNumber.match(/^(\+229|229)?\d{8}$/)) {
-                return false;
-            }
-            
-            return true;
-        }
-
+        // Convertir un numéro unique
         function convertPhoneNumber(number) {
-            const cleanNumber = number.replace(/[\s\-\(\)]/g, '');
+            // Nettoyer le numéro
+            let cleanNumber = number.replace(/[\s\-\(\)]/g, '');
 
+            // Vérifier si le numéro est déjà au nouveau format
             if (cleanNumber.includes('01')) {
-                return { 
-                    number: cleanNumber, 
-                    wasConverted: false,
-                    isValid: validatePhoneNumber(cleanNumber)
-                };
+                return { number: cleanNumber, wasConverted: false };
             }
 
-            let convertedNumber;
+            // Convertir selon le format
             if (cleanNumber.startsWith('+229')) {
-                convertedNumber = cleanNumber.slice(0, 4) + '01' + cleanNumber.slice(4);
+                return {
+                    number: cleanNumber.slice(0, 4) + '01' + cleanNumber.slice(4),
+                    wasConverted: true
+                };
             } else if (cleanNumber.startsWith('229')) {
-                convertedNumber = '+' + cleanNumber.slice(0, 3) + '01' + cleanNumber.slice(3);
+                return {
+                    number: '+' + cleanNumber.slice(0, 3) + '01' + cleanNumber.slice(3),
+                    wasConverted: true
+                };
             } else if (cleanNumber.length === 8) {
-                convertedNumber = '+22901' + cleanNumber;
-            } else {
-                return { 
-                    number: cleanNumber, 
-                    wasConverted: false, 
-                    isValid: false 
+                return {
+                    number: '+22901' + cleanNumber,
+                    wasConverted: true
                 };
             }
 
-            return { 
-                number: convertedNumber, 
-                wasConverted: true,
-                isValid: validatePhoneNumber(convertedNumber)
-            };
+            return { number: cleanNumber, wasConverted: false, isValid: false };
         }
 
-        // Gestion des contacts
+        // Conversion manuelle des numéros
+        function convertManualNumbers() {
+            const input = document.querySelector('#manual-panel textarea').value;
+            const numbers = input.split('\n').filter(n => n.trim());
+            
+            if (numbers.length === 0) {
+                showToast('Veuillez entrer au moins un numéro');
+                return;
+            }
+
+            const converted = numbers.map(number => {
+                const result = convertPhoneNumber(number.trim());
+                return result.number;
+            });
+
+            // Afficher les résultats
+            document.querySelector('#manual-panel textarea').value = converted.join('\n');
+            showToast(`${numbers.length} numéro(s) traité(s)`);
+        }
+
+        // Accès aux contacts du téléphone
         async function requestContacts() {
             try {
                 const contactsDiv = document.getElementById('contacts-list');
                 contactsDiv.innerHTML = '<div class="loading">Chargement des contacts...</div>';
 
-if (!('contacts' in navigator && 'ContactsManager' in window)) {
-    throw new Error("L'API Contacts n'est pas disponible sur votre appareil");
-}
+                // Vérifier la disponibilité de l'API Contacts
+                if (!('contacts' in navigator && 'ContactsManager' in window)) {
+                    throw new Error("L'API Contacts n'est pas disponible sur votre appareil");
+                }
 
-const properties = ['name', 'tel'];
-const options = { multiple: true };
-const contacts = await navigator.contacts.select(properties, options);
+                // Demander l'accès aux contacts
+                const properties = ['name', 'tel'];
+                const options = { multiple: true };
+                const contacts = await navigator.contacts.select(properties, options);
+                
+                processContacts(contacts);
+            } catch (error) {
+                showToast(`Erreur: ${error.message}`);
+                document.getElementById('contacts-status').innerHTML = `
+                    <div class="error-box">
+                        <p>${error.message}</p>
+                        <p>Cette fonction nécessite un appareil mobile compatible.</p>
+                    </div>
+                `;
+            }
+        }
 
-processContacts(contacts);
-} catch (error) {
-showToast(`Erreur: ${error.message}`);
-document.getElementById('contacts-list').innerHTML = `
-    <div class="error-box">
-        <p>${error.message}</p>
-        <p>Cette fonction nécessite un appareil mobile compatible.</p>
-    </div>
-`;
-}
-}
+        // Traitement des contacts
+        function processContacts(contacts) {
+            currentContacts = contacts;
+            const contactsList = document.getElementById('contacts-list');
+            contactsList.innerHTML = '';
 
-// Traitement amélioré des contacts
-function processContacts(contacts) {
-currentContacts = contacts;
-const contactsList = document.getElementById('contacts-list');
-contactsList.innerHTML = '';
-invalidContacts = [];
+            if (contacts.length === 0) {
+                showToast('Aucun contact sélectionné');
+                return;
+            }
 
-if (contacts.length === 0) {
-showToast('Aucun contact sélectionné');
-return;
-}
+            processedContacts = contacts.map(contact => {
+                const originalNumbers = contact.tel || [];
+                const convertedNumbers = originalNumbers.map(num => convertPhoneNumber(num));
+                
+                const needsUpdate = convertedNumbers.some(num => num.wasConverted);
 
-processedContacts = contacts.map(contact => {
-const originalNumbers = contact.tel || [];
-const convertedNumbers = originalNumbers.map(num => convertPhoneNumber(num));
+                // Créer l'élément de contact
+                const contactElement = document.createElement('div');
+                contactElement.className = 'contact-item';
+                contactElement.innerHTML = `
+                    <div class="contact-avatar">
+                        ${(contact.name && contact.name[0]) ? contact.name[0][0].toUpperCase() : '?'}
+                    </div>
+                    <div class="contact-details">
+                        <div class="contact-name">${contact.name ? contact.name[0] : 'Sans nom'}</div>
+                        <div class="contact-numbers">
+                            ${convertedNumbers.map(num => num.number).join(', ')}
+                        </div>
+                    </div>
+                    <div class="contact-status ${needsUpdate ? 'status-warning' : 'status-success'}">
+                        ${needsUpdate ? 'À convertir' : 'À jour'}
+                    </div>
+                `;
 
-const needsUpdate = convertedNumbers.some(num => num.wasConverted);
-const hasInvalidNumbers = convertedNumbers.some(num => !num.isValid);
+                contactsList.appendChild(contactElement);
 
-if (hasInvalidNumbers && document.getElementById('detectInvalid').checked) {
-    invalidContacts.push({
-        name: contact.name ? contact.name[0] : 'Sans nom',
-        numbers: originalNumbers,
-        id: Math.random().toString(36).substring(7)
-    });
-}
+                return {
+                    original: contact,
+                    converted: convertedNumbers,
+                    needsUpdate
+                };
+            });
 
-// Créer l'élément de contact avec actions
-const contactElement = document.createElement('div');
-contactElement.className = 'contact-item';
-contactElement.innerHTML = `
-    <div class="contact-avatar">
-        ${(contact.name && contact.name[0]) ? contact.name[0][0].toUpperCase() : '?'}
-    </div>
-    <div class="contact-details">
-        <div class="contact-name">${contact.name ? contact.name[0] : 'Sans nom'}</div>
-        <div class="contact-numbers">
-            ${convertedNumbers.map(num => num.number).join(', ')}
-        </div>
-        <div class="contact-actions">
-            ${needsUpdate ? `
-                <button class="action-button" onclick="updateContact('${contact.name ? contact.name[0] : 'Sans nom'}')">
-                    Mettre à jour
-                </button>
-            ` : ''}
-            <button class="action-button" onclick="importToPhone('${contact.name ? contact.name[0] : 'Sans nom'}')">
-                Importer
-            </button>
-        </div>
-    </div>
-    <div class="contact-status ${needsUpdate ? 'status-warning' : 'status-success'}">
-        ${needsUpdate ? 'À convertir' : 'À jour'}
-    </div>
-`;
+            updateProgress(processedContacts);
 
-contactsList.appendChild(contactElement);
+            // Si la mise à jour automatique est activée
+            if (document.getElementById('autoUpdate').checked) {
+                updateContacts();
+            }
+        }
 
-return {
-    original: contact,
-    converted: convertedNumbers,
-    needsUpdate,
-    hasInvalidNumbers
-};
-});
+        // Mise à jour des contacts
+        async function updateContacts() {
+            const contactsToUpdate = processedContacts.filter(c => c.needsUpdate);
+            
+            if (contactsToUpdate.length === 0) {
+                showToast('Tous les contacts sont déjà à jour');
+                return;
+            }
 
-updateInvalidContactsList();
+            try {
+                const progress = document.querySelector('.progress-fill');
+                
+                // Simuler la progression de la mise à jour
+                for (let i = 0; i <= 100; i++) {
+                    progress.style.width = `${i}%`;
+                    await new Promise(resolve => setTimeout(resolve, 20));
+                }
 
-if (document.getElementById('autoUpdate').checked) {
-updateContacts();
-}
-}
+                // Créer le VCard pour l'export
+                let vcard = '';
+                contactsToUpdate.forEach(contact => {
+                    vcard += 'BEGIN:VCARD\nVERSION:3.0\n';
+                    vcard += `FN:${contact.original.name ? contact.original.name[0] : 'Contact'}\n`;
+                    contact.converted.forEach(num => {
+                        vcard += `TEL:${num.number}\n`;
+                    });
+                    vcard += 'END:VCARD\n';
+                });
 
-// Affichage des contacts invalides
-function updateInvalidContactsList() {
-const invalidContactsDiv = document.getElementById('invalid-contacts');
-const invalidContactsList = document.getElementById('invalid-contacts-list');
+                // Proposer le téléchargement
+                downloadFile(vcard, 'contacts_convertis.vcf', 'text/vcard');
+                
+                showToast(`${contactsToUpdate.length} contact(s) mis à jour`);
+            } catch (error) {
+                showToast('Erreur lors de la mise à jour : ' + error.message);
+            }
+        }
 
-if (invalidContacts.length > 0) {
-invalidContactsDiv.style.display = 'block';
-invalidContactsList.innerHTML = invalidContacts.map(contact => `
-    <div class="invalid-contact-item">
-        <div>
-            <input type="checkbox" id="invalid-${contact.id}" checked>
-            <label for="invalid-${contact.id}">${contact.name}: ${contact.numbers.join(', ')}</label>
-        </div>
-    </div>
-`).join('');
-} else {
-invalidContactsDiv.style.display = 'none';
-}
-}
+        // Mise à jour de la barre de progression
+        function updateProgress(contacts) {
+            const total = contacts.length;
+            const updated = contacts.filter(c => !c.needsUpdate).length;
+            const percentage = (updated / total) * 100;
+            
+            document.querySelector('.progress-fill').style.width = `${percentage}%`;
+            document.getElementById('contacts-status').textContent = 
+                `${updated}/${total} contacts à jour`;
+        }
 
-// Suppression des contacts non conformes
-async function deleteInvalidContacts() {
-const selectedContacts = invalidContacts.filter(contact => 
-document.getElementById(`invalid-${contact.id}`).checked
-);
+        // Export des contacts
+        function exportContacts(format) {
+            if (!processedContacts.length) {
+                showToast('Aucun contact à exporter');
+                return;
+            }
 
-if (selectedContacts.length === 0) {
-showToast('Aucun contact sélectionné pour la suppression');
-return;
-}
+            if (format === 'csv') {
+                let csv = 'Nom,Numéro\n';
+                processedContacts.forEach(contact => {
+                    const name = contact.original.name ? contact.original.name[0] : 'Contact';
+                    contact.converted.forEach(num => {
+                        csv += `"${name}","${num.number}"\n`;
+                    });
+                });
+                downloadFile(csv, 'contacts.csv', 'text/csv');
+            } else {
+                let vcard = '';
+                processedContacts.forEach(contact => {
+                    vcard += 'BEGIN:VCARD\nVERSION:3.0\n';
+                    vcard += `FN:${contact.original.name ? contact.original.name[0] : 'Contact'}\n`;
+                    contact.converted.forEach(num => {
+                        vcard += `TEL:${num.number}\n`;
+                    });
+                    vcard += 'END:VCARD\n';
+                });
+                downloadFile(vcard, 'contacts.vcf', 'text/vcard');
+            }
 
-if (confirm(`Voulez-vous vraiment supprimer ${selectedContacts.length} contact(s) ?`)) {
-try {
-    // Simulation de la suppression (à implémenter avec l'API réelle)
-    showToast(`${selectedContacts.length} contact(s) supprimé(s)`);
-    invalidContacts = invalidContacts.filter(contact => 
-        !selectedContacts.find(selected => selected.id === contact.id)
-    );
-    updateInvalidContactsList();
-} catch (error) {
-    showToast('Erreur lors de la suppression : ' + error.message);
-}
-}
-}
+            showToast(`Export en ${format.toUpperCase()} terminé`);
+        }
 
-// Import d'un contact dans le téléphone
-async function importToPhone(contactName) {
-try {
-const contact = processedContacts.find(c => 
-    c.original.name && c.original.name[0] === contactName
-);
+        // Téléchargement de fichier
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
 
-if (!contact) {
-    throw new Error('Contact non trouvé');
-}
+        // Gestion de l'import de fichiers
+        function triggerFileInput() {
+            document.getElementById('file-input').click();
+        }
 
-// Créer le contact au format vCard
-let vcard = 'BEGIN:VCARD\nVERSION:3.0\n';
-vcard += `FN:${contactName}\n`;
-contact.converted.forEach(num => {
-    if (num.isValid) {
-        vcard += `TEL;TYPE=CELL:${num.number}\n`;
-    }
-});
-vcard += 'END:VCARD';
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
 
-// Créer un fichier blob et le télécharger
-const blob = new Blob([vcard], { type: 'text/vcard' });
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.href = url;
-a.download = `${contactName}.vcf`;
-document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
-URL.revokeObjectURL(url);
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                if (file.name.endsWith('.csv')) {
+                    parseCSV(content);
+                } else if (file.name.endsWith('.vcf')) {
+                    parseVCard(content);
+                }
+            };
+            reader.readAsText(file);
+        });
 
-showToast('Contact prêt à être importé');
-} catch (error) {
-showToast('Erreur lors de l\'import : ' + error.message);
-}
-}
+        // Parsing des fichiers
+        function parseCSV(content) {
+            const lines = content.split('\n');
+            const contacts = lines
+                .filter(line => line.trim())
+                .map(line => {
+                    const [name, number] = line.split(',').map(s => s.trim().replace(/"/g, ''));
+                    return { name, number };
+                });
+            
+            processImportedContacts(contacts);
+        }
 
-// Mise à jour d'un contact spécifique
-async function updateContact(contactName) {
-try {
-const contact = processedContacts.find(c => 
-    c.original.name && c.original.name[0] === contactName
-);
+        function parseVCard(content) {
+            const contacts = [];
+            let currentContact = null;
 
-if (!contact) {
-    throw new Error('Contact non trouvé');
-}
+            content.split('\n').forEach(line => {
+                line = line.trim();
+                if (line.startsWith('BEGIN:VCARD')) {
+                    currentContact = {};
+                } else if (line.startsWith('FN:')) {
+                    currentContact.name = line.slice(3);
+                } else if (line.startsWith('TEL:')) {
+                    currentContact.number = line.slice(4);
+                } else if (line.startsWith('END:VCARD')) {
+                    if (currentContact.number) {
+                        contacts.push(currentContact);
+                    }
+                    currentContact = null;
+                }
+            });
 
-// Créer le vCard pour le contact
-let vcard = 'BEGIN:VCARD\nVERSION:3.0\n';
-vcard += `FN:${contactName}\n`;
-contact.converted.forEach(num => {
-    if (num.isValid) {
-        vcard += `TEL;TYPE=CELL:${num.number}\n`;
-    }
-});
-vcard += 'END:VCARD';
+            processImportedContacts(contacts);
+        }
 
-// Proposer le téléchargement
-downloadFile(vcard, `${contactName}_converti.vcf`, 'text/vcard');
-showToast('Contact mis à jour');
-} catch (error) {
-showToast('Erreur lors de la mise à jour : ' + error.message);
-}
-}
+        function processImportedContacts(contacts) {
+            const processed = contacts.map(contact => {
+                const converted = convertPhoneNumber(contact.number);
+                return {
+                    name: contact.name,
+                    originalNumber: contact.number,
+                    convertedNumber: converted.number,
+                    wasConverted: converted.wasConverted
+                };
+            });
 
-// Utilitaire de téléchargement
-function downloadFile(content, filename, type) {
-const blob = new Blob([content], { type });
-const url = URL.createObjectURL(blob);
-const a = document.createElement('a');
-a.href = url;
-a.download = filename;
-document.body.appendChild(a);
-a.click();
-document.body.removeChild(a);
-URL.revokeObjectURL(url);
-}
+            displayImportedContacts(processed);
+        }
 
-// Initialisation
-document.addEventListener('DOMContentLoaded', function() {
-if (!('contacts' in navigator)) {
-document.querySelector('[onclick="switchTab(\'contacts\')"]')
-    .setAttribute('disabled', 'disabled');
-}
+        function displayImportedContacts(contacts) {
+            switchTab('manual');
+            const textarea = document.querySelector('#manual-panel textarea');
+            textarea.value = contacts
+                .map(c => `${c.name}: ${c.convertedNumber}`)
+                .join('\n');
+            
+            showToast(`${contacts.length} contact(s) importé(s)`);
+        }
 
-// Ajout du pull-to-refresh
-let touchStart = 0;
-let touchDistance = 0;
-
-document.addEventListener('touchstart', (e) => {
-touchStart = e.touches[0].pageY;
-}, { passive: true });
-
-document.addEventListener('touchmove', (e) => {
-touchDistance = e.touches[0].pageY - touchStart;
-if (touchDistance > 100) {
-    // Déclencher le rafraîchissement
-    touchDistance = 0;
-    if (document.querySelector('#contacts-panel.active')) {
-        requestContacts();
-    }
-}
-}, { passive: true });
-});
-</script>
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Vérifier si l'API Contacts est disponible
+            if (!('contacts' in navigator)) {
+                document.querySelector('[onclick="switchTab(\'contacts\')"]')
+                    .setAttribute('disabled', 'disabled');
+            }
+        });
+    </script>
 </body>
 </html>

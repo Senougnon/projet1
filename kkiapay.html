@@ -18,12 +18,6 @@
             --border-color: #e5e7eb;
         }
 
-        [data-theme="dark"] {
-            --background-color: #1a1a1a;
-            --text-color: #ffffff;
-            --border-color: #333333;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -35,117 +29,105 @@
             background-color: var(--background-color);
             color: var(--text-color);
             min-height: 100vh;
-            transition: background-color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
         }
 
         .header {
-            background: #fff;
+            background: white;
             padding: 1rem;
-            border-bottom: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .user-info {
             display: flex;
+            gap: 2rem;
             align-items: center;
-            gap: 1rem;
         }
 
-        .main-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
-        .model-selection {
-            background: #fff;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .model-selection select {
-            width: 100%;
-            padding: 0.5rem;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
+        .credit-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
         }
 
         .chat-container {
-            background: #fff;
-            border-radius: 8px;
+            background: white;
+            border-radius: 10px;
             padding: 1rem;
-            min-height: 500px;
+            height: calc(100vh - 200px);
             display: flex;
             flex-direction: column;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .model-select {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
         }
 
         .messages {
             flex: 1;
             overflow-y: auto;
             padding: 1rem;
-            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
         }
 
         .message {
-            margin-bottom: 1rem;
-            padding: 1rem;
-            border-radius: 8px;
             max-width: 80%;
+            padding: 1rem;
+            border-radius: 10px;
+            position: relative;
         }
 
         .message.user {
             background: var(--primary-color);
-            color: #fff;
-            margin-left: auto;
+            color: white;
+            align-self: flex-end;
         }
 
         .message.assistant {
             background: var(--background-color);
-            margin-right: auto;
+            align-self: flex-start;
         }
 
-        .input-container {
+        .input-area {
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+            margin-top: 1rem;
             display: flex;
             gap: 1rem;
-            padding: 1rem;
-            border-top: 1px solid var(--border-color);
         }
 
-        .input-container textarea {
+        .input-area textarea {
             flex: 1;
             padding: 0.5rem;
             border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: 5px;
             resize: none;
+            min-height: 50px;
         }
 
-        .input-container button {
-            padding: 0.5rem 1rem;
-            background: var(--primary-color);
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .input-container button:hover {
-            background: var(--secondary-color);
-        }
-
-        .credit-info {
-            text-align: right;
-            padding: 0.5rem;
-            font-size: 0.9rem;
-        }
-
-        /* Ajout des styles pour les autres fonctionnalités */
         .file-upload {
-            margin-bottom: 1rem;
+            display: inline-block;
+            margin-right: 1rem;
         }
 
         .file-upload input {
@@ -153,97 +135,130 @@
         }
 
         .file-upload label {
-            display: inline-block;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             padding: 0.5rem 1rem;
             background: var(--secondary-color);
-            color: #fff;
-            border-radius: 4px;
+            color: white;
+            border-radius: 5px;
             cursor: pointer;
+            transition: background 0.3s;
         }
 
-        .file-preview {
-            margin-top: 1rem;
+        .file-upload label:hover {
+            background: var(--primary-color);
+        }
+
+        .send-button {
+            padding: 0.5rem 1.5rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .send-button:hover {
+            background: var(--secondary-color);
+        }
+
+        .preview-area {
+            margin: 1rem 0;
+        }
+
+        .preview-area img {
             max-width: 200px;
+            border-radius: 5px;
+            display: none;
         }
 
-        .loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
             padding: 1rem;
+            border-radius: 5px;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease-out;
         }
 
-        .loading::after {
-            content: "";
-            width: 2rem;
-            height: 2rem;
-            border: 3px solid var(--border-color);
-            border-top-color: var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        .notification.success { border-left: 4px solid var(--success-color); }
+        .notification.error { border-left: 4px solid var(--error-color); }
+        .notification.warning { border-left: 4px solid var(--warning-color); }
 
         @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
             .message {
                 max-width: 90%;
             }
 
-            .input-container {
+            .input-area {
                 flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Mistral AI</h1>
-        <div class="user-info">
-            <span id="username"></span>
-            <span id="credits"></span>
-            <button onclick="window.location.href='/'">Retour à Eduque moi</button>
+    <div class="container">
+        <div class="header">
+            <h1>Mistral AI</h1>
+            <div class="user-info">
+                <span id="username"></span>
+                <div class="credit-badge">
+                    <span id="credits"></span>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <div class="main-container">
-        <div class="model-selection">
-            <select id="modelSelect" onchange="checkModelAccess()">
+        <div class="chat-container">
+            <select class="model-select" id="modelSelect" onchange="checkModelAccess()">
                 <option value="mistral-small-latest">Mistral Small (1 crédit)</option>
                 <option value="mistral-medium-latest">Mistral Medium (2 crédits)</option>
                 <option value="pixtral-12b-2409">Pixtral Vision (5 crédits)</option>
             </select>
-        </div>
 
-        <div class="file-upload">
-            <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(event)">
-            <label for="fileInput">
-                <i class="fas fa-upload"></i> Importer une image
-            </label>
-            <img id="imagePreview" class="file-preview" style="display: none;">
-        </div>
+            <div class="messages" id="messages"></div>
 
-        <div class="chat-container">
-            <div id="messages" class="messages"></div>
-            <div class="input-container">
-                <textarea id="userInput" placeholder="Entrez votre message..." rows="3"></textarea>
-                <button onclick="sendMessage()">
+            <div class="preview-area">
+                <img id="imagePreview" alt="Aperçu de l'image">
+            </div>
+
+            <div class="input-area">
+                <div class="file-upload">
+                    <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(event)">
+                    <label for="fileInput">
+                        <i class="fas fa-image"></i>
+                        Image
+                    </label>
+                </div>
+                <textarea id="userInput" placeholder="Entrez votre message..."></textarea>
+                <button class="send-button" onclick="sendMessage()">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
-        </div>
-
-        <div class="credit-info">
-            <span id="costEstimate"></span>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <script>
-        // Configuration Firebase d'Eduque moi
         const firebaseConfig = {
             apiKey: "AIzaSyCvizcYorGDPN3GXqma0opp7wAiMkaCt64",
             authDomain: "gemini-bb56e.firebaseapp.com",
@@ -255,92 +270,48 @@
             measurementId: "G-CSN292219J"
         };
 
-        // Initialisation de Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Variables globales
         let currentUser = null;
         const MISTRAL_API_KEY = 'Ir4if178akPjDIbcjOhlHE7xExppC83w';
         let currentImage = null;
 
-        // Fonction pour charger les données utilisateur depuis Eduque moi
-        async function loadUserData() {
+        function loadUserData() {
             const eduqueMoiData = localStorage.getItem('eduqueMoiUserData');
             if (eduqueMoiData) {
                 currentUser = JSON.parse(eduqueMoiData);
                 document.getElementById('username').textContent = currentUser.username;
                 updateCreditsDisplay();
-            } else {
-                window.location.href = '/'; // Redirection vers Eduque moi si non connecté
+                setupUserDataSync();
+                return true;
             }
+            showNotification('Veuillez vous connecter à Eduque moi', 'error');
+            return false;
         }
 
-        // Fonction pour mettre à jour l'affichage des crédits
-        function updateCreditsDisplay() {
-            const creditsElement = document.getElementById('credits');
-            creditsElement.textContent = `Crédits: ${currentUser.paidCredits} payants, ${currentUser.freeCredits} gratuits`;
-        }
-
-        // Fonction pour vérifier l'accès au modèle sélectionné
-        async function checkModelAccess() {
-            const model = document.getElementById('modelSelect').value;
-            const creditCost = getModelCreditCost(model);
-            
-            document.getElementById('costEstimate').textContent = 
-                `Coût par message: ${creditCost} crédit${creditCost > 1 ? 's' : ''}`;
-
-            if (!hasEnoughCredits(creditCost)) {
-                alert("Vous n'avez pas assez de crédits pour utiliser ce modèle.");
-                document.getElementById('modelSelect').value = 'mistral-small-latest';
-                return false;
-            }
-            return true;
-        }
-
-        // Fonction pour obtenir le coût en crédits d'un modèle
-        function getModelCreditCost(model) {
-            const costs = {
-                'mistral-small-latest': 1,
-                'mistral-medium-latest': 2,
-                'pixtral-12b-2409': 5
-            };
-            return costs[model] || 1;
-        }
-
-        // Fonction pour vérifier si l'utilisateur a assez de crédits
-        function hasEnoughCredits(required) {
-            if (currentUser.subscription) return true;
-            return (currentUser.paidCredits + currentUser.freeCredits) >= required;
-        }
-
-        // Fonction pour déduire les crédits
-        async function deductCredits(amount) {
-            if (currentUser.subscription) return;
-
+        function setupUserDataSync() {
             const userRef = db.ref('users/' + currentUser.username);
-            await userRef.transaction((userData) => {
+            userRef.on('value', (snapshot) => {
+                const userData = snapshot.val();
                 if (userData) {
-                    if (userData.paidCredits >= amount) {
-                        userData.paidCredits -= amount;
-                    } else {
-                        const remaining = amount - userData.paidCredits;
-                        userData.paidCredits = 0;
-                        userData.freeCredits = Math.max(0, userData.freeCredits - remaining);
-                    }
+                    currentUser.freeCredits = userData.freeCredits;
+                    currentUser.paidCredits = userData.paidCredits;
+                    currentUser.subscription = userData.subscription;
+                    currentUser.subscriptionEndDate = userData.subscriptionEndDate;
+                    updateCreditsDisplay();
                 }
-                return userData;
             });
-
-            // Mise à jour des données locales
-            const snapshot = await userRef.once('value');
-            const userData = snapshot.val();
-            currentUser.paidCredits = userData.paidCredits;
-            currentUser.freeCredits = userData.freeCredits;
-            updateCreditsDisplay();
         }
 
-        // Fonction pour gérer l'upload de fichier
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (file && file.type.startsWith('image/')) {
@@ -357,7 +328,59 @@
             }
         }
 
-        // Fonction pour ajouter un message au chat
+        function updateCreditsDisplay() {
+            const creditsElement = document.getElementById('credits');
+            if (currentUser.subscription) {
+                creditsElement.textContent = `Abonnement ${currentUser.subscription}`;
+            } else {
+                creditsElement.textContent = 
+                    `${currentUser.paidCredits} crédits payants, ${currentUser.freeCredits} gratuits`;
+            }
+        }
+
+        function getModelCreditCost(model) {
+            const costs = {
+                'mistral-small-latest': 1,
+                'mistral-medium-latest': 2,
+                'pixtral-12b-2409': 5
+            };
+            return costs[model] || 1;
+        }
+
+        async function checkModelAccess() {
+            const model = document.getElementById('modelSelect').value;
+            const cost = getModelCreditCost(model);
+            
+            if (currentUser.subscription) return true;
+            
+            if ((currentUser.paidCredits + currentUser.freeCredits) < cost) {
+                showNotification(
+                    `Ce modèle nécessite ${cost} crédits. Vous n'avez pas assez de crédits.`,
+                    'warning'
+                );
+                return false;
+            }
+            return true;
+        }
+
+        async function deductCredits(amount) {
+            if (currentUser.subscription) return;
+
+            const userRef = db.ref('users/' + currentUser.username);
+            await userRef.transaction((userData) => {
+                if (userData) {
+                    if (userData.paidCredits >= amount) {
+                        userData.paidCredits -= amount;
+                    } else {
+                        const remaining = amount - userData.paidCredits;
+                        userData.paidCredits = 0;
+                        userData.freeCredits = Math.max(0, userData.freeCredits - remaining);
+                    }
+                }
+                return userData;
+            });
+        }
+
         function addMessage(content, isUser) {
             const messagesContainer = document.getElementById('messages');
             const messageDiv = document.createElement('div');
@@ -367,15 +390,17 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        // Fonction pour envoyer un message
         async function sendMessage() {
             const userInput = document.getElementById('userInput').value.trim();
             const model = document.getElementById('modelSelect').value;
             
-            if (!userInput && !currentImage) return;
+            if (!userInput && !currentImage) {
+                showNotification('Veuillez entrer un message ou sélectionner une image', 'warning');
+                return;
+            }
+
             if (!await checkModelAccess()) return;
 
-            const creditCost = getModelCreditCost(model);
             addMessage(userInput, true);
             document.getElementById('userInput').value = '';
 
@@ -403,10 +428,12 @@
                 if (!response.ok) throw new Error('Erreur API Mistral');
 
                 const data = await response.json();
-                addMessage(data.choices[0].message.content, false);
+                const aiResponse = data.choices[0].message.content;
+                addMessage(aiResponse, false);
+
+                const creditCost = getModelCreditCost(model);
                 await deductCredits(creditCost);
 
-                // Réinitialisation de l'image si utilisée
                 if (currentImage) {
                     currentImage = null;
                     document.getElementById('imagePreview').style.display = 'none';
@@ -415,19 +442,18 @@
 
             } catch (error) {
                 console.error('Erreur:', error);
-                addMessage("Désolé, une erreur est survenue.", false);
+                showNotification('Une erreur est survenue. Veuillez réessayer.', 'error');
             }
         }
 
         // Initialisation
-        window.onload = () => {
-            loadUserData();
-            checkModelAccess();
-        };
+        window.addEventListener('load', () => {
+            if (loadUserData()) {
+                showNotification('Bienvenue sur Mistral AI', 'success');
+            }
+        });
 
-// Suite du script précédent...
-        
-        // Gestion de la touche Entrée
+        // Gestion des touches du clavier
         document.getElementById('userInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -435,121 +461,53 @@
             }
         });
 
-        // Mise à jour automatique des données utilisateur depuis Firebase
-        function setupUserDataSync() {
-            if (!currentUser) return;
-            
-            const userRef = db.ref('users/' + currentUser.username);
-            userRef.on('value', (snapshot) => {
-                const userData = snapshot.val();
-                if (userData) {
-                    currentUser = {
-                        ...currentUser,
-                        freeCredits: userData.freeCredits,
-                        paidCredits: userData.paidCredits,
-                        subscription: userData.subscription,
-                        subscriptionEndDate: userData.subscriptionEndDate
-                    };
-                    updateCreditsDisplay();
-                    checkModelAccess();
-                }
-            });
-        }
-
-        // Fonction pour enregistrer l'historique des conversations
-        async function saveConversationHistory(message, response) {
+        // Fonction pour sauvegarder l'historique dans Firebase
+        async function saveToHistory(message, response, model) {
             if (!currentUser) return;
 
-            const conversationRef = db.ref(`users/${currentUser.username}/mistralHistory`);
-            const newConversation = {
+            const historyRef = db.ref(`users/${currentUser.username}/mistralHistory`);
+            const newEntry = {
                 timestamp: Date.now(),
-                model: document.getElementById('modelSelect').value,
-                message,
-                response,
-                creditsUsed: getModelCreditCost(document.getElementById('modelSelect').value)
+                model: model,
+                message: message,
+                response: response,
+                hasImage: !!currentImage
             };
 
-            await conversationRef.push(newConversation);
-        }
-
-        // Fonction pour gérer les erreurs avec notifications
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.classList.add('fade-out');
-                setTimeout(() => notification.remove(), 500);
-            }, 3000);
-        }
-
-        // Fonction pour vérifier la validité de l'abonnement
-        function hasValidSubscription() {
-            if (!currentUser.subscription || !currentUser.subscriptionEndDate) return false;
-            return new Date() < new Date(currentUser.subscriptionEndDate);
-        }
-
-        // Fonction pour vérifier les limites d'utilisation
-        async function checkUsageLimits() {
-            if (hasValidSubscription()) return true;
-
-            const userRef = db.ref(`users/${currentUser.username}/mistralUsage`);
-            const today = new Date().toISOString().split('T')[0];
-            
-            const snapshot = await userRef.child(today).once('value');
-            const usage = snapshot.val() || { count: 0 };
-
-            const FREE_DAILY_LIMIT = 10;
-            if (usage.count >= FREE_DAILY_LIMIT && !hasEnoughCredits(1)) {
-                showNotification(
-                    "Vous avez atteint votre limite quotidienne d'utilisation gratuite. " +
-                    "Veuillez acheter des crédits ou souscrire à un abonnement.",
-                    'warning'
-                );
-                return false;
+            try {
+                await historyRef.push(newEntry);
+            } catch (error) {
+                console.error('Erreur lors de la sauvegarde de l\'historique:', error);
             }
-
-            // Mettre à jour le compteur d'utilisation
-            await userRef.child(today).set({
-                count: usage.count + 1
-            });
-
-            return true;
         }
 
-        // Fonction pour estimer la taille du message et ajuster les crédits nécessaires
-        function estimateMessageCost(message, model) {
-            const baseRate = getModelCreditCost(model);
-            const wordCount = message.trim().split(/\s+/).length;
-            
-            // Augmenter le coût pour les messages très longs
-            if (wordCount > 500) {
-                return Math.ceil(baseRate * 1.5);
+        // Fonction pour gérer l'état de chargement
+        function setLoading(isLoading) {
+            const sendButton = document.querySelector('.send-button');
+            if (isLoading) {
+                sendButton.disabled = true;
+                sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            } else {
+                sendButton.disabled = false;
+                sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
             }
-            return baseRate;
         }
 
-        // Amélioration de la fonction sendMessage avec gestion avancée
+        // Amélioration de la fonction sendMessage avec gestion du chargement
         async function sendMessage() {
             const userInput = document.getElementById('userInput').value.trim();
             const model = document.getElementById('modelSelect').value;
             
             if (!userInput && !currentImage) {
-                showNotification('Veuillez entrer un message ou sélectionner une image.', 'error');
+                showNotification('Veuillez entrer un message ou sélectionner une image', 'warning');
                 return;
             }
 
-            if (!await checkUsageLimits()) return;
+            if (!await checkModelAccess()) return;
 
-            const estimatedCost = estimateMessageCost(userInput, model);
-            if (!await checkModelAccess(estimatedCost)) return;
-
-            // Afficher l'indicateur de chargement
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'loading';
-            document.getElementById('messages').appendChild(loadingDiv);
+            setLoading(true);
+            addMessage(userInput, true);
+            document.getElementById('userInput').value = '';
 
             try {
                 const messages = [{
@@ -569,12 +527,10 @@
                     body: JSON.stringify({
                         model: model,
                         messages: messages,
-                        max_tokens: 2000,
-                        temperature: 0.7
+                        temperature: 0.7,
+                        max_tokens: 2048
                     })
                 });
-
-                loadingDiv.remove();
 
                 if (!response.ok) {
                     throw new Error(`Erreur API: ${response.status}`);
@@ -582,18 +538,15 @@
 
                 const data = await response.json();
                 const aiResponse = data.choices[0].message.content;
-
-                addMessage(userInput, true);
                 addMessage(aiResponse, false);
 
-                // Sauvegarder l'historique et mettre à jour les crédits
+                // Sauvegarder dans l'historique et déduire les crédits
                 await Promise.all([
-                    saveConversationHistory(userInput, aiResponse),
-                    deductCredits(estimatedCost)
+                    saveToHistory(userInput, aiResponse, model),
+                    deductCredits(getModelCreditCost(model))
                 ]);
 
-                // Réinitialiser l'interface
-                document.getElementById('userInput').value = '';
+                // Réinitialiser l'image si utilisée
                 if (currentImage) {
                     currentImage = null;
                     document.getElementById('imagePreview').style.display = 'none';
@@ -602,29 +555,81 @@
 
             } catch (error) {
                 console.error('Erreur:', error);
-                loadingDiv.remove();
                 showNotification(
-                    "Une erreur est survenue lors de l'envoi du message. Veuillez réessayer.",
+                    'Une erreur est survenue lors de l\'envoi du message. Veuillez réessayer.',
                     'error'
                 );
+            } finally {
+                setLoading(false);
             }
         }
 
-        // Initialisation complète
-        window.onload = async () => {
-            await loadUserData();
-            setupUserDataSync();
-            checkModelAccess();
+        // Fonction pour formatter les réponses
+        function formatMessage(text) {
+            // Conversion Markdown basique
+            text = text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/`(.*?)`/g, '<code>$1</code>')
+                .replace(/\n/g, '<br>');
+            return text;
+        }
+
+        // Amélioration de la fonction addMessage avec formatage
+        function addMessage(content, isUser) {
+            const messagesContainer = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
             
-            // Vérifier si l'utilisateur vient d'Eduque moi
-            if (!currentUser) {
-                showNotification(
-                    "Veuillez vous connecter à Eduque moi pour utiliser cette interface.",
-                    'error'
-                );
-                setTimeout(() => window.location.href = '/', 2000);
+            if (isUser) {
+                messageDiv.textContent = content;
+            } else {
+                messageDiv.innerHTML = formatMessage(content);
             }
-        };
+
+            // Ajouter des actions pour les messages de l'assistant
+            if (!isUser) {
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'message-actions';
+                actionsDiv.innerHTML = `
+                    <button onclick="copyToClipboard(this.parentElement.parentElement)">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                `;
+                messageDiv.appendChild(actionsDiv);
+            }
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Fonction pour copier le contenu d'un message
+        function copyToClipboard(messageElement) {
+            const textToCopy = messageElement.textContent;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showNotification('Message copié !', 'success');
+            }).catch(err => {
+                console.error('Erreur lors de la copie :', err);
+                showNotification('Erreur lors de la copie', 'error');
+            });
+        }
+
+        // Fonction pour vérifier régulièrement l'état des crédits
+        function startCreditCheck() {
+            setInterval(() => {
+                if (currentUser && !currentUser.subscription) {
+                    const totalCredits = currentUser.paidCredits + currentUser.freeCredits;
+                    if (totalCredits < 5) {
+                        showNotification(
+                            'Vos crédits sont faibles. Pensez à recharger votre compte.',
+                            'warning'
+                        );
+                    }
+                }
+            }, 300000); // Vérification toutes les 5 minutes
+        }
+
+        startCreditCheck();
     </script>
 </body>
 </html>

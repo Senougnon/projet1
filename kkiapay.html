@@ -29,6 +29,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -36,29 +37,41 @@
             color: var(--text-color);
             min-height: 100vh;
             transition: background-color 0.3s ease;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 0.5rem;
         }
 
         .header {
             background: white;
-            padding: 1rem;
+            padding: 0.75rem;
             border-radius: 10px;
-            margin-bottom: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            margin-bottom: 0.5rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            text-align: center;
         }
 
         .user-info {
             display: flex;
-            gap: 1rem;
+            gap: 0.5rem;
             align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         .login-overlay {
@@ -72,15 +85,22 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            padding: 1rem;
         }
 
         .login-form {
             background: white;
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 10px;
-            width: 90%;
-            max-width: 400px;
+            width: 100%;
+            max-width: 320px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .login-form h2 {
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            text-align: center;
         }
 
         .form-group {
@@ -89,7 +109,8 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
         }
 
         .form-group input {
@@ -97,25 +118,24 @@
             padding: 0.75rem;
             border: 1px solid var(--border-color);
             border-radius: 5px;
+            font-size: 1rem;
         }
 
         .credit-badge {
             background: var(--primary-color);
             color: white;
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 0.75rem;
             border-radius: 20px;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            text-align: center;
         }
 
-        .chat-container {
-            background: white;
-            border-radius: 10px;
-            padding: 1rem;
-            height: calc(100vh - 180px);
+        .chat-interface {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-top: 1rem;
+            min-height: 0;
         }
 
         .model-select {
@@ -123,36 +143,54 @@
             padding: 0.75rem;
             border: 1px solid var(--border-color);
             border-radius: 5px;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
             background: white;
+            font-size: 0.9rem;
+            -webkit-appearance: none;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 10px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 0;
+            position: relative;
         }
 
         .messages {
             flex: 1;
             overflow-y: auto;
-            padding: 1rem;
+            padding: 0.75rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.75rem;
+            -webkit-overflow-scrolling: touch;
         }
 
         .message {
-            max-width: 80%;
-            padding: 1rem;
-            border-radius: 10px;
+            max-width: 85%;
+            padding: 0.75rem;
+            border-radius: 15px;
             position: relative;
-            line-height: 1.5;
+            line-height: 1.4;
+            font-size: 0.95rem;
+            word-wrap: break-word;
         }
 
         .message.user {
             background: var(--primary-color);
             color: white;
             align-self: flex-end;
+            border-bottom-right-radius: 5px;
         }
 
         .message.assistant {
             background: var(--background-color);
             align-self: flex-start;
+            border-bottom-left-radius: 5px;
         }
 
         .message-actions {
@@ -169,15 +207,24 @@
             opacity: 1;
         }
 
+        .message-actions button {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            padding: 0.25rem;
+            cursor: pointer;
+        }
+
         .input-area {
-            padding-top: 1rem;
+            padding: 0.75rem;
             border-top: 1px solid var(--border-color);
+            background: white;
         }
 
         .input-controls {
             display: flex;
-            gap: 1rem;
-            align-items: flex-start;
+            gap: 0.5rem;
+            align-items: flex-end;
         }
 
         .file-upload {
@@ -191,8 +238,9 @@
         .file-upload label {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
             background: var(--secondary-color);
             color: white;
             border-radius: 5px;
@@ -206,23 +254,28 @@
 
         textarea {
             flex: 1;
-            min-height: 50px;
-            max-height: 200px;
+            min-height: 40px;
+            max-height: 120px;
             padding: 0.75rem;
             border: 1px solid var(--border-color);
             border-radius: 5px;
-            resize: vertical;
-            margin-bottom: 1rem;
+            resize: none;
+            font-size: 0.95rem;
+            line-height: 1.4;
         }
 
         .send-button {
-            padding: 0.75rem 1.5rem;
+            width: 40px;
+            height: 40px;
             background: var(--primary-color);
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .send-button:hover {
@@ -235,35 +288,41 @@
         }
 
         .preview-area {
-            margin: 1rem 0;
+            padding: 0.5rem;
+            text-align: center;
         }
 
         .preview-area img {
             max-width: 200px;
+            max-height: 150px;
             border-radius: 5px;
             display: none;
+            margin: 0 auto;
         }
 
         .notification {
             position: fixed;
             bottom: 20px;
-            right: 20px;
-            padding: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.75rem 1rem;
             border-radius: 5px;
             background: white;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            animation: slideIn 0.3s ease-out;
+            animation: slideUp 0.3s ease-out;
             z-index: 1000;
-            max-width: 300px;
+            max-width: 90%;
+            text-align: center;
+            font-size: 0.9rem;
         }
 
-        @keyframes slideIn {
+        @keyframes slideUp {
             from {
-                transform: translateX(100%);
+                transform: translate(-50%, 100%);
                 opacity: 0;
             }
             to {
-                transform: translateX(0);
+                transform: translate(-50%, 0);
                 opacity: 1;
             }
         }
@@ -286,32 +345,54 @@
             to { transform: rotate(360deg); }
         }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 0.5rem;
-            }
+        .register-link {
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
 
-            .header {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
+        .register-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .login-error {
+            color: var(--error-color);
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        /* Styles spécifiques pour les petits écrans */
+        @media (max-width: 360px) {
+            .header h1 {
+                font-size: 1.25rem;
             }
 
             .message {
                 max-width: 90%;
+                font-size: 0.9rem;
             }
 
-            .input-controls {
-                flex-direction: column;
-            }
-
-            .send-button {
-                width: 100%;
+            .credit-badge {
+                font-size: 0.75rem;
             }
         }
     </style>
 </head>
 <body>
+    <!-- Le reste du HTML reste identique -->
     <!-- Modal de connexion -->
     <div id="loginModal" class="login-overlay">
         <div class="login-form">
@@ -335,52 +416,46 @@
     <div class="container">
         <div class="header">
             <h1>Mistral AI</h1>
-            <!-- Information utilisateur -->
             <div class="user-info" id="userInfo" style="display: none;">
                 <span id="username-display"></span>
                 <div class="credit-badge">
                     <span id="credits"></span>
                 </div>
-                <button onclick="logout()" class="send-button">Déconnexion</button>
+                <button onclick="logout()" class="send-button">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
             </div>
-            <!-- Bouton de connexion -->
-            <button id="loginButton" class="send-button" onclick="showLoginForm()">
+            <button id="loginButton" class="login-button" onclick="showLoginForm()">
                 Se connecter
             </button>
         </div>
 
         <div class="chat-interface">
-            <!-- Sélection du modèle -->
             <select class="model-select" id="modelSelect" onchange="checkModelAccess()">
                 <option value="mistral-small-latest">Mistral Small (1 crédit)</option>
                 <option value="mistral-medium-latest">Mistral Medium (2 crédits)</option>
                 <option value="pixtral-12b-2409">Pixtral Vision (5 crédits)</option>
             </select>
 
-            <!-- Container de chat -->
             <div class="chat-container">
                 <div id="messages" class="messages"></div>
                 
-                <!-- Zone de prévisualisation -->
                 <div class="preview-area">
                     <img id="imagePreview" alt="Aperçu">
                 </div>
 
-                <!-- Zone de saisie -->
                 <div class="input-area">
                     <div class="input-controls">
                         <div class="file-upload">
                             <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(event)">
                             <label for="fileInput">
                                 <i class="fas fa-image"></i>
-                                Image
                             </label>
                         </div>
                         <textarea 
                             id="userInput" 
                             placeholder="Entrez votre message..."
-                            onkeydown="handleKeyPress(event)">
-                        </textarea>
+                            onkeydown="handleKeyPress(event)"></textarea>
                         <button onclick="sendMessage()" id="sendButton" class="send-button">
                             <i class="fas fa-paper-plane"></i>
                         </button>
@@ -395,7 +470,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     
     <script>
-        // Configuration Firebase d'Eduque moi
+        // Le JavaScript reste identique
+        // Configuration Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCvizcYorGDPN3GXqma0opp7wAiMkaCt64",
             authDomain: "gemini-bb56e.firebaseapp.com",
@@ -426,12 +502,12 @@
             
             if (isRegistering) {
                 title.textContent = 'Inscription Eduque moi';
-                button.textContent = 'Sinscrire';
+                button.textContent = 'S\'inscrire';
                 link.textContent = 'Déjà un compte ?';
             } else {
                 title.textContent = 'Connexion Eduque moi';
                 button.textContent = 'Se connecter';
-                link.textContent = 'Sinscrire';
+                link.textContent = 'S\'inscrire';
             }
             
             document.getElementById('loginError').style.display = 'none';
@@ -455,7 +531,7 @@
                     // Logique d'inscription
                     const snapshot = await userRef.once('value');
                     if (snapshot.exists()) {
-                        showError('Ce nom dutilisateur existe déjà');
+                        showError('Ce nom d\'utilisateur existe déjà');
                         return;
                     }
 
@@ -679,7 +755,6 @@
             } else {
                 messageDiv.innerHTML = formatMessage(content);
                 
-                // Ajouter les actions pour les messages de l'assistant
                 const actionsDiv = document.createElement('div');
                 actionsDiv.className = 'message-actions';
                 actionsDiv.innerHTML = `
@@ -770,6 +845,16 @@
             }
         }
 
+        // Fonction pour copier le contenu d'un message
+        function copyToClipboard(messageElement) {
+            const textContent = messageElement.textContent;
+            navigator.clipboard.writeText(textContent).then(() => {
+                showNotification('Message copié !', 'success');
+            }).catch(() => {
+                showNotification('Erreur lors de la copie', 'error');
+            });
+        }
+
         // Initialisation
         window.addEventListener('load', () => {
             const eduqueMoiData = localStorage.getItem('eduqueMoiUserData');
@@ -786,6 +871,15 @@
                     hideLoginForm();
                 }
             });
+
+            // Adapter la hauteur du chat sur mobile
+            function adjustHeight() {
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+
+            window.addEventListener('resize', adjustHeight);
+            adjustHeight();
         });
     </script>
 </body>

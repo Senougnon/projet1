@@ -7,7 +7,6 @@
     <style>
         :root {
             --primary-color: #1a73e8;
-            --primary-dark: #1557b0;
             --success-color: #34a853;
             --warning-color: #fbbc04;
             --error-color: #ea4335;
@@ -15,8 +14,7 @@
             --surface-color: #ffffff;
             --text-primary: #202124;
             --text-secondary: #5f6368;
-            --spacing-unit: 8px;
-            --safe-area-bottom: env(safe-area-inset-bottom, 20px);
+            --spacing-unit: 0.5rem;
         }
 
         * {
@@ -24,225 +22,148 @@
             margin: 0;
             padding: 0;
             -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            touch-action: manipulation;
         }
 
         body {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--background-color);
             color: var(--text-primary);
             line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            padding-bottom: calc(80px + var(--safe-area-bottom));
-            overscroll-behavior-y: contain;
+            min-height: 100vh;
+            max-width: 100vw;
+            overflow-x: hidden;
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
+        /* App Container */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        /* Header */
         .header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background-color: var(--surface-color);
-            padding: calc(var(--spacing-unit) * 2);
+            padding: 1rem;
+            background: var(--surface-color);
+            border-radius: 16px;
+            margin-bottom: 1rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .header h1 {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             color: var(--primary-color);
             text-align: center;
-            margin: 0;
+            margin-bottom: 0.5rem;
         }
 
+        /* Info Banner */
         .info-banner {
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-            padding: calc(var(--spacing-unit) * 2);
-            margin: var(--spacing-unit);
+            background: #e3f2fd;
+            padding: 1rem;
             border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
         }
 
-        .info-banner p {
-            margin: 4px 0;
-            font-size: 0.95rem;
-        }
-
-        .info-banner p:last-child {
-            color: var(--primary-dark);
-            font-weight: 500;
-        }
-
+        /* Tabs */
         .tabs {
             display: flex;
+            background: var(--surface-color);
+            border-radius: 12px;
+            padding: 0.25rem;
+            margin-bottom: 1rem;
             overflow-x: auto;
-            scrollbar-width: none;
-            background-color: var(--surface-color);
-            padding: 0 var(--spacing-unit);
-            position: sticky;
-            top: 56px;
-            z-index: 99;
-        }
-
-        .tabs::-webkit-scrollbar {
-            display: none;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
         }
 
         .tab {
-            flex: 1 0 auto;
-            padding: calc(var(--spacing-unit) * 1.5);
+            flex: 1;
+            min-width: 120px;
+            padding: 0.75rem 1rem;
             border: none;
             background: none;
-            font-size: 0.95rem;
             color: var(--text-secondary);
+            font-weight: 500;
             position: relative;
-            min-width: 100px;
             transition: color 0.3s;
+            scroll-snap-align: start;
         }
 
         .tab.active {
             color: var(--primary-color);
-            font-weight: 500;
         }
 
         .tab.active::after {
             content: '';
             position: absolute;
             bottom: 0;
-            left: 16px;
-            right: 16px;
+            left: 10%;
+            right: 10%;
             height: 3px;
-            background-color: var(--primary-color);
+            background: var(--primary-color);
             border-radius: 1.5px;
         }
 
-        .content {
-            padding: var(--spacing-unit);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .tab-content {
+        /* Content Panels */
+        .panel {
             display: none;
-            animation: fadeIn 0.3s ease;
+            background: var(--surface-color);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            animation: slideIn 0.3s ease;
         }
 
-        .tab-content.active {
+        .panel.active {
             display: block;
         }
 
-        .selection-controls {
-            background-color: var(--surface-color);
-            border-radius: 12px;
-            margin-bottom: calc(var(--spacing-unit) * 2);
-            padding: calc(var(--spacing-unit) * 1.5);
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-unit);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .select-all-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .select-all-checkbox {
-            width: 22px;
-            height: 22px;
-            border-radius: 6px;
-            border: 2px solid var(--primary-color);
-            appearance: none;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .select-all-checkbox:checked {
-            background-color: var(--primary-color);
-        }
-
-        .select-all-checkbox:checked::after {
-            content: '✓';
-            position: absolute;
-            color: white;
-            font-size: 14px;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .select-all-label {
-            font-size: 0.95rem;
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        .selection-info {
-            margin-left: auto;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            background-color: var(--background-color);
-            padding: 4px 12px;
-            border-radius: 12px;
-        }
-
+        /* Contact List */
         .contact-list {
-            background-color: var(--surface-color);
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            max-height: 70vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .contact-item {
-            padding: calc(var(--spacing-unit) * 2);
-            border-bottom: 1px solid rgba(0,0,0,0.08);
             display: flex;
             align-items: center;
-            gap: calc(var(--spacing-unit) * 2);
-            background-color: var(--surface-color);
-            transition: background-color 0.2s;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            animation: fadeIn 0.3s ease;
         }
 
-        .contact-item:active {
-            background-color: rgba(0,0,0,0.05);
-        }
-
-        .contact-checkbox {
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
-            border: 2px solid var(--primary-color);
-            appearance: none;
-            position: relative;
-            cursor: pointer;
-            flex-shrink: 0;
-            transition: all 0.2s;
-        }
-
-        .contact-checkbox:checked {
-            background-color: var(--primary-color);
-        }
-
-        .contact-checkbox:checked::after {
-            content: '✓';
-            position: absolute;
+        .contact-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 24px;
+            background: var(--primary-color);
             color: white;
-            font-size: 16px;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            margin-right: 1rem;
+            flex-shrink: 0;
         }
 
-        .contact-info {
+        .contact-details {
             flex: 1;
             min-width: 0;
         }
 
         .contact-name {
             font-weight: 500;
-            margin-bottom: 4px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            margin-bottom: 0.25rem;
         }
 
         .contact-numbers {
@@ -250,690 +171,471 @@
             color: var(--text-secondary);
         }
 
-        .contact-number {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 2px 0;
-        }
-
-        .number-label {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            background-color: var(--background-color);
-            padding: 2px 6px;
-            border-radius: 8px;
-        }
-
         .contact-status {
-            padding: 4px 12px;
+            padding: 0.25rem 0.5rem;
             border-radius: 12px;
             font-size: 0.8rem;
             font-weight: 500;
-            white-space: nowrap;
         }
 
         .status-warning {
-            background-color: #fff3e0;
-            color: #f57c00;
+            background: #fff3e0;
+            color: #e65100;
         }
 
         .status-success {
-            background-color: #e8f5e9;
+            background: #e8f5e9;
             color: #2e7d32;
         }
 
-        .progress-container {
-            margin: calc(var(--spacing-unit) * 2) 0;
-            background-color: rgba(0,0,0,0.08);
-            border-radius: 6px;
-            overflow: hidden;
-            height: 6px;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background-color: var(--primary-color);
-            width: 0;
-            transition: width 0.3s ease;
-        }
-
-        .action-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: var(--surface-color);
-            padding: calc(var(--spacing-unit) * 2);
-            padding-bottom: calc(var(--spacing-unit) * 2 + var(--safe-area-bottom));
-            box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
-            z-index: 100;
-            display: flex;
-            gap: var(--spacing-unit);
-        }
-
-        .btn {
-            flex: 1;
-            border: none;
-            border-radius: 24px;
-            padding: 16px;
-            font-size: 1rem;
-            font-weight: 500;
-            color: white;
-            background-color: var(--primary-color);
-            cursor: pointer;
-            transition: all 0.2s;
+        /* Buttons */
+        .button {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            background: var(--primary-color);
+            color: white;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
         }
 
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .btn:active:not(:disabled) {
+        .button:active {
             transform: scale(0.98);
         }
 
-        .btn-primary {
-            background-color: var(--primary-color);
+        .button.secondary {
+            background: var(--success-color);
         }
 
-        .btn-success {
-            background-color: var(--success-color);
+        /* Progress Bar */
+        .progress-bar {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 1rem 0;
         }
 
-        .toast {
-            position: fixed;
-            bottom: calc(80px + var(--safe-area-bottom));
-            left: 16px;
-            right: 16px;
-            background-color: rgba(0,0,0,0.9);
-            color: white;
-            padding: 16px;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            text-align: center;
-            animation: slideUp 0.3s ease;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
         }
 
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(255,255,255,0.9);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            z-index: 1000;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(26,115,232,0.2);
-            border-left-color: var(--primary-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        .loading-text {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Manual Input Styles */
+        /* Input Fields */
         .input-area {
-            background-color: var(--surface-color);
-            border-radius: 12px;
-            padding: calc(var(--spacing-unit) * 2);
-            margin-bottom: calc(var(--spacing-unit) * 2);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
         }
 
-        .textarea {
+        textarea {
             width: 100%;
             min-height: 120px;
-            padding: 12px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            resize: vertical;
-            margin-bottom: 12px;
-        }
-
-        .textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
-        }
-
-        /* Import Area Styles */
-        .import-area {
-            background-color: var(--surface-color);
+            padding: 1rem;
+            border: 1px solid #ddd;
             border-radius: 12px;
-            padding: calc(var(--spacing-unit) * 3);
-            margin-bottom: calc(var(--spacing-unit) * 2);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            text-align: center;
+            font-size: 1rem;
+            resize: vertical;
+            margin-bottom: 1rem;
         }
 
-        .import-icon {
-            font-size: 2rem;
-            color: var(--primary-color);
-            margin-bottom: calc(var(--spacing-unit) * 2);
+        /* Bottom Sheet */
+        .bottom-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface-color);
+            border-radius: 20px 20px 0 0;
+            padding: 1rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
         }
 
-        .import-text {
-            color: var(--text-secondary);
-            margin-bottom: calc(var(--spacing-unit) * 2);
+        .bottom-sheet.active {
+            transform: translateY(0);
         }
 
-        .file-input {
-            display: none;
+        /* Checkbox Styles */
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background: #f5f5f5;
+            border-radius: 12px;
+            margin-bottom: 1rem;
         }
 
-        .import-button {
-            background-color: transparent;
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 12px 24px;
+        .checkbox-wrapper input[type="checkbox"] {
+            margin-right: 0.5rem;
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 1rem 2rem;
             border-radius: 24px;
             font-weight: 500;
-            cursor: pointer;
+            z-index: 2000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
-        /* Results Area */
-        .results-area {
-            background-color: var(--surface-color);
-            border-radius: 12px;
-            padding: calc(var(--spacing-unit) * 2);
-            margin-top: calc(var(--spacing-unit) * 2);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        .toast.visible {
+            opacity: 1;
         }
 
-        .results-title {
-            font-size: 1.1rem;
-            font-weight: 500;
-            margin-bottom: calc(var(--spacing-unit) * 2);
-        }
-
-        .results-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: var(--spacing-unit);
-            margin-bottom: calc(var(--spacing-unit) * 2);
-        }
-
-        .stat-item {
-            background-color: var(--background-color);
-            padding: calc(var(--spacing-unit) * 2);
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
+        @media (max-width: 380px) {
+            .contact-avatar {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .button {
+                padding: 0.75rem;
+            }
+            
+            .header h1 {
+                font-size: 1.25rem;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <h1>Conversion GSM Bénin</h1>
-    </header>
-
-    <!-- Info Banner -->
-    <div class="info-banner">
-        <p><strong>Mise à jour importante :</strong></p>
-        <p>Ajout du préfixe "01" aux numéros mobile du Bénin</p>
-        <p>Ex: +22960374877 → +2290160374877</p>
-    </div>
-
-    <!-- Navigation Tabs -->
-    <div class="tabs">
-        <button class="tab" onclick="switchTab('phone')">Contacts</button>
-        <button class="tab" onclick="switchTab('manual')">Manuel</button>
-        <button class="tab" onclick="switchTab('import')">Importer</button>
-    </div>
-
-    <!-- Main Content -->
-    <div class="content">
-        <!-- Phone Contacts Tab -->
-        <div id="phone-tab" class="tab-content active">
-            <div class="selection-controls">
-                <div class="select-all-container">
-                    <input type="checkbox" id="selectAll" class="select-all-checkbox" onchange="toggleSelectAll()">
-                    <label for="selectAll" class="select-all-label">Sélectionner tout</label>
-                </div>
-                <span class="selection-info" id="selectionCount">0 sélectionné</span>
+    <div class="container">
+        <div class="header">
+            <h1>Convertisseur GSM Bénin</h1>
+            <div class="info-banner">
+                Passage au format 10 chiffres : ajout du préfixe "01"<br>
+                Ex: +22960374877 → +2290160374877
             </div>
-
-            <div class="progress-container">
-                <div class="progress-bar" id="progressBar"></div>
-            </div>
-
-            <div class="contact-list" id="contactsList"></div>
         </div>
 
-        <!-- Manual Input Tab -->
-        <div id="manual-tab" class="tab-content">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('manual')">Manuel</button>
+            <button class="tab" onclick="switchTab('contacts')">Contacts</button>
+            <button class="tab" onclick="switchTab('import')">Importer</button>
+        </div>
+
+        <!-- Panneau de saisie manuelle -->
+        <div id="manual-panel" class="panel active">
             <div class="input-area">
-                <textarea class="textarea" id="manualInput" placeholder="Entrez vos numéros (un par ligne)
-Exemple:
-+22960374877
-+22997123456
-60374877"></textarea>
-                <button class="btn btn-primary" onclick="convertManualNumbers()">Convertir</button>
+                <textarea placeholder="Entrez vos numéros (un par ligne)&#10;Exemple:&#10;+22960374877&#10;97123456"></textarea>
+                <button class="button" onclick="convertManualNumbers()">Convertir</button>
             </div>
-            <div class="results-area" id="manualResults" style="display: none;"></div>
         </div>
 
-        <!-- Import Tab -->
-        <div id="import-tab" class="tab-content">
-            <div class="import-area">
-                <div class="import-icon">📁</div>
-                <p class="import-text">Importez vos contacts depuis un fichier CSV ou VCF</p>
-                <input type="file" id="fileInput" class="file-input" accept=".csv,.vcf" onchange="handleFileImport(this.files)">
-                <button class="import-button" onclick="document.getElementById('fileInput').click()">
+        <!-- Panneau des contacts -->
+        <div id="contacts-panel" class="panel">
+            <button class="button" onclick="requestContacts()">
+                Accéder aux contacts
+            </button>
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="autoUpdate" checked>
+                <label for="autoUpdate">Mettre à jour automatiquement</label>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div id="contacts-status"></div>
+            <div class="contact-list" id="contacts-list"></div>
+        </div>
+
+        <!-- Panneau d'import -->
+        <div id="import-panel" class="panel">
+            <div class="file-upload-area">
+                <button class="button" onclick="triggerFileInput()">
                     Choisir un fichier
                 </button>
+                <input type="file" id="file-input" accept=".csv,.vcf" style="display: none">
+                <p class="text-center">Formats supportés : CSV, VCF</p>
             </div>
-            <div class="results-area" id="importResults" style="display: none;"></div>
         </div>
     </div>
 
-    <!-- Action Bar -->
-    <div class="action-bar">
-        <button id="updateButton" class="btn btn-primary" onclick="updateContacts()" disabled>
-            Mettre à jour les contacts
-        </button>
+    <!-- Bottom Sheet pour les actions -->
+    <div class="bottom-sheet" id="actions-sheet">
+        <div class="bottom-sheet-header">
+            <h3>Actions disponibles</h3>
+            <button onclick="closeBottomSheet()">Fermer</button>
+        </div>
+        <div class="action-buttons">
+            <button class="button" onclick="updateContacts()">
+                Mettre à jour les contacts
+            </button>
+            <button class="button secondary" onclick="exportContacts('csv')">
+                Exporter en CSV
+            </button>
+            <button class="button secondary" onclick="exportContacts('vcf')">
+                Exporter en VCF
+            </button>
+        </div>
     </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast" id="toast"></div>
 
     <script>
         // Variables globales
-        let contacts = [];
-        let selectedContacts = new Set();
-
-        // Initialisation
-        document.addEventListener('DOMContentLoaded', () => {
-            switchTab('phone');
-            initializeApp();
-        });
-
-        async function initializeApp() {
-            if ('contacts' in navigator && 'ContactsManager' in window) {
-                await requestContacts();
-            } else {
-                showToast("L'accès aux contacts n'est pas supporté sur cet appareil");
-            }
-        }
+        let currentContacts = [];
+        let processedContacts = [];
 
         // Gestion des onglets
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.getElementById(tabName + '-tab').classList.add('active');
-            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+        function switchTab(tabId) {
+            // Mettre à jour les classes actives
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+
+            // Activer l'onglet sélectionné
+            document.querySelector(`.tab[onclick="switchTab('${tabId}')"]`).classList.add('active');
+            document.getElementById(`${tabId}-panel`).classList.add('active');
         }
 
-        // Gestion des contacts
+        // Gestion des notifications Toast
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('visible');
+            
+            setTimeout(() => {
+                toast.classList.remove('visible');
+            }, duration);
+        }
+
+        // Convertir un numéro unique
+        function convertPhoneNumber(number) {
+            // Nettoyer le numéro
+            let cleanNumber = number.replace(/[\s\-\(\)]/g, '');
+
+            // Vérifier si le numéro est déjà au nouveau format
+            if (cleanNumber.includes('01')) {
+                return { number: cleanNumber, wasConverted: false };
+            }
+
+            // Convertir selon le format
+            if (cleanNumber.startsWith('+229')) {
+                return {
+                    number: cleanNumber.slice(0, 4) + '01' + cleanNumber.slice(4),
+                    wasConverted: true
+                };
+            } else if (cleanNumber.startsWith('229')) {
+                return {
+                    number: '+' + cleanNumber.slice(0, 3) + '01' + cleanNumber.slice(3),
+                    wasConverted: true
+                };
+            } else if (cleanNumber.length === 8) {
+                return {
+                    number: '+22901' + cleanNumber,
+                    wasConverted: true
+                };
+            }
+
+            return { number: cleanNumber, wasConverted: false, isValid: false };
+        }
+
+        // Conversion manuelle des numéros
+        function convertManualNumbers() {
+            const input = document.querySelector('#manual-panel textarea').value;
+            const numbers = input.split('\n').filter(n => n.trim());
+            
+            if (numbers.length === 0) {
+                showToast('Veuillez entrer au moins un numéro');
+                return;
+            }
+
+            const converted = numbers.map(number => {
+                const result = convertPhoneNumber(number.trim());
+                return result.number;
+            });
+
+            // Afficher les résultats
+            document.querySelector('#manual-panel textarea').value = converted.join('\n');
+            showToast(`${numbers.length} numéro(s) traité(s)`);
+        }
+
+        // Accès aux contacts du téléphone
         async function requestContacts() {
             try {
-                showLoading("Accès aux contacts...");
-                const props = ['tel', 'name'];
-                const opts = { multiple: true };
-                const rawContacts = await navigator.contacts.select(props, opts);
-                contacts = processContacts(rawContacts);
-                renderContacts();
-                hideLoading();
+                const contactsDiv = document.getElementById('contacts-list');
+                contactsDiv.innerHTML = '<div class="loading">Chargement des contacts...</div>';
+
+                // Vérifier la disponibilité de l'API Contacts
+                if (!('contacts' in navigator && 'ContactsManager' in window)) {
+                    throw new Error("L'API Contacts n'est pas disponible sur votre appareil");
+                }
+
+                // Demander l'accès aux contacts
+                const properties = ['name', 'tel'];
+                const options = { multiple: true };
+                const contacts = await navigator.contacts.select(properties, options);
+                
+                processContacts(contacts);
             } catch (error) {
-                hideLoading();
-                showToast("Erreur lors de l'accès aux contacts: " + error.message);
+                showToast(`Erreur: ${error.message}`);
+                document.getElementById('contacts-status').innerHTML = `
+                    <div class="error-box">
+                        <p>${error.message}</p>
+                        <p>Cette fonction nécessite un appareil mobile compatible.</p>
+                    </div>
+                `;
             }
         }
 
-        function processContacts(rawContacts) {
-            return rawContacts.map(contact => {
-                const numbers = contact.tel.map(tel => {
-                    let cleaned = tel.replace(/[\s\-\(\)]/g, '');
-                    let needsUpdate = false;
-                    let converted = cleaned;
+        // Traitement des contacts
+        function processContacts(contacts) {
+            currentContacts = contacts;
+            const contactsList = document.getElementById('contacts-list');
+            contactsList.innerHTML = '';
 
-                    if (cleaned.startsWith('+229') && !cleaned.includes('01')) {
-                        converted = cleaned.slice(0, 4) + '01' + cleaned.slice(4);
-                        needsUpdate = true;
-                    } else if (cleaned.length === 8) {
-                        converted = '+22901' + cleaned;
-                        needsUpdate = true;
-                    }
+            if (contacts.length === 0) {
+                showToast('Aucun contact sélectionné');
+                return;
+            }
 
-                    return {
-                        original: cleaned,
-                        converted: converted,
-                        needsUpdate: needsUpdate
-                    };
-                });
+            processedContacts = contacts.map(contact => {
+                const originalNumbers = contact.tel || [];
+                const convertedNumbers = originalNumbers.map(num => convertPhoneNumber(num));
+                
+                const needsUpdate = convertedNumbers.some(num => num.wasConverted);
 
-                return {
-                    name: contact.name?.[0] || 'Sans nom',
-                    numbers: numbers,
-                    needsUpdate: numbers.some(n => n.needsUpdate)
-                };
-            });
-        }
-
-        function renderContacts() {
-            const list = document.getElementById('contactsList');
-            list.innerHTML = '';
-
-            contacts.forEach((contact, index) => {
-                const div = document.createElement('div');
-                div.className = 'contact-item';
-                div.innerHTML = `
-                    <input type="checkbox" class="contact-checkbox" 
-                           data-index="${index}" 
-                           ${selectedContacts.has(index) ? 'checked' : ''}
-                           onchange="toggleContact(${index})">
-                    <div class="contact-info">
-                        <div class="contact-name">${contact.name}</div>
+                // Créer l'élément de contact
+                const contactElement = document.createElement('div');
+                contactElement.className = 'contact-item';
+                contactElement.innerHTML = `
+                    <div class="contact-avatar">
+                        ${(contact.name && contact.name[0]) ? contact.name[0][0].toUpperCase() : '?'}
+                    </div>
+                    <div class="contact-details">
+                        <div class="contact-name">${contact.name ? contact.name[0] : 'Sans nom'}</div>
                         <div class="contact-numbers">
-                            ${contact.numbers.map(num => `
-                                <div class="contact-number">
-                                    <span class="number-label">
-                                        ${num.needsUpdate ? 'Nouveau' : 'Actuel'}
-                                    </span>
-                                    ${num.needsUpdate ? 
-                                        `${num.original} → ${num.converted}` : 
-                                        num.original}
-                                </div>
-                            `).join('')}
+                            ${convertedNumbers.map(num => num.number).join(', ')}
                         </div>
                     </div>
-                    <span class="contact-status ${contact.needsUpdate ? 'status-warning' : 'status-success'}">
-                        ${contact.needsUpdate ? 'À convertir' : 'À jour'}
-                    </span>
+                    <div class="contact-status ${needsUpdate ? 'status-warning' : 'status-success'}">
+                        ${needsUpdate ? 'À convertir' : 'À jour'}
+                    </div>
                 `;
-                list.appendChild(div);
+
+                contactsList.appendChild(contactElement);
+
+                return {
+                    original: contact,
+                    converted: convertedNumbers,
+                    needsUpdate
+                };
             });
 
-            updateSelectionCount();
-        }
+            updateProgress(processedContacts);
 
-        function toggleContact(index) {
-            if (selectedContacts.has(index)) {
-                selectedContacts.delete(index);
-            } else {
-                selectedContacts.add(index);
+            // Si la mise à jour automatique est activée
+            if (document.getElementById('autoUpdate').checked) {
+                updateContacts();
             }
-            updateSelectionCount();
-            updateButtonState();
-        }
-
-        function toggleSelectAll() {
-            const selectAllCheckbox = document.getElementById('selectAll');
-            if (selectAllCheckbox.checked) {
-                contacts.forEach((_, index) => selectedContacts.add(index));
-            } else {
-                selectedContacts.clear();
-            }
-            renderContacts();
-            updateSelectionCount();
-            updateButtonState();
-        }
-
-        function updateSelectionCount() {
-            const count = selectedContacts.size;
-            document.getElementById('selectionCount').textContent = 
-                `${count} contact${count > 1 ? 's' : ''} sélectionné${count > 1 ? 's' : ''}`;
-        }
-
-        function updateButtonState() {
-            const updateButton = document.getElementById('updateButton');
-            updateButton.disabled = selectedContacts.size === 0;
         }
 
         // Mise à jour des contacts
         async function updateContacts() {
+            const contactsToUpdate = processedContacts.filter(c => c.needsUpdate);
+            
+            if (contactsToUpdate.length === 0) {
+                showToast('Tous les contacts sont déjà à jour');
+                return;
+            }
+
             try {
-                showLoading("Mise à jour des contacts...");
-                const selectedContactsList = Array.from(selectedContacts);
-                const total = selectedContactsList.length;
-                let progress = 0;
-
-                for (let index of selectedContactsList) {
-                    const contact = contacts[index];
-                    await updateContactInPhone(contact);
-                    progress++;
-                    updateProgress(progress / total * 100);
+                const progress = document.querySelector('.progress-fill');
+                
+                // Simuler la progression de la mise à jour
+                for (let i = 0; i <= 100; i++) {
+                    progress.style.width = `${i}%`;
+                    await new Promise(resolve => setTimeout(resolve, 20));
                 }
 
-                hideLoading();
-                showToast("Contacts mis à jour avec succès");
-                selectedContacts.clear();
-                await requestContacts(); // Rafraîchir la liste
-            } catch (error) {
-                hideLoading();
-                showToast("Erreur lors de la mise à jour: " + error.message);
-            }
-        }
-
-        async function updateContactInPhone(contact) {
-            // Simulation de la mise à jour
-            // Dans une vraie implémentation, utilisez l'API appropriée
-            await new Promise(resolve => setTimeout(resolve, 200));
-        }
-
-        // Utilitaires
-        function updateProgress(percent) {
-            document.getElementById('progressBar').style.width = percent + '%';
-        }
-
-        function showToast(message) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        function showLoading(message) {
-            const loading = document.createElement('div');
-            loading.className = 'loading-overlay';
-            loading.innerHTML = `
-                <div class="spinner"></div>
-                <div class="loading-text">${message}</div>
-            `;
-            document.body.appendChild(loading);
-        }
-
-        function hideLoading() {
-            const loading = document.querySelector('.loading-overlay');
-            if (loading) loading.remove();
-        }
-
-        // Gestion des entrées manuelles
-        function convertManualNumbers() {
-            const input = document.getElementById('manualInput').value;
-            const numbers = input.split('\n').filter(n => n.trim());
-            const converted = numbers.map(processManualNumber);
-            displayManualResults(converted);
-        }
-
-        function processManualNumber(number) {
-            const cleaned = number.trim().replace(/[\s\-\(\)]/g, '');
-            if (cleaned.startsWith('+229') && !cleaned.includes('01')) {
-                return {
-                    original: cleaned,
-                    converted: cleaned.slice(0, 4) + '01' + cleaned.slice(4),
-                    valid: true
-                };
-            } else if (cleaned.length === 8) {
-                return {
-                    original: cleaned,
-                    converted: '+22901' + cleaned,
-                    valid: true
-                };
-            }
-            return {
-                original: cleaned,
-                converted: cleaned,
-                valid: false
-            };
-        }
-
-        function displayManualResults(results) {
-            const resultsArea = document.getElementById('manualResults');
-            resultsArea.style.display = 'block';
-            resultsArea.innerHTML = `
-                <h3 class="results-title">Résultats</h3>
-                <div class="results-stats">
-                    <div class="stat-item">
-                        <div class="stat-value">${results.filter(r => r.valid).length}</div>
-                        <div class="stat-label">Convertis</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">${results.filter(r => !r.valid).length}</div>
-                        <div class="stat-label">Invalides</div>
-                    </div>
-                </div>
-                <textarea class="textarea" readonly>
-${results.map(r => r.valid ? r.converted : r.original + ' (Format invalide)').join('\n')}
-                </textarea>
-            `;
-        }
-
-        // Gestion de l'import de fichiers
-        function handleFileImport(files) {
-            const file = files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const content = e.target.result;
-                if (file.name.toLowerCase().endsWith('.csv')) {
-                    processCSV(content);
-                } else if (file.name.toLowerCase().endsWith('.vcf')) {
-                    processVCard(content);
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function processCSV(content) {
-            const lines = content.split('\n');
-            const numbers = [];
-            lines.forEach(line => {
-                const columns = line.split(',');
-                columns.forEach(col => {
-                    const cleaned = col.trim().replace(/["']/g, '');
-                    if (cleaned.match(/^\+?(?:229)?\d{8,}$/)) {
-                        numbers.push(cleaned);
-                    }
+                // Créer le VCard pour l'export
+                let vcard = '';
+                contactsToUpdate.forEach(contact => {
+                    vcard += 'BEGIN:VCARD\nVERSION:3.0\n';
+                    vcard += `FN:${contact.original.name ? contact.original.name[0] : 'Contact'}\n`;
+                    contact.converted.forEach(num => {
+                        vcard += `TEL:${num.number}\n`;
+                    });
+                    vcard += 'END:VCARD\n';
                 });
-            });
-            const converted = numbers.map(processManualNumber);
-            displayImportResults(converted);
-        }
 
-        function processVCard(content) {
-            const numbers = [];
-            const vcardRegex = /TEL[^:]*:([\+\d\s\-\(\)]+)/g;
-            let match;
-            while ((match = vcardRegex.exec(content)) !== null) {
-                const number = match[1].replace(/[\s\-\(\)]/g, '');
-                if (number.match(/^\+?(?:229)?\d{8,}$/)) {
-                    numbers.push(number);
-                }
+                // Proposer le téléchargement
+                downloadFile(vcard, 'contacts_convertis.vcf', 'text/vcard');
+                
+                showToast(`${contactsToUpdate.length} contact(s) mis à jour`);
+            } catch (error) {
+                showToast('Erreur lors de la mise à jour : ' + error.message);
             }
-            const converted = numbers.map(processManualNumber);
-            displayImportResults(converted);
         }
 
-        function displayImportResults(results) {
-            const resultsArea = document.getElementById('importResults');
-            resultsArea.style.display = 'block';
-            resultsArea.innerHTML = `
-                <h3 class="results-title">Résultats de l'import</h3>
-                <div class="results-stats">
-                    <div class="stat-item">
-                        <div class="stat-value">${results.filter(r => r.valid).length}</div>
-                        <div class="stat-label">Numéros valides</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">${results.filter(r => !r.valid).length}</div>
-                        <div class="stat-label">Formats invalides</div>
-                    </div>
-                </div>
-                <textarea class="textarea" readonly>
-${results.map(r => `${r.valid ? r.converted : r.original + ' (Format invalide)'}`).join('\n')}
-                </textarea>
-                <div class="export-buttons">
-                    <button class="btn btn-primary" onclick="exportToVCard(results)">
-                        Exporter en VCard
-                    </button>
-                    <button class="btn btn-success" onclick="exportToCSV(results)">
-                        Exporter en CSV
-                    </button>
-                </div>
-            `;
+        // Mise à jour de la barre de progression
+        function updateProgress(contacts) {
+            const total = contacts.length;
+            const updated = contacts.filter(c => !c.needsUpdate).length;
+            const percentage = (updated / total) * 100;
+            
+            document.querySelector('.progress-fill').style.width = `${percentage}%`;
+            document.getElementById('contacts-status').textContent = 
+                `${updated}/${total} contacts à jour`;
         }
 
-        // Fonctions d'export
-        function exportToVCard(results) {
-            let vcard = '';
-            results.filter(r => r.valid).forEach((result, index) => {
-                vcard += 'BEGIN:VCARD\n';
-                vcard += 'VERSION:3.0\n';
-                vcard += `FN:Contact ${index + 1}\n`;
-                vcard += `TEL:${result.converted}\n`;
-                vcard += 'END:VCARD\n';
-            });
-            downloadFile(vcard, 'contacts_convertis.vcf', 'text/vcard');
+        // Export des contacts
+        function exportContacts(format) {
+            if (!processedContacts.length) {
+                showToast('Aucun contact à exporter');
+                return;
+            }
+
+            if (format === 'csv') {
+                let csv = 'Nom,Numéro\n';
+                processedContacts.forEach(contact => {
+                    const name = contact.original.name ? contact.original.name[0] : 'Contact';
+                    contact.converted.forEach(num => {
+                        csv += `"${name}","${num.number}"\n`;
+                    });
+                });
+                downloadFile(csv, 'contacts.csv', 'text/csv');
+            } else {
+                let vcard = '';
+                processedContacts.forEach(contact => {
+                    vcard += 'BEGIN:VCARD\nVERSION:3.0\n';
+                    vcard += `FN:${contact.original.name ? contact.original.name[0] : 'Contact'}\n`;
+                    contact.converted.forEach(num => {
+                        vcard += `TEL:${num.number}\n`;
+                    });
+                    vcard += 'END:VCARD\n';
+                });
+                downloadFile(vcard, 'contacts.vcf', 'text/vcard');
+            }
+
+            showToast(`Export en ${format.toUpperCase()} terminé`);
         }
 
-        function exportToCSV(results) {
-            const csv = 'Numéro Original,Numéro Converti\n' + 
-                results.filter(r => r.valid)
-                    .map(r => `${r.original},${r.converted}`)
-                    .join('\n');
-            downloadFile(csv, 'contacts_convertis.csv', 'text/csv');
-        }
-
+        // Téléchargement de fichier
         function downloadFile(content, filename, type) {
-            const blob = new Blob([content], { type: type });
+            const blob = new Blob([content], { type });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -944,50 +646,94 @@ ${results.map(r => `${r.valid ? r.converted : r.original + ' (Format invalide)'}
             URL.revokeObjectURL(url);
         }
 
-        // Gestionnaire d'événements pour le retour haptique
-        document.addEventListener('touchstart', function(e) {
-            if (e.target.matches('button, .contact-checkbox, .select-all-checkbox')) {
-                if ('vibrate' in navigator) {
-                    navigator.vibrate(10);
-                }
-            }
-        }, { passive: true });
-
-        // Gestionnaire de mise en cache pour le mode hors ligne
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').catch(function(err) {
-                console.error('Service Worker registration failed:', err);
-            });
+        // Gestion de l'import de fichiers
+        function triggerFileInput() {
+            document.getElementById('file-input').click();
         }
-    </script>
 
-    <!-- Service Worker pour le mode hors ligne -->
-    <script>
-        // Service Worker minimal
-        const CACHE_NAME = 'benin-converter-v1';
-        const urlsToCache = [
-            '/',
-            '/index.html',
-            '/styles.css',
-            '/script.js'
-        ];
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
 
-        self.addEventListener('install', function(event) {
-            event.waitUntil(
-                caches.open(CACHE_NAME)
-                    .then(function(cache) {
-                        return cache.addAll(urlsToCache);
-                    })
-            );
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                if (file.name.endsWith('.csv')) {
+                    parseCSV(content);
+                } else if (file.name.endsWith('.vcf')) {
+                    parseVCard(content);
+                }
+            };
+            reader.readAsText(file);
         });
 
-        self.addEventListener('fetch', function(event) {
-            event.respondWith(
-                caches.match(event.request)
-                    .then(function(response) {
-                        return response || fetch(event.request);
-                    })
-            );
+        // Parsing des fichiers
+        function parseCSV(content) {
+            const lines = content.split('\n');
+            const contacts = lines
+                .filter(line => line.trim())
+                .map(line => {
+                    const [name, number] = line.split(',').map(s => s.trim().replace(/"/g, ''));
+                    return { name, number };
+                });
+            
+            processImportedContacts(contacts);
+        }
+
+        function parseVCard(content) {
+            const contacts = [];
+            let currentContact = null;
+
+            content.split('\n').forEach(line => {
+                line = line.trim();
+                if (line.startsWith('BEGIN:VCARD')) {
+                    currentContact = {};
+                } else if (line.startsWith('FN:')) {
+                    currentContact.name = line.slice(3);
+                } else if (line.startsWith('TEL:')) {
+                    currentContact.number = line.slice(4);
+                } else if (line.startsWith('END:VCARD')) {
+                    if (currentContact.number) {
+                        contacts.push(currentContact);
+                    }
+                    currentContact = null;
+                }
+            });
+
+            processImportedContacts(contacts);
+        }
+
+        function processImportedContacts(contacts) {
+            const processed = contacts.map(contact => {
+                const converted = convertPhoneNumber(contact.number);
+                return {
+                    name: contact.name,
+                    originalNumber: contact.number,
+                    convertedNumber: converted.number,
+                    wasConverted: converted.wasConverted
+                };
+            });
+
+            displayImportedContacts(processed);
+        }
+
+        function displayImportedContacts(contacts) {
+            switchTab('manual');
+            const textarea = document.querySelector('#manual-panel textarea');
+            textarea.value = contacts
+                .map(c => `${c.name}: ${c.convertedNumber}`)
+                .join('\n');
+            
+            showToast(`${contacts.length} contact(s) importé(s)`);
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Vérifier si l'API Contacts est disponible
+            if (!('contacts' in navigator)) {
+                document.querySelector('[onclick="switchTab(\'contacts\')"]')
+                    .setAttribute('disabled', 'disabled');
+            }
         });
     </script>
 </body>

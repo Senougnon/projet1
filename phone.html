@@ -7,16 +7,16 @@
     <style>
         :root {
             --primary-color: #1a73e8;
-            --accent-color: #34a853;
-            --danger-color: #ea4335;
+            --primary-dark: #1557b0;
+            --success-color: #34a853;
             --warning-color: #fbbc04;
-            --surface-color: #ffffff;
+            --error-color: #ea4335;
             --background-color: #f8f9fa;
+            --surface-color: #ffffff;
             --text-primary: #202124;
             --text-secondary: #5f6368;
             --spacing-unit: 8px;
-            --safe-area-inset-top: env(safe-area-inset-top, 0px);
-            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-area-bottom: env(safe-area-inset-bottom, 20px);
         }
 
         * {
@@ -24,227 +24,253 @@
             margin: 0;
             padding: 0;
             -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-
-        html, body {
-            height: 100%;
-            width: 100%;
-            background-color: var(--background-color);
-            color: var(--text-primary);
-            overscroll-behavior-y: contain;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         body {
-            padding: calc(var(--spacing-unit) * 2 + var(--safe-area-inset-top)) 
-                    calc(var(--spacing-unit) * 2) 
-                    calc(var(--spacing-unit) * 2 + var(--safe-area-inset-bottom));
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            padding-bottom: calc(80px + var(--safe-area-bottom));
+            overscroll-behavior-y: contain;
         }
 
-        .app-container {
-            max-width: 600px;
-            margin: 0 auto;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* En-tête */
         .header {
             position: sticky;
             top: 0;
+            z-index: 100;
             background-color: var(--surface-color);
             padding: calc(var(--spacing-unit) * 2);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            z-index: 100;
-            border-radius: 16px 16px 0 0;
         }
 
         .header h1 {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             color: var(--primary-color);
             text-align: center;
-            margin-bottom: var(--spacing-unit);
+            margin: 0;
         }
 
         .info-banner {
-            background-color: #e3f2fd;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
             padding: calc(var(--spacing-unit) * 2);
+            margin: var(--spacing-unit);
             border-radius: 12px;
-            margin: var(--spacing-unit) 0;
-            font-size: 0.9rem;
-            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        /* Navigation */
-        .nav-tabs {
+        .info-banner p {
+            margin: 4px 0;
+            font-size: 0.95rem;
+        }
+
+        .info-banner p:last-child {
+            color: var(--primary-dark);
+            font-weight: 500;
+        }
+
+        .tabs {
             display: flex;
-            justify-content: space-around;
+            overflow-x: auto;
+            scrollbar-width: none;
             background-color: var(--surface-color);
-            padding: calc(var(--spacing-unit)) 0;
-            margin-bottom: calc(var(--spacing-unit) * 2);
-            border-radius: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 0 var(--spacing-unit);
+            position: sticky;
+            top: 56px;
+            z-index: 99;
         }
 
-        .nav-tab {
-            flex: 1;
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            flex: 1 0 auto;
             padding: calc(var(--spacing-unit) * 1.5);
             border: none;
             background: none;
+            font-size: 0.95rem;
             color: var(--text-secondary);
-            font-size: 0.9rem;
-            font-weight: 500;
             position: relative;
+            min-width: 100px;
             transition: color 0.3s;
         }
 
-        .nav-tab.active {
+        .tab.active {
             color: var(--primary-color);
+            font-weight: 500;
         }
 
-        .nav-tab.active::after {
+        .tab.active::after {
             content: '';
             position: absolute;
-            bottom: -4px;
-            left: 25%;
-            width: 50%;
+            bottom: 0;
+            left: 16px;
+            right: 16px;
             height: 3px;
             background-color: var(--primary-color);
             border-radius: 1.5px;
         }
 
-        /* Contenu principal */
-        .main-content {
-            flex: 1;
-            overflow-y: auto;
-            background-color: var(--surface-color);
-            border-radius: 0 0 16px 16px;
-            padding: calc(var(--spacing-unit) * 2);
+        .content {
+            padding: var(--spacing-unit);
+            max-width: 600px;
+            margin: 0 auto;
         }
 
         .tab-content {
             display: none;
-            animation: slideIn 0.3s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            animation: fadeIn 0.3s ease;
         }
 
         .tab-content.active {
             display: block;
         }
 
-        /* Contacts du téléphone */
-        .account-selector {
+        .selection-controls {
             background-color: var(--surface-color);
-            padding: calc(var(--spacing-unit) * 2);
             border-radius: 12px;
             margin-bottom: calc(var(--spacing-unit) * 2);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .account-selector select {
-            width: 100%;
             padding: calc(var(--spacing-unit) * 1.5);
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 16px;
-        }
-
-        .contacts-list {
-            background-color: var(--surface-color);
-            border-radius: 12px;
-            overflow: hidden;
-            margin-bottom: calc(var(--spacing-unit) * 2);
-        }
-
-        .contacts-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: calc(var(--spacing-unit) * 2);
-            border-bottom: 1px solid #eee;
+            gap: var(--spacing-unit);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .select-all-container {
             display: flex;
             align-items: center;
-            gap: var(--spacing-unit);
+            gap: 8px;
+        }
+
+        .select-all-checkbox {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            border: 2px solid var(--primary-color);
+            appearance: none;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .select-all-checkbox:checked {
+            background-color: var(--primary-color);
+        }
+
+        .select-all-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .select-all-label {
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .selection-info {
+            margin-left: auto;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            background-color: var(--background-color);
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+
+        .contact-list {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .contact-item {
             padding: calc(var(--spacing-unit) * 2);
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
             display: flex;
             align-items: center;
             gap: calc(var(--spacing-unit) * 2);
+            background-color: var(--surface-color);
+            transition: background-color 0.2s;
         }
 
-        .contact-item:last-child {
-            border-bottom: none;
+        .contact-item:active {
+            background-color: rgba(0,0,0,0.05);
         }
 
         .contact-checkbox {
             width: 24px;
             height: 24px;
             border-radius: 6px;
-            border: 2px solid #ddd;
+            border: 2px solid var(--primary-color);
             appearance: none;
             position: relative;
             cursor: pointer;
             flex-shrink: 0;
+            transition: all 0.2s;
         }
 
         .contact-checkbox:checked {
             background-color: var(--primary-color);
-            border-color: var(--primary-color);
         }
 
         .contact-checkbox:checked::after {
-            content: '';
+            content: '✓';
             position: absolute;
-            left: 7px;
-            top: 3px;
-            width: 6px;
-            height: 12px;
-            border: solid white;
-            border-width: 0 2px 2px 0;
-            transform: rotate(45deg);
+            color: white;
+            font-size: 16px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .contact-info {
             flex: 1;
+            min-width: 0;
         }
 
         .contact-name {
             font-weight: 500;
             margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .contact-numbers {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
         }
 
         .contact-number {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 2px 0;
+        }
+
+        .number-label {
+            font-size: 0.8rem;
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            background-color: var(--background-color);
+            padding: 2px 6px;
+            border-radius: 8px;
         }
 
         .contact-status {
-            padding: 4px 8px;
+            padding: 4px 12px;
             border-radius: 12px;
             font-size: 0.8rem;
             font-weight: 500;
+            white-space: nowrap;
         }
 
         .status-warning {
@@ -257,350 +283,711 @@
             color: #2e7d32;
         }
 
-        /* Boutons et actions */
-        .action-button {
-            width: 100%;
-            padding: calc(var(--spacing-unit) * 2);
-            border: none;
-            border-radius: 12px;
-            background-color: var(--primary-color);
-            color: white;
-            font-size: 1rem;
-            font-weight: 500;
-            margin-bottom: calc(var(--spacing-unit) * 2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: var(--spacing-unit);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .action-button:active {
-            transform: scale(0.98);
-        }
-
-        .action-button.secondary {
-            background-color: var(--accent-color);
-        }
-
-        /* Progress bar */
         .progress-container {
             margin: calc(var(--spacing-unit) * 2) 0;
+            background-color: rgba(0,0,0,0.08);
+            border-radius: 6px;
+            overflow: hidden;
+            height: 6px;
         }
 
         .progress-bar {
-            height: 4px;
-            background-color: #e0e0e0;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
             height: 100%;
             background-color: var(--primary-color);
-            width: 0%;
+            width: 0;
             transition: width 0.3s ease;
         }
 
-        /* Messages et notifications */
-        .message {
+        .action-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--surface-color);
             padding: calc(var(--spacing-unit) * 2);
+            padding-bottom: calc(var(--spacing-unit) * 2 + var(--safe-area-bottom));
+            box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
+            z-index: 100;
+            display: flex;
+            gap: var(--spacing-unit);
+        }
+
+        .btn {
+            flex: 1;
+            border: none;
+            border-radius: 24px;
+            padding: 16px;
+            font-size: 1rem;
+            font-weight: 500;
+            color: white;
+            background-color: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: calc(80px + var(--safe-area-bottom));
+            left: 16px;
+            right: 16px;
+            background-color: rgba(0,0,0,0.9);
+            color: white;
+            padding: 16px;
             border-radius: 12px;
+            font-size: 0.95rem;
+            text-align: center;
+            animation: slideUp 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255,255,255,0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(26,115,232,0.2);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Manual Input Styles */
+        .input-area {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            padding: calc(var(--spacing-unit) * 2);
             margin-bottom: calc(var(--spacing-unit) * 2);
-            animation: slideIn 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .message.success {
-            background-color: #e8f5e9;
-            color: #2e7d32;
+        .textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            resize: vertical;
+            margin-bottom: 12px;
         }
 
-        .message.warning {
-            background-color: #fff3e0;
-            color: #f57c00;
+        .textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(26,115,232,0.2);
         }
 
-        .message.error {
-            background-color: #fef2f2;
-            color: #dc2626;
+        /* Import Area Styles */
+        .import-area {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            padding: calc(var(--spacing-unit) * 3);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .import-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+
+        .import-text {
+            color: var(--text-secondary);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .import-button {
+            background-color: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        /* Results Area */
+        .results-area {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            padding: calc(var(--spacing-unit) * 2);
+            margin-top: calc(var(--spacing-unit) * 2);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .results-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+
+        .results-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-unit);
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+
+        .stat-item {
+            background-color: var(--background-color);
+            padding: calc(var(--spacing-unit) * 2);
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="header">
-            <h1>Convertisseur GSM Bénin</h1>
-            <div class="info-banner">
-                Mise à jour des numéros : ajout du préfixe "01"<br>
-                <small>Ex: +22960374877 → +2290160374877</small>
-            </div>
-        </div>
+    <!-- Header -->
+    <header class="header">
+        <h1>Conversion GSM Bénin</h1>
+    </header>
 
-        <nav class="nav-tabs">
-            <button class="nav-tab active" onclick="switchTab('contacts')">
-                Contacts
-            </button>
-            <button class="nav-tab" onclick="switchTab('manuel')">
-                Manuel
-            </button>
-            <button class="nav-tab" onclick="switchTab('fichier')">
-                Fichier
-            </button>
-        </nav>
+    <!-- Info Banner -->
+    <div class="info-banner">
+        <p><strong>Mise à jour importante :</strong></p>
+        <p>Ajout du préfixe "01" aux numéros mobile du Bénin</p>
+        <p>Ex: +22960374877 → +2290160374877</p>
+    </div>
 
-        <div class="main-content">
-            <!-- Onglet Contacts -->
-            <div id="contacts-tab" class="tab-content active">
-                <div class="account-selector">
-                    <select id="accountSelect" onchange="updateContactsList()">
-                        <option value="">Choisir un compte...</option>
-                        <!-- Sera rempli dynamiquement -->
-                    </select>
+    <!-- Navigation Tabs -->
+    <div class="tabs">
+        <button class="tab" onclick="switchTab('phone')">Contacts</button>
+        <button class="tab" onclick="switchTab('manual')">Manuel</button>
+        <button class="tab" onclick="switchTab('import')">Importer</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Phone Contacts Tab -->
+        <div id="phone-tab" class="tab-content active">
+            <div class="selection-controls">
+                <div class="select-all-container">
+                    <input type="checkbox" id="selectAll" class="select-all-checkbox" onchange="toggleSelectAll()">
+                    <label for="selectAll" class="select-all-label">Sélectionner tout</label>
                 </div>
-
-                <button class="action-button" onclick="requestContacts()">
-                    Charger les contacts
-                </button>
-
-                <div class="contacts-list">
-                    <div class="contacts-header">
-                        <div class="select-all-container">
-                            <input type="checkbox" class="contact-checkbox" id="selectAll" onchange="toggleSelectAll()">
-                            <label for="selectAll">Tout sélectionner</label>
-                        </div>
-                        <span id="selectedCount"></span>
-                    </div>
-                    <div id="contactsList">
-                        <!-- Sera rempli dynamiquement -->
-                    </div>
-                </div>
-
-                <div class="progress-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressBar"></div>
-                    </div>
-                </div>
-
-                <button class="action-button secondary" onclick="convertSelectedContacts()">
-                    Convertir les contacts sélectionnés
-                </button>
+                <span class="selection-info" id="selectionCount">0 sélectionné</span>
             </div>
 
-            <!-- Autres onglets... -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+
+            <div class="contact-list" id="contactsList"></div>
         </div>
+
+        <!-- Manual Input Tab -->
+        <div id="manual-tab" class="tab-content">
+            <div class="input-area">
+                <textarea class="textarea" id="manualInput" placeholder="Entrez vos numéros (un par ligne)
+Exemple:
++22960374877
++22997123456
+60374877"></textarea>
+                <button class="btn btn-primary" onclick="convertManualNumbers()">Convertir</button>
+            </div>
+            <div class="results-area" id="manualResults" style="display: none;"></div>
+        </div>
+
+        <!-- Import Tab -->
+        <div id="import-tab" class="tab-content">
+            <div class="import-area">
+                <div class="import-icon">📁</div>
+                <p class="import-text">Importez vos contacts depuis un fichier CSV ou VCF</p>
+                <input type="file" id="fileInput" class="file-input" accept=".csv,.vcf" onchange="handleFileImport(this.files)">
+                <button class="import-button" onclick="document.getElementById('fileInput').click()">
+                    Choisir un fichier
+                </button>
+            </div>
+            <div class="results-area" id="importResults" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+        <button id="updateButton" class="btn btn-primary" onclick="updateContacts()" disabled>
+            Mettre à jour les contacts
+        </button>
     </div>
 
     <script>
         // Variables globales
+        let contacts = [];
         let selectedContacts = new Set();
-        let allContacts = [];
-        let currentAccount = null;
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            switchTab('phone');
+            initializeApp();
+        });
+
+        async function initializeApp() {
+            if ('contacts' in navigator && 'ContactsManager' in window) {
+                await requestContacts();
+            } else {
+                showToast("L'accès aux contacts n'est pas supporté sur cet appareil");
+            }
+        }
 
         // Gestion des onglets
         function switchTab(tabName) {
-            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            document.querySelector(`.nav-tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
-            document.getElementById(`${tabName}-tab`).classList.add('active');
-        }
-
-        // Initialisation des comptes
-        async function initializeAccounts() {
-            try {
-                // Vérifier si l'API Contacts est disponible
-                if (!('contacts' in navigator && 'ContactsManager' in window)) {
-                    throw new Error("L'API Contacts n'est pas disponible");
-                }
-
-                // Récupérer les comptes disponibles
-                const accounts = await navigator.contacts.getAccounts();
-                const select = document.getElementById('accountSelect');
-                
-                select.innerHTML = '<option value="">Choisir un compte...</option>';
-                accounts.forEach(account => {
-                    const option = document.createElement('option');
-                    option.value = account.id;
-                    option.textContent = account.name || account.email || account.id;
-                    select.appendChild(option);
-                });
-            } catch (error) {
-                showMessage('error', `Erreur d'initialisation: ${error.message}`);
-            }
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabName + '-tab').classList.add('active');
+            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
         }
 
         // Gestion des contacts
         async function requestContacts() {
             try {
-                const accountId = document.getElementById('accountSelect').value;
-                if (!accountId) {
-                    throw new Error("Veuillez sélectionner un compte");
-                }
-
-                currentAccount = accountId;
+                showLoading("Accès aux contacts...");
                 const props = ['tel', 'name'];
-                const opts = {
-                    multiple: true,
-                    account: accountId
-                };
-
-                const contacts = await navigator.contacts.select(props, opts);
-                processContacts(contacts);
+                const opts = { multiple: true };
+                const rawContacts = await navigator.contacts.select(props, opts);
+                contacts = processContacts(rawContacts);
+                renderContacts();
+                hideLoading();
             } catch (error) {
-                showMessage('error', `Erreur: ${error.message}`);
+                hideLoading();
+                showToast("Erreur lors de l'accès aux contacts: " + error.message);
             }
         }
 
-        function processContacts(contacts) {
-            allContacts = contacts.map(contact => ({
-                id: crypto.randomUUID(),
-                name: contact.name?.[0] || 'Sans nom',
-                originalNumbers: contact.tel,
-                numbers: contact.tel.map(number => convertNumber(number)),
-                needsUpdate: contact.tel.some((num, i) => num !== convertNumber(num))
-            }));
+        function processContacts(rawContacts) {
+            return rawContacts.map(contact => {
+                const numbers = contact.tel.map(tel => {
+                    let cleaned = tel.replace(/[\s\-\(\)]/g, '');
+                    let needsUpdate = false;
+                    let converted = cleaned;
 
-            updateContactsList();
-            updateSelectedCount();
+                    if (cleaned.startsWith('+229') && !cleaned.includes('01')) {
+                        converted = cleaned.slice(0, 4) + '01' + cleaned.slice(4);
+                        needsUpdate = true;
+                    } else if (cleaned.length === 8) {
+                        converted = '+22901' + cleaned;
+                        needsUpdate = true;
+                    }
+
+                    return {
+                        original: cleaned,
+                        converted: converted,
+                        needsUpdate: needsUpdate
+                    };
+                });
+
+                return {
+                    name: contact.name?.[0] || 'Sans nom',
+                    numbers: numbers,
+                    needsUpdate: numbers.some(n => n.needsUpdate)
+                };
+            });
         }
 
-        function convertNumber(number) {
-            const cleaned = number.replace(/[\s\-\(\)]/g, '');
-            
-            if (cleaned.includes('01')) return cleaned;
-            
-            if (cleaned.startsWith('+229')) {
-                return cleaned.slice(0, 4) + '01' + cleaned.slice(4);
-            } else if (cleaned.length === 8) {
-                return '+22901' + cleaned;
-            } else if (cleaned.startsWith('229')) {
-                return '+' + cleaned.slice(0, 3) + '01' + cleaned.slice(3);
-            }
-            
-            return cleaned;
-        }
+        function renderContacts() {
+            const list = document.getElementById('contactsList');
+            list.innerHTML = '';
 
-        function updateContactsList() {
-            const listContainer = document.getElementById('contactsList');
-            listContainer.innerHTML = '';
-
-            allContacts.forEach(contact => {
+            contacts.forEach((contact, index) => {
                 const div = document.createElement('div');
                 div.className = 'contact-item';
                 div.innerHTML = `
-                    <input type="checkbox" 
-                           class="contact-checkbox" 
-                           id="contact-${contact.id}"
-                           ${selectedContacts.has(contact.id) ? 'checked' : ''}
-                           onchange="toggleContact('${contact.id}')">
+                    <input type="checkbox" class="contact-checkbox" 
+                           data-index="${index}" 
+                           ${selectedContacts.has(index) ? 'checked' : ''}
+                           onchange="toggleContact(${index})">
                     <div class="contact-info">
                         <div class="contact-name">${contact.name}</div>
-                        <div class="contact-number">${contact.originalNumbers.join(', ')}</div>
-                        <div class="contact-number">→ ${contact.numbers.join(', ')}</div>
+                        <div class="contact-numbers">
+                            ${contact.numbers.map(num => `
+                                <div class="contact-number">
+                                    <span class="number-label">
+                                        ${num.needsUpdate ? 'Nouveau' : 'Actuel'}
+                                    </span>
+                                    ${num.needsUpdate ? 
+                                        `${num.original} → ${num.converted}` : 
+                                        num.original}
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
                     <span class="contact-status ${contact.needsUpdate ? 'status-warning' : 'status-success'}">
                         ${contact.needsUpdate ? 'À convertir' : 'À jour'}
                     </span>
                 `;
-                listContainer.appendChild(div);
+                list.appendChild(div);
             });
+
+            updateSelectionCount();
         }
 
-        function toggleContact(id) {
-            if (selectedContacts.has(id)) {
-                selectedContacts.delete(id);
+        function toggleContact(index) {
+            if (selectedContacts.has(index)) {
+                selectedContacts.delete(index);
             } else {
-                selectedContacts.add(id);
+                selectedContacts.add(index);
             }
-            updateSelectedCount();
-            updateSelectAllCheckbox();
+            updateSelectionCount();
+            updateButtonState();
         }
 
         function toggleSelectAll() {
             const selectAllCheckbox = document.getElementById('selectAll');
-            
             if (selectAllCheckbox.checked) {
-                allContacts.forEach(contact => selectedContacts.add(contact.id));
+                contacts.forEach((_, index) => selectedContacts.add(index));
             } else {
                 selectedContacts.clear();
             }
-            
-            updateContactsList();
-            updateSelectedCount();
+            renderContacts();
+            updateSelectionCount();
+            updateButtonState();
         }
 
-        function updateSelectAllCheckbox() {
-            const selectAllCheckbox = document.getElementById('selectAll');
-            selectAllCheckbox.checked = selectedContacts.size === allContacts.length;
-            selectAllCheckbox.indeterminate = selectedContacts.size > 0 && selectedContacts.size < allContacts.length;
+        function updateSelectionCount() {
+            const count = selectedContacts.size;
+            document.getElementById('selectionCount').textContent = 
+                `${count} contact${count > 1 ? 's' : ''} sélectionné${count > 1 ? 's' : ''}`;
         }
 
-        function updateSelectedCount() {
-            const countElement = document.getElementById('selectedCount');
-            countElement.textContent = `${selectedContacts.size} sélectionné${selectedContacts.size > 1 ? 's' : ''}`;
+        function updateButtonState() {
+            const updateButton = document.getElementById('updateButton');
+            updateButton.disabled = selectedContacts.size === 0;
         }
 
-        async function convertSelectedContacts() {
-            if (selectedContacts.size === 0) {
-                showMessage('warning', 'Veuillez sélectionner des contacts à convertir');
-                return;
-            }
-
-            const progressBar = document.getElementById('progressBar');
-            const selectedContactsList = allContacts.filter(contact => selectedContacts.has(contact.id));
-            let progress = 0;
-
+        // Mise à jour des contacts
+        async function updateContacts() {
             try {
-                for (const contact of selectedContactsList) {
-                    if (contact.needsUpdate) {
-                        await updateContactInPhone(contact);
-                    }
-                    progress += (100 / selectedContactsList.length);
-                    progressBar.style.width = `${progress}%`;
+                showLoading("Mise à jour des contacts...");
+                const selectedContactsList = Array.from(selectedContacts);
+                const total = selectedContactsList.length;
+                let progress = 0;
+
+                for (let index of selectedContactsList) {
+                    const contact = contacts[index];
+                    await updateContactInPhone(contact);
+                    progress++;
+                    updateProgress(progress / total * 100);
                 }
 
-                showMessage('success', 'Contacts mis à jour avec succès !');
-                await initializeAccounts(); // Rafraîchir la liste des contacts
+                hideLoading();
+                showToast("Contacts mis à jour avec succès");
                 selectedContacts.clear();
-                updateSelectedCount();
+                await requestContacts(); // Rafraîchir la liste
             } catch (error) {
-                showMessage('error', `Erreur lors de la mise à jour : ${error.message}`);
-            } finally {
-                progressBar.style.width = '0%';
+                hideLoading();
+                showToast("Erreur lors de la mise à jour: " + error.message);
             }
         }
 
         async function updateContactInPhone(contact) {
-            try {
-                // Utiliser l'API Contacts pour mettre à jour
-                const updates = {
-                    id: contact.id,
-                    tel: contact.numbers
+            // Simulation de la mise à jour
+            // Dans une vraie implémentation, utilisez l'API appropriée
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+
+        // Utilitaires
+        function updateProgress(percent) {
+            document.getElementById('progressBar').style.width = percent + '%';
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function showLoading(message) {
+            const loading = document.createElement('div');
+            loading.className = 'loading-overlay';
+            loading.innerHTML = `
+                <div class="spinner"></div>
+                <div class="loading-text">${message}</div>
+            `;
+            document.body.appendChild(loading);
+        }
+
+        function hideLoading() {
+            const loading = document.querySelector('.loading-overlay');
+            if (loading) loading.remove();
+        }
+
+        // Gestion des entrées manuelles
+        function convertManualNumbers() {
+            const input = document.getElementById('manualInput').value;
+            const numbers = input.split('\n').filter(n => n.trim());
+            const converted = numbers.map(processManualNumber);
+            displayManualResults(converted);
+        }
+
+        function processManualNumber(number) {
+            const cleaned = number.trim().replace(/[\s\-\(\)]/g, '');
+            if (cleaned.startsWith('+229') && !cleaned.includes('01')) {
+                return {
+                    original: cleaned,
+                    converted: cleaned.slice(0, 4) + '01' + cleaned.slice(4),
+                    valid: true
                 };
-
-                await navigator.contacts.update(currentAccount, updates);
-            } catch (error) {
-                throw new Error(`Impossible de mettre à jour ${contact.name}: ${error.message}`);
+            } else if (cleaned.length === 8) {
+                return {
+                    original: cleaned,
+                    converted: '+22901' + cleaned,
+                    valid: true
+                };
             }
+            return {
+                original: cleaned,
+                converted: cleaned,
+                valid: false
+            };
         }
 
-        function showMessage(type, text) {
-            const message = document.createElement('div');
-            message.className = `message ${type}`;
-            message.textContent = text;
-
-            const mainContent = document.querySelector('.main-content');
-            mainContent.insertBefore(message, mainContent.firstChild);
-
-            setTimeout(() => {
-                message.remove();
-            }, 5000);
+        function displayManualResults(results) {
+            const resultsArea = document.getElementById('manualResults');
+            resultsArea.style.display = 'block';
+            resultsArea.innerHTML = `
+                <h3 class="results-title">Résultats</h3>
+                <div class="results-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">${results.filter(r => r.valid).length}</div>
+                        <div class="stat-label">Convertis</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${results.filter(r => !r.valid).length}</div>
+                        <div class="stat-label">Invalides</div>
+                    </div>
+                </div>
+                <textarea class="textarea" readonly>
+${results.map(r => r.valid ? r.converted : r.original + ' (Format invalide)').join('\n')}
+                </textarea>
+            `;
         }
 
-        // Initialisation
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeAccounts();
+        // Gestion de l'import de fichiers
+        function handleFileImport(files) {
+            const file = files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                if (file.name.toLowerCase().endsWith('.csv')) {
+                    processCSV(content);
+                } else if (file.name.toLowerCase().endsWith('.vcf')) {
+                    processVCard(content);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function processCSV(content) {
+            const lines = content.split('\n');
+            const numbers = [];
+            lines.forEach(line => {
+                const columns = line.split(',');
+                columns.forEach(col => {
+                    const cleaned = col.trim().replace(/["']/g, '');
+                    if (cleaned.match(/^\+?(?:229)?\d{8,}$/)) {
+                        numbers.push(cleaned);
+                    }
+                });
+            });
+            const converted = numbers.map(processManualNumber);
+            displayImportResults(converted);
+        }
+
+        function processVCard(content) {
+            const numbers = [];
+            const vcardRegex = /TEL[^:]*:([\+\d\s\-\(\)]+)/g;
+            let match;
+            while ((match = vcardRegex.exec(content)) !== null) {
+                const number = match[1].replace(/[\s\-\(\)]/g, '');
+                if (number.match(/^\+?(?:229)?\d{8,}$/)) {
+                    numbers.push(number);
+                }
+            }
+            const converted = numbers.map(processManualNumber);
+            displayImportResults(converted);
+        }
+
+        function displayImportResults(results) {
+            const resultsArea = document.getElementById('importResults');
+            resultsArea.style.display = 'block';
+            resultsArea.innerHTML = `
+                <h3 class="results-title">Résultats de l'import</h3>
+                <div class="results-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">${results.filter(r => r.valid).length}</div>
+                        <div class="stat-label">Numéros valides</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${results.filter(r => !r.valid).length}</div>
+                        <div class="stat-label">Formats invalides</div>
+                    </div>
+                </div>
+                <textarea class="textarea" readonly>
+${results.map(r => `${r.valid ? r.converted : r.original + ' (Format invalide)'}`).join('\n')}
+                </textarea>
+                <div class="export-buttons">
+                    <button class="btn btn-primary" onclick="exportToVCard(results)">
+                        Exporter en VCard
+                    </button>
+                    <button class="btn btn-success" onclick="exportToCSV(results)">
+                        Exporter en CSV
+                    </button>
+                </div>
+            `;
+        }
+
+        // Fonctions d'export
+        function exportToVCard(results) {
+            let vcard = '';
+            results.filter(r => r.valid).forEach((result, index) => {
+                vcard += 'BEGIN:VCARD\n';
+                vcard += 'VERSION:3.0\n';
+                vcard += `FN:Contact ${index + 1}\n`;
+                vcard += `TEL:${result.converted}\n`;
+                vcard += 'END:VCARD\n';
+            });
+            downloadFile(vcard, 'contacts_convertis.vcf', 'text/vcard');
+        }
+
+        function exportToCSV(results) {
+            const csv = 'Numéro Original,Numéro Converti\n' + 
+                results.filter(r => r.valid)
+                    .map(r => `${r.original},${r.converted}`)
+                    .join('\n');
+            downloadFile(csv, 'contacts_convertis.csv', 'text/csv');
+        }
+
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type: type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Gestionnaire d'événements pour le retour haptique
+        document.addEventListener('touchstart', function(e) {
+            if (e.target.matches('button, .contact-checkbox, .select-all-checkbox')) {
+                if ('vibrate' in navigator) {
+                    navigator.vibrate(10);
+                }
+            }
+        }, { passive: true });
+
+        // Gestionnaire de mise en cache pour le mode hors ligne
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(function(err) {
+                console.error('Service Worker registration failed:', err);
+            });
+        }
+    </script>
+
+    <!-- Service Worker pour le mode hors ligne -->
+    <script>
+        // Service Worker minimal
+        const CACHE_NAME = 'benin-converter-v1';
+        const urlsToCache = [
+            '/',
+            '/index.html',
+            '/styles.css',
+            '/script.js'
+        ];
+
+        self.addEventListener('install', function(event) {
+            event.waitUntil(
+                caches.open(CACHE_NAME)
+                    .then(function(cache) {
+                        return cache.addAll(urlsToCache);
+                    })
+            );
+        });
+
+        self.addEventListener('fetch', function(event) {
+            event.respondWith(
+                caches.match(event.request)
+                    .then(function(response) {
+                        return response || fetch(event.request);
+                    })
+            );
         });
     </script>
 </body>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mistral AI Vision</title>
+    <title>Interface Mistral AI Complète</title>
     <style>
         :root {
             --primary-color: #2563eb;
@@ -11,25 +11,30 @@
             --background-color: #f3f4f6;
             --text-color: #1f2937;
             --error-color: #dc2626;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --border-color: #e5e7eb;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
         }
 
         body {
             background-color: var(--background-color);
             color: var(--text-color);
             line-height: 1.6;
+            min-height: 100vh;
+            padding: 1rem;
         }
 
         .container {
             max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+            margin: 0 auto;
+            padding: 1rem;
         }
 
         .app-container {
@@ -51,11 +56,85 @@
         }
 
         .header p {
-            color: #6b7280;
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--background-color);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-color);
+        }
+
+        .tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .tab:hover:not(.active) {
+            background: #e5e7eb;
+        }
+
+        .tab[data-tab="vision"] {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .tab[data-tab="vision"]:hover:not(.active) {
+            background-color: #059669;
+        }
+
+        .image-upload-container {
+            margin-bottom: 1rem;
+            padding: 2rem;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .image-upload-container:hover {
+            border-color: var(--primary-color);
+            background: #f8fafc;
+        }
+
+        .image-upload-container.drag-over {
+            border-color: var(--success-color);
+            background: #f0fdf4;
+        }
+
+        .image-preview {
+            max-width: 300px;
+            max-height: 300px;
+            margin: 1rem auto;
+            border-radius: 8px;
+            display: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .file-input {
+            display: none;
         }
 
         .messages-container {
-            height: 600px;
+            height: 500px;
             overflow-y: auto;
             background: var(--background-color);
             border-radius: 8px;
@@ -67,13 +146,19 @@
             margin-bottom: 1rem;
             padding: 1rem;
             border-radius: 8px;
-            max-width: 80%;
+            max-width: 85%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .message.user {
             background: white;
             margin-left: auto;
-            border: 1px solid #e5e7eb;
+            border: 1px solid var(--border-color);
         }
 
         .message.assistant {
@@ -88,44 +173,34 @@
         }
 
         .message img {
-            max-width: 100%;
+            max-width: 200px;
             border-radius: 4px;
-            margin: 0.5rem 0;
+            margin-top: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .input-container {
             display: flex;
-            flex-direction: column;
             gap: 1rem;
-        }
-
-        .input-row {
-            display: flex;
-            gap: 1rem;
+            margin-top: 1rem;
         }
 
         .input-field {
             flex: 1;
             padding: 0.75rem;
-            border: 2px solid #e5e7eb;
+            border: 2px solid var(--border-color);
             border-radius: 8px;
             font-size: 1rem;
-            transition: border-color 0.3s ease;
-            min-height: 100px;
-            resize: vertical;
+            transition: all 0.3s ease;
         }
 
         .input-field:focus {
             outline: none;
             border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
         }
 
-        .buttons-container {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .button {
+        .send-button {
             padding: 0.75rem 1.5rem;
             background: var(--primary-color);
             color: white;
@@ -136,29 +211,78 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            transition: background 0.3s ease;
+            transition: all 0.3s ease;
         }
 
-        .button:hover {
+        .send-button:hover:not(:disabled) {
             background: var(--secondary-color);
         }
 
-        .button.secondary {
-            background: #6b7280;
-        }
-
-        .button.secondary:hover {
-            background: #4b5563;
-        }
-
-        .button:disabled {
+        .send-button:disabled {
             background: #9ca3af;
             cursor: not-allowed;
+        }
+
+        .options-panel {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .options-panel h3 {
+            margin-bottom: 1rem;
+            color: var(--text-color);
+            font-size: 1.1rem;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .option-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .option-item label {
+            font-size: 0.9rem;
+            color: #4b5563;
+        }
+
+        .option-item select,
+        .option-item input {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .option-item select:focus,
+        .option-item input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
         }
 
         .error {
             background: #fee2e2;
             color: var(--error-color);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info {
+            background: #e0f2fe;
+            color: #0284c7;
             padding: 1rem;
             border-radius: 8px;
             margin-bottom: 1rem;
@@ -182,66 +306,55 @@
         }
 
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
+            to { transform: rotate(360deg); }
+        }
+
+        .model-info {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            .app-container {
+                padding: 1rem;
+            }
+
+            .tabs {
+                gap: 0.5rem;
+            }
+
+            .tab {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .messages-container {
+                height: 400px;
+            }
+
+            .message {
+                max-width: 95%;
             }
         }
 
-        .image-preview {
-            max-width: 300px;
-            margin-top: 1rem;
-        }
+        @media (max-width: 480px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
 
-        .options-panel {
-            margin-bottom: 1rem;
-            padding: 1rem;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #e5e7eb;
-        }
+            .input-container {
+                flex-direction: column;
+            }
 
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-        }
-
-        .option-item {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .option-item label {
-            font-size: 0.875rem;
-            color: #4b5563;
-        }
-
-        .option-item select,
-        .option-item input {
-            padding: 0.5rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 4px;
-        }
-
-        #dropZone {
-            border: 2px dashed #e5e7eb;
-            border-radius: 8px;
-            padding: 2rem;
-            text-align: center;
-            background: #f9fafb;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        #dropZone.dragover {
-            border-color: var(--primary-color);
-            background: #f0f9ff;
-        }
-
-        #dropZone p {
-            color: #6b7280;
-            margin-bottom: 1rem;
+            .send-button {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -249,23 +362,69 @@
     <div class="container">
         <div class="app-container">
             <div class="header">
-                <h1>Mistral AI Vision</h1>
-                <p>Chat avec support d'images</p>
+                <h1>Interface Mistral AI</h1>
+                <p>Chat, Vision, et Embeddings en un seul endroit</p>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" data-tab="chat">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Chat
+                </button>
+                <button class="tab" data-tab="vision">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 8V4a2 2 0 0 1 2-2h4"></path>
+                        <path d="M16 2h4a2 2 0 0 1 2 2v4"></path>
+                        <path d="M20 16v4a2 2 0 0 1-2 2h-4"></path>
+                        <path d="M8 20H4a2 2 0 0 1-2-2v-4"></path>
+                    </svg>
+                    Vision
+                </button>
+                <button class="tab" data-tab="embeddings">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2"></path>
+                        <path d="M6 8a2 2 0 0 1 2-2h8"></path>
+                        <path d="M18 16a2 2 0 0 1-2 2H8"></path>
+                    </svg>
+                    Embeddings
+                </button>
+            </div>
+
+            <div id="vision-container" style="display: none;">
+                <div class="image-upload-container" id="drop-zone">
+                    <input type="file" accept="image/*" class="file-input" id="file-input">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7"></path>
+                        <path d="M16 5V3"></path>
+                        <path d="M8 9l4 4"></path>
+                        <path d="M12 13l4-4"></path>
+                    </svg>
+                    <p>Glissez une image ici ou cliquez pour sélectionner</p>
+                    <img id="image-preview" class="image-preview">
+                </div>
             </div>
 
             <div class="options-panel">
+                <h3>Options</h3>
                 <div class="options-grid">
                     <div class="option-item">
                         <label for="model-select">Modèle</label>
                         <select id="model-select">
-                            <option value="mistral-large-latest">Mistral Large</option>
-                            <option value="mistral-medium-latest">Mistral Medium</option>
                             <option value="mistral-small-latest">Mistral Small</option>
+                            <option value="mistral-medium-latest">Mistral Medium</option>
+                            <option value="pixtral-12b-2409">Pixtral (Vision)</option>
                         </select>
+                        <div class="model-info" id="model-info"></div>
                     </div>
                     <div class="option-item">
                         <label for="temperature">Température (0-1)</label>
                         <input type="number" id="temperature" min="0" max="1" step="0.1" value="0.7">
+                    </div>
+                    <div class="option-item">
+                        <label for="max-tokens">Tokens maximum</label>
+                        <input type="number" id="max-tokens" min="1" max="4096" value="300">
                     </div>
                 </div>
             </div>
@@ -273,35 +432,21 @@
             <div class="messages-container" id="messages"></div>
 
             <div class="input-container">
-                <div id="dropZone">
-                    <p>Glissez-déposez une image ici ou cliquez pour sélectionner</p>
-                    <button class="button secondary">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                            <polyline points="21 15 16 10 5 21"></polyline>
-                        </svg>
-                        Sélectionner une image
-                    </button>
-                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
-                </div>
-
-                <div class="input-row">
-                    <textarea class="input-field" id="input-field" placeholder="Décrivez votre image ou posez une question..."></textarea>
-                    <button class="button" id="send-button">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 2L11 13"></path>
-                            <path d="M22 2L15 22L11 13L2 9L22 2z"></path>
-                        </svg>
-                        Envoyer
-                    </button>
-                </div>
+                <input type="text" class="input-field" id="input-field" placeholder="Entrez votre message...">
+                <button class="send-button" id="send-button">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 2L11 13"></path>
+                        <path d="M22 2L15 22L11 13L2 9L22 2z"></path>
+                    </svg>
+                    Envoyer
+                </button>
             </div>
         </div>
     </div>
 
     <script>
         const API_KEY = 'Ir4if178akPjDIbcjOhlHE7xExppC83w';
+        let activeTab = 'chat';
         let isLoading = false;
         let currentImage = null;
 
@@ -309,54 +454,109 @@
         const messagesContainer = document.getElementById('messages');
         const inputField = document.getElementById('input-field');
         const sendButton = document.getElementById('send-button');
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
+        const tabs = document.querySelectorAll('.tab');
         const modelSelect = document.getElementById('model-select');
         const temperatureInput = document.getElementById('temperature');
+        const maxTokensInput = document.getElementById('max-tokens');
+        const visionContainer = document.getElementById('vision-container');
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const imagePreview = document.getElementById('image-preview');
+        const modelInfo = document.getElementById('model-info');
+
+        // Modèle info descriptions
+        const modelDescriptions = {
+            'mistral-small-latest': 'Modèle rapide et efficace pour les tâches générales',
+            'mistral-medium-latest': 'Équilibre entre performance et rapidité',
+            'pixtral-12b-2409': 'Modèle spécialisé pour l\'analyse d\'images'
+        };
 
         // Event Listeners
+        modelSelect.addEventListener('change', (e) => {
+            modelInfo.textContent = modelDescriptions[e.target.value] || '';
+        });
+
+        // Vision handling
         dropZone.addEventListener('click', () => fileInput.click());
         dropZone.addEventListener('dragover', (e) => {
             e.preventDefault();
-            dropZone.classList.add('dragover');
+            dropZone.classList.add('drag-over');
         });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
-        dropZone.addEventListener('drop', handleDrop);
-        fileInput.addEventListener('change', handleFileSelect);
-        sendButton.addEventListener('click', handleSend);
-        inputField.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
-            }
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('drag-over');
         });
-
-        function handleDrop(e) {
+        dropZone.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropZone.classList.remove('dragover');
+            dropZone.classList.remove('drag-over');
             const file = e.dataTransfer.files[0];
-            if (file && file.type.startsWith('image/')) {
-                handleImage(file);
-            }
-        }
+            handleImageUpload(file);
+        });
 
-        function handleFileSelect(e) {
+        fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
-            if (file) {
-                handleImage(file);
+            handleImageUpload(file);
+        });
+
+        function handleImageUpload(file) {
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentImage = e.target.result;
+                    imagePreview.src = currentImage;
+                    imagePreview.style.display = 'block';
+                    addSystemMessage(`Image chargée : ${file.name}`);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                showError('Veuillez sélectionner un fichier image valide.');
             }
         }
 
-        function handleImage(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                currentImage = e.target.result;
-                addMessage('Image chargée:', 'user', currentImage);
-            };
-            reader.readAsDataURL(file);
+        // Tabs handling
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                activeTab = tab.dataset.tab;
+                visionContainer.style.display = activeTab === 'vision' ? 'block' : 'none';
+                updateModelForTab();
+                updatePlaceholder();
+            });
+        });
+
+        function updateModelForTab() {
+            switch(activeTab) {
+                case 'vision':
+                    modelSelect.value = 'pixtral-12b-2409';
+                    modelSelect.disabled = true;
+                    break;
+                case 'embeddings':
+                    modelSelect.value = 'mistral-embed';
+                    modelSelect.disabled = true;
+                    break;
+                default:
+                    modelSelect.disabled = false;
+                    modelSelect.value = 'mistral-small-latest';
+            }
+            modelInfo.textContent = modelDescriptions[modelSelect.value] || '';
         }
 
-        function addMessage(content, role, image = null) {
+        function updatePlaceholder() {
+            switch(activeTab) {
+                case 'chat':
+                    inputField.placeholder = "Entrez votre message...";
+                    break;
+                case 'vision':
+                    inputField.placeholder = "Posez une question sur l'image...";
+                    break;
+                case 'embeddings':
+                    inputField.placeholder = "Entrez le texte pour générer des embeddings...";
+                    break;
+            }
+        }
+
+        // Message handling
+        function addMessage(content, role, imageUrl = null) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${role}`;
             
@@ -364,19 +564,27 @@
             headerDiv.className = 'header';
             headerDiv.textContent = role === 'user' ? 'Vous' : 'Assistant';
             
-            messageDiv.appendChild(headerDiv);
-
-            if (image) {
-                const imgElement = document.createElement('img');
-                imgElement.src = image;
-                imgElement.alt = 'Image envoyée';
-                messageDiv.appendChild(imgElement);
-            }
-
             const contentDiv = document.createElement('div');
             contentDiv.textContent = content;
-            messageDiv.appendChild(contentDiv);
             
+            messageDiv.appendChild(headerDiv);
+            messageDiv.appendChild(contentDiv);
+
+            if (imageUrl) {
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = 'Image envoyée';
+                messageDiv.appendChild(img);
+            }
+
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function addSystemMessage(content) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'info';
+            messageDiv.textContent = content;
             messagesContainer.appendChild(messageDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
@@ -384,7 +592,14 @@
         function showError(message) {
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error';
-            errorDiv.textContent = message;
+            errorDiv.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                ${message}
+            `;
             messagesContainer.appendChild(errorDiv);
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
@@ -405,68 +620,133 @@
             }
         }
 
+        // API Handling
         async function handleSend() {
             const input = inputField.value.trim();
-            if ((!input && !currentImage) || isLoading) return;
+            if ((!input && activeTab !== 'vision') || isLoading) return;
 
-            addMessage(input, 'user');
+            if (activeTab === 'vision' && !currentImage) {
+                showError("Veuillez d'abord sélectionner une image.");
+                return;
+            }
+
+            addMessage(input, 'user', activeTab === 'vision' ? currentImage : null);
             inputField.value = '';
             setLoading(true);
 
             try {
-                const messages = [];
-                
-                if (currentImage) {
-                    messages.push({
-                        role: 'user',
-                        content: [
-                            {
-                                type: 'image_url',
-                                image_url: {
-                                    url: currentImage
-                                }
-                            }
-                        ]
-                    });
+                switch(activeTab) {
+                    case 'chat':
+                        await handleChat(input);
+                        break;
+                    case 'vision':
+                        await handleVision(input);
+                        break;
+                    case 'embeddings':
+                        await handleEmbeddings(input);
+                        break;
                 }
-
-                if (input) {
-                    messages.push({
-                        role: 'user',
-                        content: input
-                    });
-                }
-
-                const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${API_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: modelSelect.value,
-                        messages: messages,
-                        temperature: parseFloat(temperatureInput.value)
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Erreur API: ${response.status}`);
-                }
-
-                const data = await response.json();
-                addMessage(data.choices[0].message.content, 'assistant');
-                
-                // Reset current image after sending
-                currentImage = null;
-                dropZone.querySelector('p').textContent = 'Glissez-déposez une image ici ou cliquez pour sélectionner';
-
             } catch (error) {
                 showError(error.message);
             } finally {
                 setLoading(false);
             }
         }
+
+        async function handleChat(input) {
+            const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: modelSelect.value,
+                    messages: [{ role: 'user', content: input }],
+                    temperature: parseFloat(temperatureInput.value),
+                    max_tokens: parseInt(maxTokensInput.value)
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erreur API: ${response.status}`);
+            }
+
+            const data = await response.json();
+            addMessage(data.choices[0].message.content, 'assistant');
+        }
+
+        async function handleVision(input) {
+            const messages = [{
+                role: 'user',
+                content: [
+                    {
+                        type: 'text',
+                        text: input || "Que voyez-vous sur cette image ?"
+                    },
+                    {
+                        type: 'image_url',
+                        image_url: currentImage
+                    }
+                ]
+            }];
+
+            const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: 'pixtral-12b-2409',
+                    messages: messages,
+                    max_tokens: parseInt(maxTokensInput.value)
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erreur API: ${response.status}`);
+            }
+
+            const data = await response.json();
+            addMessage(data.choices[0].message.content, 'assistant');
+        }
+
+        async function handleEmbeddings(input) {
+            const response = await fetch('https://api.mistral.ai/v1/embeddings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${API_KEY}`
+                },
+                body: JSON.stringify({
+                    model: 'mistral-embed',
+                    input: input
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Erreur API: ${response.status}`);
+            }
+
+            const data = await response.json();
+            addMessage(
+                `Embeddings générés avec succès. Premiers éléments: ${data.data[0].embedding.slice(0, 5).join(', ')}...`, 
+                'assistant'
+            );
+        }
+
+        // Initialize
+        sendButton.addEventListener('click', handleSend);
+        inputField.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
+            }
+        });
+
+        // Set initial model info
+        modelInfo.textContent = modelDescriptions[modelSelect.value];
     </script>
 </body>
 </html>

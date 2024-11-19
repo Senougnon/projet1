@@ -7,15 +7,14 @@
     <style>
         :root {
             --primary-color: #1a73e8;
-            --success-color: #34a853;
+            --accent-color: #34a853;
+            --danger-color: #ea4335;
             --warning-color: #fbbc04;
-            --error-color: #ea4335;
-            --background-color: #f8f9fa;
             --surface-color: #ffffff;
+            --background-color: #f8f9fa;
             --text-primary: #202124;
             --text-secondary: #5f6368;
-            --spacing-unit: 16px;
-            --border-radius: 12px;
+            --spacing-unit: 8px;
             --safe-area-inset-top: env(safe-area-inset-top, 0px);
             --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
         }
@@ -25,163 +24,206 @@
             margin: 0;
             padding: 0;
             -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            overscroll-behavior-y: contain;
         }
 
         body {
-            background-color: var(--background-color);
-            color: var(--text-primary);
-            line-height: 1.5;
-            padding: calc(var(--spacing-unit) + var(--safe-area-inset-top)) var(--spacing-unit) calc(var(--spacing-unit) + var(--safe-area-inset-bottom));
-            -webkit-font-smoothing: antialiased;
+            padding: calc(var(--spacing-unit) * 2 + var(--safe-area-inset-top)) 
+                    calc(var(--spacing-unit) * 2) 
+                    calc(var(--spacing-unit) * 2 + var(--safe-area-inset-bottom));
         }
 
         .app-container {
             max-width: 600px;
             margin: 0 auto;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
+        /* En-tête */
         .header {
             position: sticky;
             top: 0;
-            z-index: 100;
             background-color: var(--surface-color);
-            padding: var(--spacing-unit);
-            border-radius: var(--border-radius) var(--border-radius) 0 0;
+            padding: calc(var(--spacing-unit) * 2);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 100;
+            border-radius: 16px 16px 0 0;
         }
 
-        h1 {
+        .header h1 {
             font-size: 1.5rem;
-            font-weight: 600;
+            color: var(--primary-color);
             text-align: center;
             margin-bottom: var(--spacing-unit);
-            color: var(--primary-color);
         }
 
         .info-banner {
-            background-color: rgba(26,115,232,0.1);
-            padding: var(--spacing-unit);
-            border-radius: var(--border-radius);
-            margin-bottom: var(--spacing-unit);
+            background-color: #e3f2fd;
+            padding: calc(var(--spacing-unit) * 2);
+            border-radius: 12px;
+            margin: var(--spacing-unit) 0;
             font-size: 0.9rem;
-            border-left: 4px solid var(--primary-color);
+            line-height: 1.4;
         }
 
+        /* Navigation */
         .nav-tabs {
             display: flex;
-            gap: 8px;
-            margin-bottom: var(--spacing-unit);
-            overflow-x: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 4px;
-        }
-
-        .nav-tabs::-webkit-scrollbar {
-            display: none;
-        }
-
-        .tab-button {
-            flex: 1;
-            min-width: max-content;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 20px;
-            background-color: transparent;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
-
-        .tab-button.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .content-card {
+            justify-content: space-around;
             background-color: var(--surface-color);
-            border-radius: var(--border-radius);
-            padding: var(--spacing-unit);
-            margin-bottom: var(--spacing-unit);
+            padding: calc(var(--spacing-unit)) 0;
+            margin-bottom: calc(var(--spacing-unit) * 2);
+            border-radius: 24px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
-        .action-button {
-            width: 100%;
-            padding: 16px;
+        .nav-tab {
+            flex: 1;
+            padding: calc(var(--spacing-unit) * 1.5);
             border: none;
-            border-radius: 24px;
-            background-color: var(--primary-color);
-            color: white;
-            font-size: 1rem;
+            background: none;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
             font-weight: 500;
-            margin: 8px 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            position: relative;
+            transition: color 0.3s;
         }
 
-        .action-button:active {
-            transform: scale(0.98);
-        }
-
-        .secondary-button {
-            background-color: var(--success-color);
-        }
-
-        .outline-button {
-            background-color: transparent;
-            border: 2px solid var(--primary-color);
+        .nav-tab.active {
             color: var(--primary-color);
         }
 
-        .contact-list {
-            max-height: 60vh;
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 25%;
+            width: 50%;
+            height: 3px;
+            background-color: var(--primary-color);
+            border-radius: 1.5px;
+        }
+
+        /* Contenu principal */
+        .main-content {
+            flex: 1;
             overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            margin: var(--spacing-unit) 0;
-            border-radius: var(--border-radius);
             background-color: var(--surface-color);
+            border-radius: 0 0 16px 16px;
+            padding: calc(var(--spacing-unit) * 2);
+        }
+
+        .tab-content {
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Contacts du téléphone */
+        .account-selector {
+            background-color: var(--surface-color);
+            padding: calc(var(--spacing-unit) * 2);
+            border-radius: 12px;
+            margin-bottom: calc(var(--spacing-unit) * 2);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .account-selector select {
+            width: 100%;
+            padding: calc(var(--spacing-unit) * 1.5);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+
+        .contacts-list {
+            background-color: var(--surface-color);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+
+        .contacts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: calc(var(--spacing-unit) * 2);
+            border-bottom: 1px solid #eee;
+        }
+
+        .select-all-container {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-unit);
         }
 
         .contact-item {
-            padding: 12px 16px;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+            padding: calc(var(--spacing-unit) * 2);
+            border-bottom: 1px solid #eee;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: calc(var(--spacing-unit) * 2);
+        }
+
+        .contact-item:last-child {
+            border-bottom: none;
         }
 
         .contact-checkbox {
             width: 24px;
             height: 24px;
             border-radius: 6px;
-            border: 2px solid var(--primary-color);
+            border: 2px solid #ddd;
             appearance: none;
-            -webkit-appearance: none;
             position: relative;
             cursor: pointer;
+            flex-shrink: 0;
         }
 
         .contact-checkbox:checked {
             background-color: var(--primary-color);
+            border-color: var(--primary-color);
         }
 
         .contact-checkbox:checked::after {
-            content: "✓";
+            content: '';
             position: absolute;
-            color: white;
-            font-size: 16px;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            left: 7px;
+            top: 3px;
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
         }
 
         .contact-info {
@@ -198,7 +240,7 @@
             font-size: 0.9rem;
         }
 
-        .status-badge {
+        .contact-status {
             padding: 4px 8px;
             border-radius: 12px;
             font-size: 0.8rem;
@@ -206,44 +248,52 @@
         }
 
         .status-warning {
-            background-color: rgba(251,188,4,0.1);
-            color: var(--warning-color);
+            background-color: #fff3e0;
+            color: #f57c00;
         }
 
         .status-success {
-            background-color: rgba(52,168,83,0.1);
-            color: var(--success-color);
+            background-color: #e8f5e9;
+            color: #2e7d32;
         }
 
-        .floating-action-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: var(--surface-color);
-            padding: var(--spacing-unit);
-            padding-bottom: calc(var(--spacing-unit) + var(--safe-area-inset-bottom));
-            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            z-index: 1000;
-        }
-
-        .selection-controls {
+        /* Boutons et actions */
+        .action-button {
+            width: 100%;
+            padding: calc(var(--spacing-unit) * 2);
+            border: none;
+            border-radius: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: calc(var(--spacing-unit) * 2);
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 8px 0;
+            justify-content: center;
+            gap: var(--spacing-unit);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .action-button:active {
+            transform: scale(0.98);
+        }
+
+        .action-button.secondary {
+            background-color: var(--accent-color);
+        }
+
+        /* Progress bar */
+        .progress-container {
+            margin: calc(var(--spacing-unit) * 2) 0;
         }
 
         .progress-bar {
-            width: 100%;
             height: 4px;
-            background-color: rgba(0,0,0,0.1);
+            background-color: #e0e0e0;
             border-radius: 2px;
             overflow: hidden;
-            margin: 8px 0;
         }
 
         .progress-fill {
@@ -253,46 +303,27 @@
             transition: width 0.3s ease;
         }
 
-        @media (display-mode: standalone) {
-            body {
-                padding-top: env(safe-area-inset-top);
-                padding-bottom: env(safe-area-inset-bottom);
-            }
+        /* Messages et notifications */
+        .message {
+            padding: calc(var(--spacing-unit) * 2);
+            border-radius: 12px;
+            margin-bottom: calc(var(--spacing-unit) * 2);
+            animation: slideIn 0.3s ease;
         }
 
-        .textarea-container {
-            position: relative;
-            margin: var(--spacing-unit) 0;
+        .message.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
         }
 
-        textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 12px;
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-            line-height: 1.5;
-            resize: none;
+        .message.warning {
+            background-color: #fff3e0;
+            color: #f57c00;
         }
 
-        textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(26,115,232,0.1);
-        }
-
-        .file-drop-zone {
-            border: 2px dashed rgba(0,0,0,0.1);
-            border-radius: var(--border-radius);
-            padding: var(--spacing-unit);
-            text-align: center;
-            margin: var(--spacing-unit) 0;
-        }
-
-        .file-drop-zone.dragover {
-            border-color: var(--primary-color);
-            background-color: rgba(26,115,232,0.05);
+        .message.error {
+            background-color: #fef2f2;
+            color: #dc2626;
         }
     </style>
 </head>
@@ -301,312 +332,276 @@
         <div class="header">
             <h1>Convertisseur GSM Bénin</h1>
             <div class="info-banner">
-                <strong>Nouveau format :</strong> Ajout du préfixe "01"<br>
-                Ex: +22960374877 → +2290160374877
-            </div>
-
-            <div class="nav-tabs">
-                <button class="tab-button active" onclick="switchTab('phone')">
-                    Contacts
-                </button>
-                <button class="tab-button" onclick="switchTab('manual')">
-                    Saisie
-                </button>
-                <button class="tab-button" onclick="switchTab('import')">
-                    Import
-                </button>
+                Mise à jour des numéros : ajout du préfixe "01"<br>
+                <small>Ex: +22960374877 → +2290160374877</small>
             </div>
         </div>
 
-<!-- Tab Contents -->
-<div id="phone-tab" class="tab-content active">
-    <div class="content-card">
-        <button class="action-button" onclick="requestContacts()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-            Charger mes contacts
-        </button>
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('contacts')">
+                Contacts
+            </button>
+            <button class="nav-tab" onclick="switchTab('manuel')">
+                Manuel
+            </button>
+            <button class="nav-tab" onclick="switchTab('fichier')">
+                Fichier
+            </button>
+        </nav>
 
-        <div class="selection-controls" id="selectionControls" style="display: none;">
-            <label class="checkbox-container">
-                <input type="checkbox" id="selectAll" onclick="toggleSelectAll()">
-                Tout sélectionner
-            </label>
-            <span id="selectedCount">0 sélectionné</span>
-        </div>
+        <div class="main-content">
+            <!-- Onglet Contacts -->
+            <div id="contacts-tab" class="tab-content active">
+                <div class="account-selector">
+                    <select id="accountSelect" onchange="updateContactsList()">
+                        <option value="">Choisir un compte...</option>
+                        <!-- Sera rempli dynamiquement -->
+                    </select>
+                </div>
 
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressBar"></div>
-        </div>
+                <button class="action-button" onclick="requestContacts()">
+                    Charger les contacts
+                </button>
 
-        <div id="contactsStatus"></div>
-        <div class="contact-list" id="contactsList"></div>
-    </div>
-</div>
+                <div class="contacts-list">
+                    <div class="contacts-header">
+                        <div class="select-all-container">
+                            <input type="checkbox" class="contact-checkbox" id="selectAll" onchange="toggleSelectAll()">
+                            <label for="selectAll">Tout sélectionner</label>
+                        </div>
+                        <span id="selectedCount"></span>
+                    </div>
+                    <div id="contactsList">
+                        <!-- Sera rempli dynamiquement -->
+                    </div>
+                </div>
 
-<div id="manual-tab" class="tab-content">
-    <div class="content-card">
-        <div class="textarea-container">
-            <textarea id="input" placeholder="Entrez vos numéros (un par ligne)
-Exemple :
-+22960374877
-+22997123456
-60374877"></textarea>
-        </div>
-        <button class="action-button" onclick="convertNumbers()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 3h5v5"></path>
-                <path d="M4 20L21 3"></path>
-                <path d="M21 16v5h-5"></path>
-                <path d="M15 15l6 6"></path>
-                <path d="M4 4l5 5"></path>
-            </svg>
-            Convertir
-        </button>
-    </div>
-</div>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar"></div>
+                    </div>
+                </div>
 
-<div id="import-tab" class="tab-content">
-    <div class="content-card">
-        <div class="file-drop-zone" id="dropZone" onclick="triggerFileInput()">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
-                <polyline points="13 2 13 9 20 9"></polyline>
-            </svg>
-            <p>Touchez pour importer</p>
-            <p><small>CSV, VCF (vCard)</small></p>
-            <input type="file" id="fileInput" accept=".csv,.vcf" style="display: none" onchange="handleFiles(this.files)">
+                <button class="action-button secondary" onclick="convertSelectedContacts()">
+                    Convertir les contacts sélectionnés
+                </button>
+            </div>
+
+            <!-- Autres onglets... -->
         </div>
     </div>
-</div>
 
-<!-- Results Section -->
-<div class="content-card" id="resultsCard" style="display: none;">
-    <h2>Résultats</h2>
-    <div class="textarea-container">
-        <textarea id="output" readonly></textarea>
-    </div>
-    <div id="stats"></div>
-</div>
+    <script>
+        // Variables globales
+        let selectedContacts = new Set();
+        let allContacts = [];
+        let currentAccount = null;
 
-<!-- Floating Action Bar -->
-<div class="floating-action-bar" id="actionBar" style="display: none;">
-    <button class="action-button" id="updateContactsBtn" onclick="updateSelectedContacts()">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 9l-7 7-7-7"></path>
-        </svg>
-        Mettre à jour les contacts
-        <span id="updateCount"></span>
-    </button>
-    <div class="export-options">
-        <button class="action-button outline-button" onclick="exportVCard()">
-            Exporter en VCard
-        </button>
-        <button class="action-button outline-button" onclick="copyToClipboard()">
-            Copier les numéros
-        </button>
-    </div>
-</div>
-</div>
-
-<script>
-let selectedContacts = new Set();
-let allContacts = [];
-
-// Gestion des onglets
-function switchTab(tabName) {
-    document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
-    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(tabName + '-tab').style.display = 'block';
-    document.querySelector(`.tab-button[onclick="switchTab('${tabName}')"]`).classList.add('active');
-}
-
-// Gestion des contacts
-async function requestContacts() {
-    try {
-        // Vérifier la disponibilité de l'API Contacts
-        if (!('contacts' in navigator && 'ContactsManager' in window)) {
-            throw new Error("L'API Contacts n'est pas disponible");
+        // Gestion des onglets
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            document.querySelector(`.nav-tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
         }
 
-        const props = ['tel', 'name'];
-        const opts = {multiple: true};
+        // Initialisation des comptes
+        async function initializeAccounts() {
+            try {
+                // Vérifier si l'API Contacts est disponible
+                if (!('contacts' in navigator && 'ContactsManager' in window)) {
+                    throw new Error("L'API Contacts n'est pas disponible");
+                }
 
-        const contacts = await navigator.contacts.select(props, opts);
-        processPhoneContacts(contacts);
-        
-        // Afficher les contrôles de sélection et la barre d'action
-        document.getElementById('selectionControls').style.display = 'flex';
-        document.getElementById('actionBar').style.display = 'block';
-    } catch (error) {
-        showError("Impossible d'accéder aux contacts", error.message);
-    }
-}
-
-function processPhoneContacts(contacts) {
-    allContacts = contacts.map(contact => ({
-        name: contact.name?.[0] || 'Sans nom',
-        tel: contact.tel,
-        id: Math.random().toString(36).substring(7),
-        newNumbers: contact.tel.map(convertNumber)
-    }));
-
-    renderContacts();
-    updateSelectionCount();
-}
-
-function renderContacts() {
-    const listDiv = document.getElementById('contactsList');
-    listDiv.innerHTML = '';
-
-    allContacts.forEach(contact => {
-        const needsUpdate = contact.tel.some((num, i) => num !== contact.newNumbers[i]);
-        
-        const div = document.createElement('div');
-        div.className = 'contact-item';
-        div.innerHTML = `
-            <input type="checkbox" class="contact-checkbox" 
-                   data-id="${contact.id}"
-                   ${selectedContacts.has(contact.id) ? 'checked' : ''}
-                   onchange="toggleContact('${contact.id}')">
-            <div class="contact-info">
-                <div class="contact-name">${contact.name}</div>
-                <div class="contact-number">${contact.newNumbers.join(', ')}</div>
-            </div>
-            <span class="status-badge ${needsUpdate ? 'status-warning' : 'status-success'}">
-                ${needsUpdate ? 'À convertir' : 'OK'}
-            </span>
-        `;
-        listDiv.appendChild(div);
-    });
-}
-
-function toggleContact(id) {
-    if (selectedContacts.has(id)) {
-        selectedContacts.delete(id);
-    } else {
-        selectedContacts.add(id);
-    }
-    updateSelectionCount();
-}
-
-function toggleSelectAll() {
-    const selectAllCheckbox = document.getElementById('selectAll');
-    if (selectAllCheckbox.checked) {
-        allContacts.forEach(contact => selectedContacts.add(contact.id));
-    } else {
-        selectedContacts.clear();
-    }
-    renderContacts();
-    updateSelectionCount();
-}
-
-function updateSelectionCount() {
-    const count = selectedContacts.size;
-    document.getElementById('selectedCount').textContent = `${count} sélectionné${count > 1 ? 's' : ''}`;
-    document.getElementById('updateCount').textContent = count ? `(${count})` : '';
-    document.getElementById('updateContactsBtn').disabled = count === 0;
-}
-
-async function updateSelectedContacts() {
-    const progressBar = document.querySelector('.progress-fill');
-    const selectedContactsData = allContacts.filter(c => selectedContacts.has(c.id));
-    
-    try {
-        // Simuler la mise à jour (à adapter selon l'API réelle du système)
-        for (let i = 0; i < selectedContactsData.length; i++) {
-            const progress = ((i + 1) / selectedContactsData.length) * 100;
-            progressBar.style.width = `${progress}%`;
-            await new Promise(resolve => setTimeout(resolve, 100));
+                // Récupérer les comptes disponibles
+                const accounts = await navigator.contacts.getAccounts();
+                const select = document.getElementById('accountSelect');
+                
+                select.innerHTML = '<option value="">Choisir un compte...</option>';
+                accounts.forEach(account => {
+                    const option = document.createElement('option');
+                    option.value = account.id;
+                    option.textContent = account.name || account.email || account.id;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                showMessage('error', `Erreur d'initialisation: ${error.message}`);
+            }
         }
 
-        // Préparation pour l'export
-        const vcard = generateVCard(selectedContactsData);
-        showSuccess("Contacts convertis avec succès");
-        
-        // Proposer l'export
-        downloadFile(vcard, 'contacts_convertis.vcf', 'text/vcard');
-    } catch (error) {
-        showError("Erreur lors de la mise à jour", error.message);
-    }
-}
+        // Gestion des contacts
+        async function requestContacts() {
+            try {
+                const accountId = document.getElementById('accountSelect').value;
+                if (!accountId) {
+                    throw new Error("Veuillez sélectionner un compte");
+                }
 
-// Utilitaires
-function convertNumber(number) {
-    number = number.replace(/[\s\-\(\)]/g, '');
-    
-    if (number.includes('01')) return number;
-    
-    if (number.startsWith('+229')) {
-        return number.slice(0, 4) + '01' + number.slice(4);
-    } else if (number.length === 8) {
-        return '+22901' + number;
-    } else if (number.startsWith('229')) {
-        return '+' + number.slice(0, 3) + '01' + number.slice(3);
-    }
-    
-    return number;
-}
+                currentAccount = accountId;
+                const props = ['tel', 'name'];
+                const opts = {
+                    multiple: true,
+                    account: accountId
+                };
 
-function showError(title, message) {
-    document.getElementById('contactsStatus').innerHTML = `
-        <div class="error-box">
-            <strong>${title}</strong><br>
-            ${message}
-        </div>
-    `;
-}
+                const contacts = await navigator.contacts.select(props, opts);
+                processContacts(contacts);
+            } catch (error) {
+                showMessage('error', `Erreur: ${error.message}`);
+            }
+        }
 
-function showSuccess(message) {
-    document.getElementById('contactsStatus').innerHTML = `
-        <div class="success-box">
-            ${message}
-        </div>
-    `;
-}
+        function processContacts(contacts) {
+            allContacts = contacts.map(contact => ({
+                id: crypto.randomUUID(),
+                name: contact.name?.[0] || 'Sans nom',
+                originalNumbers: contact.tel,
+                numbers: contact.tel.map(number => convertNumber(number)),
+                needsUpdate: contact.tel.some((num, i) => num !== convertNumber(num))
+            }));
 
-// Export functions
-function generateVCard(contacts) {
-    let vcard = '';
-    contacts.forEach(contact => {
-        vcard += 'BEGIN:VCARD\nVERSION:3.0\n';
-        vcard += `FN:${contact.name}\n`;
-        contact.newNumbers.forEach(num => {
-            vcard += `TEL;TYPE=CELL:${num}\n`;
+            updateContactsList();
+            updateSelectedCount();
+        }
+
+        function convertNumber(number) {
+            const cleaned = number.replace(/[\s\-\(\)]/g, '');
+            
+            if (cleaned.includes('01')) return cleaned;
+            
+            if (cleaned.startsWith('+229')) {
+                return cleaned.slice(0, 4) + '01' + cleaned.slice(4);
+            } else if (cleaned.length === 8) {
+                return '+22901' + cleaned;
+            } else if (cleaned.startsWith('229')) {
+                return '+' + cleaned.slice(0, 3) + '01' + cleaned.slice(3);
+            }
+            
+            return cleaned;
+        }
+
+        function updateContactsList() {
+            const listContainer = document.getElementById('contactsList');
+            listContainer.innerHTML = '';
+
+            allContacts.forEach(contact => {
+                const div = document.createElement('div');
+                div.className = 'contact-item';
+                div.innerHTML = `
+                    <input type="checkbox" 
+                           class="contact-checkbox" 
+                           id="contact-${contact.id}"
+                           ${selectedContacts.has(contact.id) ? 'checked' : ''}
+                           onchange="toggleContact('${contact.id}')">
+                    <div class="contact-info">
+                        <div class="contact-name">${contact.name}</div>
+                        <div class="contact-number">${contact.originalNumbers.join(', ')}</div>
+                        <div class="contact-number">→ ${contact.numbers.join(', ')}</div>
+                    </div>
+                    <span class="contact-status ${contact.needsUpdate ? 'status-warning' : 'status-success'}">
+                        ${contact.needsUpdate ? 'À convertir' : 'À jour'}
+                    </span>
+                `;
+                listContainer.appendChild(div);
+            });
+        }
+
+        function toggleContact(id) {
+            if (selectedContacts.has(id)) {
+                selectedContacts.delete(id);
+            } else {
+                selectedContacts.add(id);
+            }
+            updateSelectedCount();
+            updateSelectAllCheckbox();
+        }
+
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            
+            if (selectAllCheckbox.checked) {
+                allContacts.forEach(contact => selectedContacts.add(contact.id));
+            } else {
+                selectedContacts.clear();
+            }
+            
+            updateContactsList();
+            updateSelectedCount();
+        }
+
+        function updateSelectAllCheckbox() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            selectAllCheckbox.checked = selectedContacts.size === allContacts.length;
+            selectAllCheckbox.indeterminate = selectedContacts.size > 0 && selectedContacts.size < allContacts.length;
+        }
+
+        function updateSelectedCount() {
+            const countElement = document.getElementById('selectedCount');
+            countElement.textContent = `${selectedContacts.size} sélectionné${selectedContacts.size > 1 ? 's' : ''}`;
+        }
+
+        async function convertSelectedContacts() {
+            if (selectedContacts.size === 0) {
+                showMessage('warning', 'Veuillez sélectionner des contacts à convertir');
+                return;
+            }
+
+            const progressBar = document.getElementById('progressBar');
+            const selectedContactsList = allContacts.filter(contact => selectedContacts.has(contact.id));
+            let progress = 0;
+
+            try {
+                for (const contact of selectedContactsList) {
+                    if (contact.needsUpdate) {
+                        await updateContactInPhone(contact);
+                    }
+                    progress += (100 / selectedContactsList.length);
+                    progressBar.style.width = `${progress}%`;
+                }
+
+                showMessage('success', 'Contacts mis à jour avec succès !');
+                await initializeAccounts(); // Rafraîchir la liste des contacts
+                selectedContacts.clear();
+                updateSelectedCount();
+            } catch (error) {
+                showMessage('error', `Erreur lors de la mise à jour : ${error.message}`);
+            } finally {
+                progressBar.style.width = '0%';
+            }
+        }
+
+        async function updateContactInPhone(contact) {
+            try {
+                // Utiliser l'API Contacts pour mettre à jour
+                const updates = {
+                    id: contact.id,
+                    tel: contact.numbers
+                };
+
+                await navigator.contacts.update(currentAccount, updates);
+            } catch (error) {
+                throw new Error(`Impossible de mettre à jour ${contact.name}: ${error.message}`);
+            }
+        }
+
+        function showMessage(type, text) {
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.textContent = text;
+
+            const mainContent = document.querySelector('.main-content');
+            mainContent.insertBefore(message, mainContent.firstChild);
+
+            setTimeout(() => {
+                message.remove();
+            }, 5000);
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeAccounts();
         });
-        vcard += 'END:VCARD\n';
-    });
-    return vcard;
-}
-
-function downloadFile(content, filename, type) {
-    const blob = new Blob([content], { type: type });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-}
-
-function copyToClipboard() {
-    const output = document.getElementById('output');
-    output.select();
-    document.execCommand('copy');
-    showSuccess("Numéros copiés dans le presse-papier");
-}
-
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    // Start with phone contacts tab
-    switchTab('phone');
-});
-</script>
+    </script>
 </body>
 </html>

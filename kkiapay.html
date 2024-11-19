@@ -1,94 +1,630 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-<title>Recraft Image Generator</title>
-<style>
-body {
-  font-family: sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-#imageContainer {
-  width: 512px; /* Adjust as needed */
-  height: 512px; /* Adjust as needed */
-  border: 1px solid #ccc;
-  margin-top: 20px;
-}
-img {
-  max-width: 100%;
-  max-height: 100%;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mistral AI - Eduque moi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1d4ed8;
+            --background-color: #f3f4f6;
+            --text-color: #1f2937;
+            --error-color: #dc2626;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --border-color: #e5e7eb;
+        }
 
-</style>
+        [data-theme="dark"] {
+            --background-color: #1a1a1a;
+            --text-color: #ffffff;
+            --border-color: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            transition: background-color 0.3s ease;
+        }
+
+        .header {
+            background: #fff;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .model-selection {
+            background: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .model-selection select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .chat-container {
+            background: #fff;
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 500px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            background: var(--primary-color);
+            color: #fff;
+            margin-left: auto;
+        }
+
+        .message.assistant {
+            background: var(--background-color);
+            margin-right: auto;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .input-container textarea {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            resize: none;
+        }
+
+        .input-container button {
+            padding: 0.5rem 1rem;
+            background: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .input-container button:hover {
+            background: var(--secondary-color);
+        }
+
+        .credit-info {
+            text-align: right;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Ajout des styles pour les autres fonctionnalités */
+        .file-upload {
+            margin-bottom: 1rem;
+        }
+
+        .file-upload input {
+            display: none;
+        }
+
+        .file-upload label {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: var(--secondary-color);
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .file-preview {
+            margin-top: 1rem;
+            max-width: 200px;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .loading::after {
+            content: "";
+            width: 2rem;
+            height: 2rem;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .message {
+                max-width: 90%;
+            }
+
+            .input-container {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Recraft Image Generator</h1>
+    <div class="header">
+        <h1>Mistral AI</h1>
+        <div class="user-info">
+            <span id="username"></span>
+            <span id="credits"></span>
+            <button onclick="window.location.href='/'">Retour à Eduque moi</button>
+        </div>
+    </div>
 
-  <input type="text" id="prompt" placeholder="Enter prompt">
-  <select id="style">
-    <option value="realistic_image">Realistic Image</option>
-    <option value="digital_illustration">Digital Illustration</option>
-    <option value="vector_illustration">Vector Illustration</option>
-    <option value="icon">Icon</option>
-  </select>
-  <select id="size">
-    <option value="1024x1024">1024x1024</option>
-    <option value="1365x1024">1365x1024</option>
-    <option value="1024x1365">1024x1365</option>
-    <!-- Add other sizes -->
-  </select>
-  <button onclick="generateImage()">Generate</button>
+    <div class="main-container">
+        <div class="model-selection">
+            <select id="modelSelect" onchange="checkModelAccess()">
+                <option value="mistral-small-latest">Mistral Small (1 crédit)</option>
+                <option value="mistral-medium-latest">Mistral Medium (2 crédits)</option>
+                <option value="pixtral-12b-2409">Pixtral Vision (5 crédits)</option>
+            </select>
+        </div>
 
-  <div id="imageContainer"></div>
+        <div class="file-upload">
+            <input type="file" id="fileInput" accept="image/*" onchange="handleFileUpload(event)">
+            <label for="fileInput">
+                <i class="fas fa-upload"></i> Importer une image
+            </label>
+            <img id="imagePreview" class="file-preview" style="display: none;">
+        </div>
 
-<script>
-const apiKey = 'aJE0agNtftcETLBX5EBJhoy2CKvMVfA7SSr6bqsAydjrWl7imvzLHG7E90jp7Rjs'; // Replace with your actual API key
-const apiUrl = 'https://external.api.recraft.ai/v1/images/generations';
+        <div class="chat-container">
+            <div id="messages" class="messages"></div>
+            <div class="input-container">
+                <textarea id="userInput" placeholder="Entrez votre message..." rows="3"></textarea>
+                <button onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
 
-async function generateImage() {
-  const prompt = document.getElementById('prompt').value;
-  const style = document.getElementById('style').value;
-  const size = document.getElementById('size').value;
+        <div class="credit-info">
+            <span id="costEstimate"></span>
+        </div>
+    </div>
 
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        // Configuration Firebase d'Eduque moi
+        const firebaseConfig = {
+            apiKey: "AIzaSyCvizcYorGDPN3GXqma0opp7wAiMkaCt64",
+            authDomain: "gemini-bb56e.firebaseapp.com",
+            databaseURL: "https://gemini-bb56e-default-rtdb.firebaseio.com",
+            projectId: "gemini-bb56e",
+            storageBucket: "gemini-bb56e.appspot.com",
+            messagingSenderId: "277143630015",
+            appId: "1:277143630015:web:78736f2cf52d29495d160a",
+            measurementId: "G-CSN292219J"
+        };
 
-  const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${apiKey}`,
-  };
+        // Initialisation de Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-  const body = {
-    prompt: prompt,
-    style: style,
-    size: size, // Include size in the request
-  };
+        // Variables globales
+        let currentUser = null;
+        const MISTRAL_API_KEY = 'Ir4if178akPjDIbcjOhlHE7xExppC83w';
+        let currentImage = null;
 
-  try {
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: headers,
-      body: JSON.stringify(body),
-    });
+        // Fonction pour charger les données utilisateur depuis Eduque moi
+        async function loadUserData() {
+            const eduqueMoiData = localStorage.getItem('eduqueMoiUserData');
+            if (eduqueMoiData) {
+                currentUser = JSON.parse(eduqueMoiData);
+                document.getElementById('username').textContent = currentUser.username;
+                updateCreditsDisplay();
+            } else {
+                window.location.href = '/'; // Redirection vers Eduque moi si non connecté
+            }
+        }
 
-    if (!response.ok) {
-      const errorData = await response.json(); // Get error details
-      throw new Error(`API Error: ${response.status} - ${errorData.error.message}`); // Throw error with details
-    }
+        // Fonction pour mettre à jour l'affichage des crédits
+        function updateCreditsDisplay() {
+            const creditsElement = document.getElementById('credits');
+            creditsElement.textContent = `Crédits: ${currentUser.paidCredits} payants, ${currentUser.freeCredits} gratuits`;
+        }
 
+        // Fonction pour vérifier l'accès au modèle sélectionné
+        async function checkModelAccess() {
+            const model = document.getElementById('modelSelect').value;
+            const creditCost = getModelCreditCost(model);
+            
+            document.getElementById('costEstimate').textContent = 
+                `Coût par message: ${creditCost} crédit${creditCost > 1 ? 's' : ''}`;
 
-    const data = await response.json();
-    const imageUrl = data.data[0].url;
+            if (!hasEnoughCredits(creditCost)) {
+                alert("Vous n'avez pas assez de crédits pour utiliser ce modèle.");
+                document.getElementById('modelSelect').value = 'mistral-small-latest';
+                return false;
+            }
+            return true;
+        }
 
-    const imageContainer = document.getElementById('imageContainer');
-    imageContainer.innerHTML = `<img src="${imageUrl}" alt="${prompt}">`;
+        // Fonction pour obtenir le coût en crédits d'un modèle
+        function getModelCreditCost(model) {
+            const costs = {
+                'mistral-small-latest': 1,
+                'mistral-medium-latest': 2,
+                'pixtral-12b-2409': 5
+            };
+            return costs[model] || 1;
+        }
 
-  } catch (error) {
-    console.error(error); // Log the detailed error
-    const imageContainer = document.getElementById('imageContainer');
-    imageContainer.innerHTML = `<p style="color: red;">${error.message}</p>`; // Display error to user
-  }
-}
+        // Fonction pour vérifier si l'utilisateur a assez de crédits
+        function hasEnoughCredits(required) {
+            if (currentUser.subscription) return true;
+            return (currentUser.paidCredits + currentUser.freeCredits) >= required;
+        }
 
-</script>
+        // Fonction pour déduire les crédits
+        async function deductCredits(amount) {
+            if (currentUser.subscription) return;
+
+            const userRef = db.ref('users/' + currentUser.username);
+            await userRef.transaction((userData) => {
+                if (userData) {
+                    if (userData.paidCredits >= amount) {
+                        userData.paidCredits -= amount;
+                    } else {
+                        const remaining = amount - userData.paidCredits;
+                        userData.paidCredits = 0;
+                        userData.freeCredits = Math.max(0, userData.freeCredits - remaining);
+                    }
+                }
+                return userData;
+            });
+
+            // Mise à jour des données locales
+            const snapshot = await userRef.once('value');
+            const userData = snapshot.val();
+            currentUser.paidCredits = userData.paidCredits;
+            currentUser.freeCredits = userData.freeCredits;
+            updateCreditsDisplay();
+        }
+
+        // Fonction pour gérer l'upload de fichier
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentImage = e.target.result;
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = currentImage;
+                    preview.style.display = 'block';
+                    document.getElementById('modelSelect').value = 'pixtral-12b-2409';
+                    checkModelAccess();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Fonction pour ajouter un message au chat
+        function addMessage(content, isUser) {
+            const messagesContainer = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'assistant'}`;
+            messageDiv.textContent = content;
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Fonction pour envoyer un message
+        async function sendMessage() {
+            const userInput = document.getElementById('userInput').value.trim();
+            const model = document.getElementById('modelSelect').value;
+            
+            if (!userInput && !currentImage) return;
+            if (!await checkModelAccess()) return;
+
+            const creditCost = getModelCreditCost(model);
+            addMessage(userInput, true);
+            document.getElementById('userInput').value = '';
+
+            try {
+                const messages = [{
+                    role: 'user',
+                    content: currentImage ? [
+                        { type: 'text', text: userInput },
+                        { type: 'image_url', image_url: currentImage }
+                    ] : userInput
+                }];
+
+                const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${MISTRAL_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: messages
+                    })
+                });
+
+                if (!response.ok) throw new Error('Erreur API Mistral');
+
+                const data = await response.json();
+                addMessage(data.choices[0].message.content, false);
+                await deductCredits(creditCost);
+
+                // Réinitialisation de l'image si utilisée
+                if (currentImage) {
+                    currentImage = null;
+                    document.getElementById('imagePreview').style.display = 'none';
+                    document.getElementById('fileInput').value = '';
+                }
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                addMessage("Désolé, une erreur est survenue.", false);
+            }
+        }
+
+        // Initialisation
+        window.onload = () => {
+            loadUserData();
+            checkModelAccess();
+        };
+
+// Suite du script précédent...
+        
+        // Gestion de la touche Entrée
+        document.getElementById('userInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Mise à jour automatique des données utilisateur depuis Firebase
+        function setupUserDataSync() {
+            if (!currentUser) return;
+            
+            const userRef = db.ref('users/' + currentUser.username);
+            userRef.on('value', (snapshot) => {
+                const userData = snapshot.val();
+                if (userData) {
+                    currentUser = {
+                        ...currentUser,
+                        freeCredits: userData.freeCredits,
+                        paidCredits: userData.paidCredits,
+                        subscription: userData.subscription,
+                        subscriptionEndDate: userData.subscriptionEndDate
+                    };
+                    updateCreditsDisplay();
+                    checkModelAccess();
+                }
+            });
+        }
+
+        // Fonction pour enregistrer l'historique des conversations
+        async function saveConversationHistory(message, response) {
+            if (!currentUser) return;
+
+            const conversationRef = db.ref(`users/${currentUser.username}/mistralHistory`);
+            const newConversation = {
+                timestamp: Date.now(),
+                model: document.getElementById('modelSelect').value,
+                message,
+                response,
+                creditsUsed: getModelCreditCost(document.getElementById('modelSelect').value)
+            };
+
+            await conversationRef.push(newConversation);
+        }
+
+        // Fonction pour gérer les erreurs avec notifications
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.classList.add('fade-out');
+                setTimeout(() => notification.remove(), 500);
+            }, 3000);
+        }
+
+        // Fonction pour vérifier la validité de l'abonnement
+        function hasValidSubscription() {
+            if (!currentUser.subscription || !currentUser.subscriptionEndDate) return false;
+            return new Date() < new Date(currentUser.subscriptionEndDate);
+        }
+
+        // Fonction pour vérifier les limites d'utilisation
+        async function checkUsageLimits() {
+            if (hasValidSubscription()) return true;
+
+            const userRef = db.ref(`users/${currentUser.username}/mistralUsage`);
+            const today = new Date().toISOString().split('T')[0];
+            
+            const snapshot = await userRef.child(today).once('value');
+            const usage = snapshot.val() || { count: 0 };
+
+            const FREE_DAILY_LIMIT = 10;
+            if (usage.count >= FREE_DAILY_LIMIT && !hasEnoughCredits(1)) {
+                showNotification(
+                    "Vous avez atteint votre limite quotidienne d'utilisation gratuite. " +
+                    "Veuillez acheter des crédits ou souscrire à un abonnement.",
+                    'warning'
+                );
+                return false;
+            }
+
+            // Mettre à jour le compteur d'utilisation
+            await userRef.child(today).set({
+                count: usage.count + 1
+            });
+
+            return true;
+        }
+
+        // Fonction pour estimer la taille du message et ajuster les crédits nécessaires
+        function estimateMessageCost(message, model) {
+            const baseRate = getModelCreditCost(model);
+            const wordCount = message.trim().split(/\s+/).length;
+            
+            // Augmenter le coût pour les messages très longs
+            if (wordCount > 500) {
+                return Math.ceil(baseRate * 1.5);
+            }
+            return baseRate;
+        }
+
+        // Amélioration de la fonction sendMessage avec gestion avancée
+        async function sendMessage() {
+            const userInput = document.getElementById('userInput').value.trim();
+            const model = document.getElementById('modelSelect').value;
+            
+            if (!userInput && !currentImage) {
+                showNotification('Veuillez entrer un message ou sélectionner une image.', 'error');
+                return;
+            }
+
+            if (!await checkUsageLimits()) return;
+
+            const estimatedCost = estimateMessageCost(userInput, model);
+            if (!await checkModelAccess(estimatedCost)) return;
+
+            // Afficher l'indicateur de chargement
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'loading';
+            document.getElementById('messages').appendChild(loadingDiv);
+
+            try {
+                const messages = [{
+                    role: 'user',
+                    content: currentImage ? [
+                        { type: 'text', text: userInput },
+                        { type: 'image_url', image_url: currentImage }
+                    ] : userInput
+                }];
+
+                const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${MISTRAL_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: messages,
+                        max_tokens: 2000,
+                        temperature: 0.7
+                    })
+                });
+
+                loadingDiv.remove();
+
+                if (!response.ok) {
+                    throw new Error(`Erreur API: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const aiResponse = data.choices[0].message.content;
+
+                addMessage(userInput, true);
+                addMessage(aiResponse, false);
+
+                // Sauvegarder l'historique et mettre à jour les crédits
+                await Promise.all([
+                    saveConversationHistory(userInput, aiResponse),
+                    deductCredits(estimatedCost)
+                ]);
+
+                // Réinitialiser l'interface
+                document.getElementById('userInput').value = '';
+                if (currentImage) {
+                    currentImage = null;
+                    document.getElementById('imagePreview').style.display = 'none';
+                    document.getElementById('fileInput').value = '';
+                }
+
+            } catch (error) {
+                console.error('Erreur:', error);
+                loadingDiv.remove();
+                showNotification(
+                    "Une erreur est survenue lors de l'envoi du message. Veuillez réessayer.",
+                    'error'
+                );
+            }
+        }
+
+        // Initialisation complète
+        window.onload = async () => {
+            await loadUserData();
+            setupUserDataSync();
+            checkModelAccess();
+            
+            // Vérifier si l'utilisateur vient d'Eduque moi
+            if (!currentUser) {
+                showNotification(
+                    "Veuillez vous connecter à Eduque moi pour utiliser cette interface.",
+                    'error'
+                );
+                setTimeout(() => window.location.href = '/', 2000);
+            }
+        };
+    </script>
 </body>
 </html>

@@ -374,7 +374,7 @@
 
     <script>
         // Constantes
-        const MISTRAL_API_KEY = 'YOUR_API_KEY';
+        const MISTRAL_API_KEY = 'Ir4if178akPjDIbcjOhlHE7xExppC83w';
         const MODEL_COSTS = {
             'mistral-small-latest': 1,
             'mistral-medium-latest': 2,
@@ -386,14 +386,22 @@
         let currentUser = null;
         let currentImage = null;
 
-        // Configuration Firebase (à remplacer par vos credentials)
+        // Configuration Firebase
         const firebaseConfig = {
-            // Votre configuration Firebase
+            apiKey: "AIzaSyCvizcYorGDPN3GXqma0opp7wAiMkaCt64",
+            authDomain: "gemini-bb56e.firebaseapp.com",
+            databaseURL: "https://gemini-bb56e-default-rtdb.firebaseio.com",
+            projectId: "gemini-bb56e",
+            storageBucket: "gemini-bb56e.appspot.com",
+            messagingSenderId: "277143630015",
+            appId: "1:277143630015:web:78736f2cf52d29495d160a",
+            measurementId: "G-CSN292219J"
         };
 
         // Initialisation Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+
 
         // Fonction de navigation vers Eduque moi
         function navigateToEduqueMoi() {

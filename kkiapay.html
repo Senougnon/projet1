@@ -389,6 +389,105 @@
                 font-size: 0.75rem;
             }
         }
+            .input-controls {
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-end;
+        padding: 0.5rem;
+        background: white;
+        border-radius: 10px;
+    }
+
+    .file-upload label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        background: var(--primary-color);
+        color: white;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background 0.3s;
+        font-size: 1.25rem; /* Icône plus grande */
+    }
+
+    .file-upload label:active {
+        background: var(--secondary-color);
+        transform: scale(0.95);
+    }
+
+    .send-button {
+        width: 44px;
+        height: 44px;
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem; /* Icône plus grande */
+        padding: 0;
+    }
+
+    .send-button:active {
+        background: var(--secondary-color);
+        transform: scale(0.95);
+    }
+
+    .send-button:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        opacity: 0.7;
+    }
+
+    .send-button i,
+    .file-upload label i {
+        display: inline-block;
+        line-height: 1;
+        width: auto;
+        height: auto;
+    }
+
+    textarea {
+        flex: 1;
+        min-height: 44px;
+        max-height: 120px;
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        resize: none;
+        font-size: 1rem;
+        line-height: 1.4;
+        margin: 0;
+    }
+
+    .input-area {
+        padding: 0.5rem;
+        background: white;
+        border-top: 1px solid var(--border-color);
+    }
+
+    /* Styles spécifiques pour les très petits écrans */
+    @media (max-width: 320px) {
+        .input-controls {
+            gap: 0.5rem;
+        }
+
+        .file-upload label,
+        .send-button {
+            width: 40px;
+            height: 40px;
+        }
+
+        textarea {
+            font-size: 0.95rem;
+            padding: 0.5rem;
+        }
+    }
     </style>
 </head>
 <body>

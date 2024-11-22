@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Convertisseur GSM Bénin</title>
+    <title>Convertisseur GSM Bénin - Evisions</title>
     <style>
         :root {
             --primary-color: #1a73e8;
@@ -34,6 +34,42 @@
             max-width: 100vw;
             overflow-x: hidden;
             padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        /* Company Banner */
+        .company-banner {
+            background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .company-banner h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .company-banner p {
+            font-size: 1rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .services-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .service-tag {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
         }
 
         /* App Container */
@@ -91,6 +127,7 @@
             position: relative;
             transition: color 0.3s;
             scroll-snap-align: start;
+            cursor: pointer;
         }
 
         .tab.active {
@@ -246,24 +283,6 @@
             margin-bottom: 1rem;
         }
 
-        /* Bottom Sheet */
-        .bottom-sheet {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--surface-color);
-            border-radius: 20px 20px 0 0;
-            padding: 1rem;
-            transform: translateY(100%);
-            transition: transform 0.3s ease;
-            z-index: 1000;
-        }
-
-        .bottom-sheet.active {
-            transform: translateY(0);
-        }
-
         /* Checkbox Styles */
         .checkbox-wrapper {
             display: flex;
@@ -279,6 +298,154 @@
             width: 20px;
             height: 20px;
         }
+
+        /* Enhanced Footer Styles */
+        .footer {
+            text-align: center;
+            padding: 2rem 1rem;
+            background: linear-gradient(135deg, #788d01 0%, #292929 100%);
+            margin-top: 2rem;
+            border-radius: 16px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(26, 115, 232, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+            animation: shine 3s infinite linear;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .footer p {
+            margin-bottom: 0.8rem;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .footer strong {
+            color: #FFD700;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer a:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        /* Footer Popup Styles */
+        .footer-popup {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translate(-50%, 200%);
+            width: 90%;
+            max-width: 500px;
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+            color: white;
+        }
+
+        .footer-popup.show {
+            transform: translate(-50%, 0);
+            opacity: 1;
+        }
+
+        .footer-popup .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .footer-popup .close-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: rotate(90deg);
+        }
+
+        .footer-popup p {
+            margin-bottom: 0.8rem;
+            opacity: 0.9;
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .footer-popup strong {
+            color: #FFD700;
+            font-weight: 600;
+        }
+
+        .footer-popup a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .footer-popup a:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .footer p:nth-child(1), .footer-popup p:nth-child(1) { animation-delay: 0.1s; }
+        .footer p:nth-child(2), .footer-popup p:nth-child(2) { animation-delay: 0.2s; }
+        .footer p:nth-child(3), .footer-popup p:nth-child(3) { animation-delay: 0.3s; }
+        .footer p:nth-child(4), .footer-popup p:nth-child(4) { animation-delay: 0.4s; }
 
         /* Toast Notifications */
         .toast {
@@ -300,6 +467,24 @@
             opacity: 1;
         }
 
+        /* Bottom Sheet */
+        .bottom-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface-color);
+            border-radius: 20px 20px 0 0;
+            padding: 1rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .bottom-sheet.active {
+            transform: translateY(0);
+        }
+
         @media (max-width: 380px) {
             .contact-avatar {
                 width: 40px;
@@ -310,8 +495,16 @@
                 padding: 0.75rem;
             }
             
-            .header h1 {
+            .header h1 {font-size: 1.25rem;
+            }
+            
+            .company-banner h2 {
                 font-size: 1.25rem;
+            }
+            
+            .service-tag {
+                font-size: 0.8rem;
+                padding: 0.4rem 0.8rem;
             }
         }
     </style>
@@ -327,21 +520,13 @@
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('manual')">Manuel</button>
-            <button class="tab" onclick="switchTab('contacts')">Contacts</button>
+            <button class="tab active" onclick="switchTab('contacts')">Contacts</button>
+            <button class="tab" onclick="switchTab('manual')">Manuel</button>
             <button class="tab" onclick="switchTab('import')">Importer</button>
         </div>
 
-        <!-- Panneau de saisie manuelle -->
-        <div id="manual-panel" class="panel active">
-            <div class="input-area">
-                <textarea placeholder="Entrez vos numéros (un par ligne)&#10;Exemple:&#10;+22960374877&#10;97123456"></textarea>
-                <button class="button" onclick="convertManualNumbers()">Convertir</button>
-            </div>
-        </div>
-
         <!-- Panneau des contacts -->
-        <div id="contacts-panel" class="panel">
+        <div id="contacts-panel" class="panel active">
             <button class="button" onclick="requestContacts()">
                 Accéder aux contacts
             </button>
@@ -356,6 +541,14 @@
             <div class="contact-list" id="contacts-list"></div>
         </div>
 
+        <!-- Panneau de saisie manuelle -->
+        <div id="manual-panel" class="panel">
+            <div class="input-area">
+                <textarea placeholder="Entrez vos numéros (un par ligne)&#10;Exemple:&#10;+22960374877&#10;97123456"></textarea>
+                <button class="button" onclick="convertManualNumbers()">Convertir</button>
+            </div>
+        </div>
+
         <!-- Panneau d'import -->
         <div id="import-panel" class="panel">
             <div class="file-upload-area">
@@ -366,6 +559,25 @@
                 <p class="text-center">Formats supportés : CSV, VCF</p>
             </div>
         </div>
+
+        <!-- Footer avec informations de contact -->
+        <div class="footer">
+            <p>Développé par <strong>Evisions</strong></p>
+            <p>Pour vos projets digitaux, contactez nous :</p>
+            <p><a href="http://wa.me/22960374877">+229 60374877</a></p>
+            <p>Services : Création de sites web, applications mobiles,<br>
+               maintenance réseau & informatique, installation WiFi zone<br>
+               et solutions digitales sur mesure</p>
+        </div>
+    </div>
+
+    <!-- Footer Popup -->
+    <div class="footer-popup" id="footer-popup">
+        <button class="close-btn" onclick="closeFooterPopup()">×</button>
+        <p>Développé par <strong>Evisions</strong></p>
+        <p>Pour vos projets digitaux, contactez nous :</p>
+        <p><a href="http://wa.me/22960374877">+229 60374877</a></p>
+
     </div>
 
     <!-- Bottom Sheet pour les actions -->
@@ -727,13 +939,37 @@
             showToast(`${contacts.length} contact(s) importé(s)`);
         }
 
+        // Gestion du Footer Popup
+        function showFooterPopup() {
+            const popup = document.getElementById('footer-popup');
+            popup.classList.add('show');
+
+            // Fermeture automatique après 30 secondes
+            setTimeout(() => {
+                closeFooterPopup();
+            }, 30000);
+        }
+
+        function closeFooterPopup() {
+            const popup = document.getElementById('footer-popup');
+            popup.classList.remove('show');
+        }
+
         // Initialisation
         document.addEventListener('DOMContentLoaded', function() {
             // Vérifier si l'API Contacts est disponible
             if (!('contacts' in navigator)) {
                 document.querySelector('[onclick="switchTab(\'contacts\')"]')
                     .setAttribute('disabled', 'disabled');
+                // Si l'API n'est pas disponible, basculer vers l'onglet manuel
+                switchTab('manual');
+            } else {
+                // Activer l'onglet contacts par défaut
+                switchTab('contacts');
             }
+
+            // Afficher le popup après 10 secondes
+            setTimeout(showFooterPopup, 10000);
         });
     </script>
 </body>

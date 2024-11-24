@@ -318,9 +318,8 @@
     </div>
 
     <script>
-        // Configuration de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
+const firebaseConfig = {
+  apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
   authDomain: "cyber-campus-2706f.firebaseapp.com",
   databaseURL: "https://cyber-campus-2706f-default-rtdb.firebaseio.com",
   projectId: "cyber-campus-2706f",
@@ -328,7 +327,7 @@
   messagingSenderId: "719410601264",
   appId: "1:719410601264:web:44fd2e3757721866303cf5",
   measurementId: "G-CEEFJP5LYZ"
-        };
+};
 
         // Initialisation de Firebase
         firebase.initializeApp(firebaseConfig);
@@ -379,9 +378,18 @@
                                 <h2>${category}</h2>
                                 <i class="fas fa-thumbtack pin-icon" onclick="editCategory('${category}')"></i>
                             </div>
-                            <button class="add-ticket-btn" onclick="showAddTicketModal('${category}')">
-                                <i class="fas fa-plus"></i> Ajouter un ticket
-                            </button>
+                            <div>
+                                <button class="add-ticket-btn" onclick="showAddTicketModal('${category}')">
+                                    <i class="fas fa-plus"></i> Ajouter un ticket
+                                </button>
+                                <label for="importFile_${category}" class="file-input-label">
+                                    <i class="fas fa-file-import"></i> Importer dans ${category}
+                                </label>
+                                <input type="file" id="importFile_${category}" 
+                                    accept=".json,.csv,.txt" 
+                                    style="display: none;" 
+                                    onchange="importTicketsToCategory('${category}', event)">
+                            </div>
                         </div>
                         <button onclick="deleteAllTicketsInCategory('${category}')">Supprimer tous les tickets de ${category}</button>
                         <table>
@@ -468,6 +476,143 @@
                     console.error("Erreur lors de la modification:", error);
                     hideLoading();
                     alert('Erreur lors de la modification du ticket');
+                });
+        }
+
+        function importTicketsToCategory(category, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            showLoading();
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const fileExtension = file.name.split('.').pop().toLowerCase();
+                    if (fileExtension === 'json') {
+                        handleJsonImportToCategory(e.target.result, category);
+                    } else if (fileExtension === 'csv') {
+                        handleCsvImportToCategory(e.target.result, category);
+                    } else if (fileExtension === 'txt') {
+                        handleTxtImportToCategory(e.target.result, category);
+                    } else {
+                        throw new Error('Format de fichier non supporté');
+                    }
+                } catch (error) {
+                    console.error('Erreur d\'importation:', error);
+                    hideLoading();
+                    alert('Erreur lors de l\'importation. Veuillez vérifier le format du fichier.');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function handleJsonImportToCategory(jsonContent, category) {
+            const importedData = JSON.parse(jsonContent);
+            
+            // Si le JSON contient directement les tableaux de tickets
+            let ticketsToImport;
+            if (importedData.motDePasse) {
+                ticketsToImport = importedData;
+            } 
+            // Si le JSON contient des catégories
+            else if (importedData[category]) {
+                ticketsToImport = importedData[category];
+            } else {
+                hideLoading();
+                alert('Format JSON invalide ou catégorie non trouvée');
+                return;
+            }
+
+            mergeTicketsToCategory(category, ticketsToImport);
+        }
+
+        function handleCsvImportToCategory(csvContent, category) {
+            const lines = csvContent.split('\n');
+            const tickets = {
+                motDePasse: [],
+                prix: [],
+                utilisateur: []
+            };
+
+            // Skip header line
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                
+                const values = lines[i].split(',');
+                tickets.utilisateur.push(values[0].trim());
+                tickets.motDePasse.push(values[1].trim());
+                if (values[3]) { // Si le prix est inclus dans le CSV
+                    tickets.prix.push(values[3].trim());
+                }
+            }
+
+            if (!tickets.prix.length) {
+                tempImportData = { [category]: tickets };
+                tempCategory = category;
+                showPriceModal(category);
+            } else {
+                mergeTicketsToCategory(category, tickets);
+            }
+        }
+
+        function handleTxtImportToCategory(txtContent, category) {
+            const lines = txtContent.split('\n');
+            const tickets = {
+                motDePasse: [],
+                prix: [],
+                utilisateur: []
+            };
+            const regex = /add name="([^"]+)" password="([^"]+)"/;
+
+            for (let line of lines) {
+                line = line.trim();
+                if (!line || line === '/ip hotspot user') continue;
+
+                const match = line.match(regex);
+                if (match) {
+                    const [_, name, password] = match;
+                    tickets.utilisateur.push(name);
+                    tickets.motDePasse.push(password);
+                }
+            }
+
+            if (tickets.motDePasse.length > 0) {
+                tempImportData = { [category]: tickets };
+                tempCategory = category;
+                showPriceModal(category);
+            } else {
+                hideLoading();
+                alert('Aucun ticket valide trouvé dans le fichier');
+            }
+        }
+
+        function mergeTicketsToCategory(category, newTickets) {
+            if (!allTickets[category]) {
+                allTickets[category] = {
+                    motDePasse: [],
+                    prix: [],
+                    utilisateur: []
+                };
+            }
+
+            const currentTickets = allTickets[category];
+            
+            const mergedTickets = {
+                motDePasse: [...currentTickets.motDePasse, ...newTickets.motDePasse],
+                prix: [...currentTickets.prix, ...newTickets.prix],
+                utilisateur: [...currentTickets.utilisateur, ...newTickets.utilisateur]
+            };
+
+            database.ref(`TicketsTotal/${category}`).set(mergedTickets)
+                .then(() => {
+                    hideLoading();
+                    alert(`Importation réussie dans la catégorie ${category} ! Les nouveaux tickets ont été ajoutés aux existants.`);
+                })
+                .catch((error) => {
+                    console.error("Erreur lors de l'importation:", error);
+                    hideLoading();
+                    alert("Erreur lors de l'importation. Veuillez réessayer.");
                 });
         }
 
@@ -694,10 +839,20 @@
 
         function handleJsonImport(jsonContent) {
             const importedData = JSON.parse(jsonContent);
-            if (confirm('Êtes-vous sûr de vouloir importer ces tickets ? Cela remplacera les tickets existants dans les catégories correspondantes.')) {
+            if (confirm('Êtes-vous sûr de vouloir importer ces tickets ? Les nouveaux tickets seront ajoutés aux tickets existants.')) {
                 const updates = {};
                 for (let category in importedData) {
-                    updates[`TicketsTotal/${category}`] = importedData[category];
+                    if (allTickets[category]) {
+                        // Fusion des tickets existants avec les nouveaux
+                        updates[`TicketsTotal/${category}`] = {
+                            motDePasse: [...allTickets[category].motDePasse, ...importedData[category].motDePasse],
+                            prix: [...allTickets[category].prix, ...importedData[category].prix],
+                            utilisateur: [...allTickets[category].utilisateur, ...importedData[category].utilisateur]
+                        };
+                    } else {
+                        // Nouvelle catégorie
+                        updates[`TicketsTotal/${category}`] = importedData[category];
+                    }
                 }
                 database.ref().update(updates)
                     .then(() => {
@@ -813,10 +968,20 @@
         }
 
         function finishImport() {
-            if (confirm('Êtes-vous sûr de vouloir importer ces tickets ? Cela remplacera les tickets existants dans les catégories correspondantes.')) {
+            if (confirm('Êtes-vous sûr de vouloir importer ces tickets ? Les nouveaux tickets seront ajoutés aux tickets existants.')) {
                 const updates = {};
                 for (let category in tempImportData) {
-                    updates[`TicketsTotal/${category}`] = tempImportData[category];
+                    if (allTickets[category]) {
+                        // Fusion des tickets existants avec les nouveaux
+                        updates[`TicketsTotal/${category}`] = {
+                            motDePasse: [...allTickets[category].motDePasse, ...tempImportData[category].motDePasse],
+                            prix: [...allTickets[category].prix, ...tempImportData[category].prix],
+                            utilisateur: [...allTickets[category].utilisateur, ...tempImportData[category].utilisateur]
+                        };
+                    } else {
+                        // Nouvelle catégorie
+                        updates[`TicketsTotal/${category}`] = tempImportData[category];
+                    }
                 }
                 
                 database.ref().update(updates)
@@ -833,7 +998,7 @@
                         hideLoading();
                         alert("Erreur lors de l'importation. Veuillez réessayer.");
                     });
-                } else {
+            } else {
                 cancelImport();
             }
         }

@@ -364,6 +364,8 @@
     </div>
 
     <script>
+
+        
 const firebaseConfig = {
   apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
   authDomain: "cyber-campus-2706f.firebaseapp.com",
@@ -388,6 +390,28 @@ const firebaseConfig = {
         // Variables pour stocker les informations d'édition
         let editingCategory = '';
         let editingIndex = -1;
+
+            // Vérification immédiate avant tout chargement
+    (function() {
+        const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+        if (!isLoggedIn) {
+            window.location.replace('login.html');
+        }
+    })();
+
+    // Vérification continue pendant la session
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!sessionStorage.getItem('isLoggedIn')) {
+            window.location.replace('login.html');
+        }
+    });
+
+    // Empêcher le retour à la page après déconnexion
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted || !sessionStorage.getItem('isLoggedIn')) {
+            window.location.replace('login.html');
+        }
+    });
 
         function showLoading() {
             document.getElementById('loadingIndicator').style.display = 'flex';
@@ -1124,24 +1148,30 @@ const firebaseConfig = {
 
         // Ajoutez ce code au début de votre script existant, juste après la déclaration des variables
 
-function checkAuth() {
+        function checkAuth() {
     const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+    
     if (!isLoggedIn) {
-        window.location.href = 'login.html';
+        window.location.replace('login.html');
+        return false;
     }
+    
+    return true;
 }
 
-// Ajoutez un bouton de déconnexion dans votre HTML existant
-function logout() {
-    sessionStorage.removeItem('isLoggedIn');
-    window.location.href = 'login.html';
-}
-
-// Modifiez votre fonction window.onload
+// Modifiez la fonction window.onload
 window.onload = () => {
-    checkAuth();
-    loadTickets();
+    if (checkAuth()) {
+        loadTickets();
+    }
 };
+
+// Fonction de déconnexion améliorée
+function logout() {
+    sessionStorage.clear(); // Nettoie toutes les données de session
+    window.location.replace('login.html');
+}
+
 
         // Écouteur d'événement pour la recherche
         document.getElementById('searchBar').addEventListener('input', searchTickets);

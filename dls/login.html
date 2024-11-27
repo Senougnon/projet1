@@ -111,51 +111,7 @@
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
-            authDomain: "cyber-campus-2706f.firebaseapp.com",
-            databaseURL: "https://cyber-campus-2706f-default-rtdb.firebaseio.com",
-            projectId: "cyber-campus-2706f",
-            storageBucket: "cyber-campus-2706f.appspot.com",
-            messagingSenderId: "719410601264",
-            appId: "1:719410601264:web:44fd2e3757721866303cf5",
-            measurementId: "G-CEEFJP5LYZ"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        async function login(event) {
-            event.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('errorMessage');
-            
-            try {
-                const adminRef = database.ref('admins');
-                const snapshot = await adminRef.once('value');
-                const admins = snapshot.val();
-
-                const admin = Object.values(admins).find(admin => 
-                    admin.username === username && admin.password === password
-                );
-
-                if (admin) {
-                    // Stockage de la session
-                    sessionStorage.setItem('isLoggedIn', 'true');
-                    // Redirection vers la page principale
-                    window.location.href = 'a3.html';
-                } else {
-                    errorMessage.textContent = 'Nom d\'utilisateur ou mot de passe incorrect';
-                    errorMessage.style.display = 'block';
-                }
-            } catch (error) {
-                console.error('Erreur de connexion:', error);
-                errorMessage.textContent = 'Une erreur est survenue. Veuillez réessayer.';
-                errorMessage.style.display = 'block';
-            }
-        }
+const _0x32ea7b=_0x3555;function _0x5e68(){const _0x1677e5=['54507TJWdkQ','preventDefault','7906280RkeAxS','val','true','397211acSApb','Erreur\x20de\x20connexion:','dlswifi','username','ref','2931915PJFNMW','1660wMdyHu','values','20545481IUVdou','getElementById','isLoggedIn','textContent','error','92eJmKmU','a3.html','1269CcZeeB','block','display','admins','href','4ceKmtN','value','1435780JKLfHt','dlswifi.firebaseapp.com','setItem','once','database','G-YDLNR7S0C6','Une\x20erreur\x20est\x20survenue.\x20Veuillez\x20réessayer.','12FTBXlK','location','find'];_0x5e68=function(){return _0x1677e5;};return _0x5e68();}(function(_0x4719bf,_0x6dce68){const _0x41c2ba=_0x3555,_0x1616d2=_0x4719bf();while(!![]){try{const _0x184a2b=-parseInt(_0x41c2ba(0x18f))/0x1*(parseInt(_0x41c2ba(0x17e))/0x2)+-parseInt(_0x41c2ba(0x18a))/0x3*(parseInt(_0x41c2ba(0x177))/0x4)+-parseInt(_0x41c2ba(0x180))/0x5+-parseInt(_0x41c2ba(0x187))/0x6*(parseInt(_0x41c2ba(0x16f))/0x7)+parseInt(_0x41c2ba(0x18c))/0x8+-parseInt(_0x41c2ba(0x179))/0x9*(-parseInt(_0x41c2ba(0x170))/0xa)+parseInt(_0x41c2ba(0x172))/0xb;if(_0x184a2b===_0x6dce68)break;else _0x1616d2['push'](_0x1616d2['shift']());}catch(_0xdc50dc){_0x1616d2['push'](_0x1616d2['shift']());}}}(_0x5e68,0x84663));const firebaseConfig={'apiKey':'AIzaSyBwLgE4rF7RimBCr2cx8krF2c9FpXetQLc','authDomain':_0x32ea7b(0x181),'databaseURL':'https://dlswifi-default-rtdb.firebaseio.com','projectId':_0x32ea7b(0x191),'storageBucket':'dlswifi.firebasestorage.app','messagingSenderId':'914445912574','appId':'1:914445912574:web:4448ebbc615241b63ad8af','measurementId':_0x32ea7b(0x185)};firebase['initializeApp'](firebaseConfig);const database=firebase[_0x32ea7b(0x184)]();function _0x3555(_0x432e14,_0x31940d){const _0x5e6874=_0x5e68();return _0x3555=function(_0x35553d,_0x506d52){_0x35553d=_0x35553d-0x16e;let _0x1aef5a=_0x5e6874[_0x35553d];return _0x1aef5a;},_0x3555(_0x432e14,_0x31940d);}async function login(_0x5b2b04){const _0x14bbc4=_0x32ea7b;_0x5b2b04[_0x14bbc4(0x18b)]();const _0x1933b8=document['getElementById']('username')['value'],_0x312690=document[_0x14bbc4(0x173)]('password')[_0x14bbc4(0x17f)],_0x38af49=document[_0x14bbc4(0x173)]('errorMessage');try{const _0x18a6ef=database[_0x14bbc4(0x16e)](_0x14bbc4(0x17c)),_0x55c92f=await _0x18a6ef[_0x14bbc4(0x183)]('value'),_0x4140ac=_0x55c92f[_0x14bbc4(0x18d)](),_0x223d1b=Object[_0x14bbc4(0x171)](_0x4140ac)[_0x14bbc4(0x189)](_0x52bec8=>_0x52bec8[_0x14bbc4(0x192)]===_0x1933b8&&_0x52bec8['password']===_0x312690);_0x223d1b?(sessionStorage[_0x14bbc4(0x182)](_0x14bbc4(0x174),_0x14bbc4(0x18e)),window[_0x14bbc4(0x188)][_0x14bbc4(0x17d)]=_0x14bbc4(0x178)):(_0x38af49[_0x14bbc4(0x175)]='Nom\x20d\x27utilisateur\x20ou\x20mot\x20de\x20passe\x20incorrect',_0x38af49['style'][_0x14bbc4(0x17b)]=_0x14bbc4(0x17a));}catch(_0x23a63c){console[_0x14bbc4(0x176)](_0x14bbc4(0x190),_0x23a63c),_0x38af49['textContent']=_0x14bbc4(0x186),_0x38af49['style'][_0x14bbc4(0x17b)]=_0x14bbc4(0x17a);}}
     </script>
 </body>
 </html>

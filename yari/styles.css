@@ -1,0 +1,63 @@
+body {
+    font-family: sans-serif;
+}
+
+.container {
+    width: 95%;
+    margin: 0 auto;
+}
+
+.tabs {
+    display: flex;
+    margin-bottom: 20px;
+}
+
+.tab {
+    padding: 10px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.tab.active {
+    background-color: #eee;
+}
+
+.content-section {
+    display: none;
+    border: 1px solid #ccc;
+    padding: 20px;
+}
+
+.content-section.active {
+    display: block;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+input, select, button {
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+}
+.dashboard-item {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.dashboard-item label {
+    font-weight: bold;
+    margin-right: 10px;
+    width: 100px
+}

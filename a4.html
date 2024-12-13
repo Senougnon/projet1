@@ -144,6 +144,29 @@
             margin-top: 20px;
         }
 
+        .partners-management {
+            margin-bottom: 30px;
+        }
+
+        .partner-actions {
+            margin-bottom: 20px;
+        }
+
+        .partner-form {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .partner-form input {
+            margin-bottom: 10px;
+        }
+
+        .partners-table table {
+            width: 100%;
+        }
+
         @media (max-width: 768px) {
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -206,6 +229,58 @@
                 <tbody id="salesTable"></tbody>
             </table>
         </div>
+
+        <div class="partners-management">
+            <h2>Gestion des partenaires</h2>
+            <div class="partner-actions">
+                <button class="action-btn" onclick="showAddPartnerForm()">Ajouter un partenaire</button>
+            </div>
+
+            <div class="partner-form" id="addPartnerForm" style="display: none;">
+                <h3>Ajouter un partenaire</h3>
+                <input type="text" id="newPartnerName" placeholder="Nom du partenaire">
+                <input type="password" id="newPartnerPassword" placeholder="Mot de passe">
+                <button class="action-btn" onclick="addPartner()">Enregistrer</button>
+                <button class="action-btn clear-btn" onclick="hideAddPartnerForm()">Annuler</button>
+            </div>
+
+            <div class="partners-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nom du partenaire</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="partnersTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="editPartnerModal" class="modal">
+            <div class="modal-content">
+                <h2>Modifier le partenaire</h2>
+                <input type="hidden" id="editPartnerId">
+                <input type="text" id="editPartnerName" placeholder="Nom du partenaire">
+                <input type="password" id="editPartnerPassword" placeholder="Mot de passe">
+                <div class="modal-actions">
+                    <button class="action-btn" onclick="closeEditModal()">Annuler</button>
+                    <button class="action-btn" onclick="updatePartner()">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="messagePartnerModal" class="modal">
+            <div class="modal-content">
+                <h2>Envoyer un message</h2>
+                <input type="hidden" id="messagePartnerId">
+                <textarea id="messageContent" placeholder="Votre message"></textarea>
+                <div class="modal-actions">
+                    <button class="action-btn" onclick="closeMessageModal()">Annuler</button>
+                    <button class="action-btn" onclick="sendMessage()">Envoyer</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="confirmModal" class="modal">
@@ -221,7 +296,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getDatabase, ref, get, remove, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+        import { getDatabase, ref, get, remove, set, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
@@ -239,28 +314,202 @@
 
         let allSales = [];
         let vendors = new Set();
+        let partners = {}; // Stockera les informations des partenaires
 
-        // Chargement initial
-        window.addEventListener('DOMContentLoaded', async () => {
-            await loadVendors();
-            await loadSales();
-            lucide.createIcons();
-        });
+        // ------ Fonctions pour la gestion des partenaires ------
 
-        async function loadVendors() {
+        // Charger la liste des partenaires
+        async function loadPartners() {
             try {
-                const vendorsRef = ref(db, 'VendorsHistory');
-                const snapshot = await get(vendorsRef);
-                
+                const partnersRef = ref(db, 'Vendors');
+                const snapshot = await get(partnersRef);
+
                 if (snapshot.exists()) {
-                    vendors = new Set(Object.keys(snapshot.val()));
-                    updateVendorFilter();
+                    partners = snapshot.val();
+                    updatePartnersTable();
                 }
             } catch (error) {
-                console.error("Erreur lors du chargement des vendeurs:", error);
+                console.error("Erreur lors du chargement des partenaires:", error);
             }
         }
 
+        // Mettre à jour le tableau des partenaires
+        function updatePartnersTable() {
+            const tbody = document.getElementById('partnersTable');
+            tbody.innerHTML = '';
+
+            for (const partnerId in partners) {
+                const partner = partners[partnerId];
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${partnerId}</td>
+                    <td>
+                        <button class="action-btn" onclick="showEditPartnerForm('${partnerId}')">Modifier</button>
+                        <button class="action-btn delete-btn" onclick="deletePartner('${partnerId}')">Supprimer</button>
+                        <button class="action-btn" onclick="showMessagePartnerForm('${partnerId}')">Message</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+
+        // Afficher le formulaire d'ajout de partenaire
+        window.showAddPartnerForm = function() {
+            document.getElementById('addPartnerForm').style.display = 'block';
+        };
+
+        // Masquer le formulaire d'ajout de partenaire
+        window.hideAddPartnerForm = function() {
+            document.getElementById('newPartnerName').value = '';
+            document.getElementById('newPartnerPassword').value = '';
+            document.getElementById('addPartnerForm').style.display = 'none';
+        };
+
+        // Ajouter un nouveau partenaire
+        window.addPartner = async function() {
+            const name = document.getElementById('newPartnerName').value;
+            const password = document.getElementById('newPartnerPassword').value;
+
+            if (name && password) {
+                try {
+                    const partnersRef = ref(db, `Vendors/${name}`);
+                    await set(partnersRef, { password: password });
+                    await loadPartners();
+                    hideAddPartnerForm();
+                } catch (error) {
+                    console.error("Erreur lors de l'ajout du partenaire:", error);
+                }
+            } else {
+                alert('Veuillez remplir tous les champs.');
+            }
+        };
+
+        // Afficher le formulaire de modification de partenaire
+        window.showEditPartnerForm = function(partnerId) {
+            const modal = document.getElementById('editPartnerModal');
+            document.getElementById('editPartnerId').value = partnerId;
+            document.getElementById('editPartnerName').value = partnerId;
+            document.getElementById('editPartnerPassword').value = partners[partnerId].password;
+            modal.style.display = 'flex';
+        };
+
+        // Fermer le formulaire de modification de partenaire
+        window.closeEditModal = function() {
+            document.getElementById('editPartnerModal').style.display = 'none';
+        };
+
+        // Mettre à jour un partenaire
+        window.updatePartner = async function() {
+            const partnerId = document.getElementById('editPartnerId').value;
+            const name = document.getElementById('editPartnerName').value;
+            const password = document.getElementById('editPartnerPassword').value;
+
+            if (name && password) {
+                try {
+                    const partnersRef = ref(db, `Vendors/${name}`); // Met à jour avec le nouveau nom si modifié
+                    await set(partnersRef, { password: password });
+
+                    // Si le nom a changé, supprimer l'ancien
+                    if (partnerId !== name) {
+                        await remove(ref(db, `Vendors/${partnerId}`));
+                    }
+
+                    await loadPartners();
+                    closeEditModal();
+                } catch (error) {
+                    console.error("Erreur lors de la mise à jour du partenaire:", error);
+                }
+            } else {
+                alert('Veuillez remplir tous les champs.');
+            }
+        };
+
+        // Supprimer un partenaire
+        window.deletePartner = async function(partnerId) {
+            if (confirm(`Êtes-vous sûr de vouloir supprimer le partenaire ${partnerId} ?`)) {
+                try {
+                    const partnerRef = ref(db, `Vendors/${partnerId}`);
+                    await remove(partnerRef);
+                    await loadPartners();
+                } catch (error) {
+                    console.error("Erreur lors de la suppression du partenaire:", error);
+                }
+            }
+        };
+
+        // Afficher le formulaire d'envoi de message
+        window.showMessagePartnerForm = function(partnerId) {
+            const modal = document.getElementById('messagePartnerModal');
+            document.getElementById('messagePartnerId').value = partnerId;
+            document.getElementById('messageContent').value = '';
+            modal.style.display = 'flex';
+        };
+
+        // Fermer le formulaire d'envoi de message
+        window.closeMessageModal = function() {
+            document.getElementById('messagePartnerModal').style.display = 'none';
+        };
+
+        // Envoyer un message à un partenaire
+        window.sendMessage = async function() {
+            const partnerId = document.getElementById('messagePartnerId').value;
+            const message = document.getElementById('messageContent').value;
+
+            if (message) {
+                try {
+                    const messagesRef = ref(db, `Vendors/${partnerId}/messages`);
+                    await push(messagesRef, {
+                        content: message,
+                        timestamp: Date.now()
+                    });
+                    alert('Message envoyé !');
+                    closeMessageModal();
+                } catch (error) {
+                    console.error("Erreur lors de l'envoi du message:", error);
+                }
+            } else {
+                alert('Veuillez saisir un message.');
+            }
+        };
+
+        // ------ Fin des fonctions pour la gestion des partenaires ------
+
+        // Chargement initial des données de vente et des partenaires
+        async function loadSalesData() {
+            try {
+                // Charger les données des vendeurs
+                const vendorsRef = ref(db, 'VendorsHistory');
+                const vendorsSnapshot = await get(vendorsRef);
+
+                if (vendorsSnapshot.exists()) {
+                    vendors = new Set(Object.keys(vendorsSnapshot.val()));
+                    updateVendorFilter();
+                }
+
+                // Charger les données des ventes
+                const salesRef = ref(db, 'VendorsHistory');
+                const salesSnapshot = await get(salesRef);
+
+                if (salesSnapshot.exists()) {
+                    allSales = [];
+                    const data = salesSnapshot.val();
+                    Object.entries(data).forEach(([vendor, sales]) => {
+                        Object.entries(sales).forEach(([id, sale]) => {
+                            allSales.push({
+                                id,
+                                vendor,
+                                ...sale
+                            });
+                        });
+                    });
+                    applyFilters();
+                }
+            } catch (error) {
+                console.error("Erreur lors du chargement des données:", error);
+            }
+        }
+
+        // Ancienement loadVendors
         function updateVendorFilter() {
             const vendorFilter = document.getElementById('vendorFilter');
             vendorFilter.innerHTML = '<option value="all">Tous les vendeurs</option>';
@@ -408,6 +657,13 @@
         window.closeModal = function() {
             document.getElementById('confirmModal').style.display = 'none';
         };
+
+        // Chargement initial
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadSalesData(); // Charger les données de vente et des vendeurs
+            await loadPartners(); // Charger la liste des partenaires
+            lucide.createIcons();
+        });
     </script>
 </body>
 </html>

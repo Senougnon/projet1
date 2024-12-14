@@ -1,0 +1,844 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, get, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+// Configuration Firebase (Remplacez par votre configuration)
+const firebaseConfig = {
+    apiKey: "AIzaSyCNiyVW5DgsvqIR2eAlQ2Ls02DuliFWOOI",
+    authDomain: "immo-75593.firebaseapp.com",
+    databaseURL: "https://immo-75593-default-rtdb.firebaseio.com",
+    projectId: "immo-75593",
+    storageBucket: "immo-75593.firebasestorage.app",
+    messagingSenderId: "146632846661",
+    appId: "1:146632846661:web:d63ca5c24f5b4acdeea22c",
+    measurementId: "G-52KYCJZSHE"
+  };
+
+// Initialiser Firebase
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
+// État de l'authentification
+let isAuthenticated = false;
+
+// Gestion de l'authentification
+const authSection = document.getElementById("auth-section");
+const loginFormContainer = document.getElementById("login-form-container");
+const registerFormContainer = document.getElementById("register-form-container");
+const loginForm = document.getElementById("login-form");
+const registerForm = document.getElementById("register-form");
+const showRegisterLink = document.getElementById("show-register");
+const showLoginLink = document.getElementById("show-login");
+
+let currentUser = null; // Variable pour stocker l'utilisateur courant
+
+// Basculer entre les formulaires de connexion et d'inscription
+showRegisterLink.addEventListener("click", () => {
+  loginFormContainer.style.display = "none";
+  registerFormContainer.style.display = "block";
+});
+
+showLoginLink.addEventListener("click", () => {
+  registerFormContainer.style.display = "none";
+  loginFormContainer.style.display = "block";
+});
+
+// Inscription
+registerForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  showLoading();
+  const username = document.getElementById("register-username").value;
+  const password = document.getElementById("register-password").value;
+
+  try {
+    // Hasher le mot de passe (simple exemple, utilisez une méthode plus sécurisée en production)
+    const hashedPassword = simpleHash(password);
+
+    // Enregistrer l'utilisateur dans Firebase
+    const usersRef = ref(database, 'users');
+    await push(usersRef, {
+      username: username,
+      password: hashedPassword,
+      role: 'user' // Attribuer un rôle par défaut
+    });
+
+    alert("Inscription réussie !");
+    registerForm.reset();
+    showLoginForm(); // Affiche le formulaire de connexion après l'inscription
+  } catch (error) {
+    console.error("Erreur lors de l'inscription :", error);
+    alert("Erreur lors de l'inscription.");
+  } finally {
+    hideLoading();
+  }
+});
+
+// Fonction pour afficher le formulaire de connexion
+function showLoginForm() {
+  registerFormContainer.style.display = "none";
+  loginFormContainer.style.display = "block";
+}
+
+// Connexion
+loginForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  showLoading();
+  const username = document.getElementById("login-username").value;
+  const password = document.getElementById("login-password").value;
+
+  try {
+    const usersRef = ref(database, 'users');
+    const snapshot = await get(usersRef);
+    if (snapshot.exists()) {
+      const users = snapshot.val();
+      let userFound = false;
+      for (const userId in users) {
+        const user = users[userId];
+        // Comparer le mot de passe haché
+        if (user.username === username && user.password === simpleHash(password)) {
+          // Stocker les informations de l'utilisateur
+          currentUser = {
+            id: userId,
+            username: user.username,
+            role: user.role, // Récupérer le rôle
+            subscription: user.subscription || {}
+            // ... autres informations si nécessaires ...
+          };
+          isAuthenticated = true;
+          checkUserRoleAndSubscription();
+          hideAuthSection();
+          loadDashboardData();
+          userFound = true;
+          break;
+        }
+      }
+      if (!userFound) {
+        alert("Pseudo ou mot de passe incorrect.");
+      }
+    } else {
+      alert("Aucun utilisateur trouvé.");
+    }
+  } catch (error) {
+    console.error("Erreur lors de la connexion :", error);
+    alert("Erreur lors de la connexion.");
+  } finally {
+    hideLoading();
+  }
+});
+
+// Fonction pour vérifier le rôle de l'utilisateur et son statut d'abonnement
+function checkUserRoleAndSubscription() {
+    if (currentUser) {
+        // Vérifier le rôle
+        const isAdmin = currentUser.role === 'admin';
+        const addProprietaireBtn = document.getElementById('add-proprietaire-btn');
+        const addMaisonBtn = document.getElementById('add-maison-btn');
+        const addLocataireBtn = document.getElementById('add-locataire-btn');
+        const addSouscriptionBtn = document.getElementById('add-souscription-btn');
+  
+// ... suite du code JavaScript (script.js) ...
+
+if (addProprietaireBtn) {
+    addProprietaireBtn.style.display = isAdmin ? 'block' : 'none';
+}
+if (addMaisonBtn) {
+    addMaisonBtn.style.display = isAdmin ? 'block' : 'none';
+}
+if (addLocataireBtn) {
+    addLocataireBtn.style.display = isAdmin ? 'block' : 'none';
+}
+if (addSouscriptionBtn) {
+    addSouscriptionBtn.style.display = isAdmin ? 'block' : 'none';
+}
+
+// Vérifier l'abonnement
+const userSubscription = currentUser.subscription;
+const isSubscribed = userSubscription && userSubscription.status === 'active';
+const subscribeBtn = document.getElementById('subscribe-btn');
+const cancelSubscriptionBtn = document.getElementById('cancel-subscription-btn');
+const trialInfo = document.getElementById('trial-info');
+
+if (isSubscribed) {
+    // Utilisateur abonné
+    document.getElementById('abonnement-status-text').textContent = 'Abonné';
+    subscribeBtn.style.display = 'none';
+    cancelSubscriptionBtn.style.display = 'block';
+    trialInfo.style.display = 'none';
+} else {
+    // Utilisateur non abonné
+    document.getElementById('abonnement-status-text').textContent = 'Non abonné';
+    subscribeBtn.style.display = 'block';
+    cancelSubscriptionBtn.style.display = 'none';
+    trialInfo.style.display = 'block';
+}
+}
+}
+
+// Fonction pour hacher le mot de passe (méthode simple pour l'exemple)
+function simpleHash(str) {
+let hash = 0;
+for (let i = 0; i < str.length; i++) {
+const char = str.charCodeAt(i);
+hash = (hash << 5) - hash + char;
+hash |= 0; // Convertir en entier 32bit
+}
+return hash.toString();
+}
+
+// Fonction pour afficher l'interface utilisateur après la connexion
+function showMainInterface() {
+authSection.style.display = "none";
+// Afficher les autres sections de l'application
+// ...
+}
+
+// Fonction pour masquer la section d'authentification
+function hideAuthSection() {
+authSection.style.display = "none";
+}
+
+// Gestion des onglets
+const tabs = document.querySelectorAll(".nav-button");
+const contentSections = document.querySelectorAll(".content-section");
+
+tabs.forEach(tab => {
+tab.addEventListener("click", () => {
+const target = tab.dataset.target;
+
+tabs.forEach(t => t.classList.remove("active"));
+tab.classList.add("active");
+
+contentSections.forEach(s => s.classList.remove("active"));
+document.getElementById(target).classList.add("active");
+});
+});
+
+// Fonctions pour afficher/masquer le chargement
+function showLoading() {
+document.getElementById("loading-overlay").style.display = "flex";
+}
+
+function hideLoading() {
+document.getElementById("loading-overlay").style.display = "none";
+}
+
+// Gestion des formulaires d'ajout
+const addProprietaireBtn = document.getElementById("add-proprietaire-btn");
+const addMaisonBtn = document.getElementById("add-maison-btn");
+const addLocataireBtn = document.getElementById("add-locataire-btn");
+const addSouscriptionBtn = document.getElementById("add-souscription-btn");
+
+const addProprietaireForm = document.getElementById("add-proprietaire-form");
+const addMaisonForm = document.getElementById("add-maison-form");
+const addLocataireForm = document.getElementById("add-locataire-form");
+const addSouscriptionForm = document.getElementById("add-souscription-form");
+
+const cancelProprietaireBtn = document.getElementById("cancel-proprietaire-btn");
+const cancelMaisonBtn = document.getElementById("cancel-maison-btn");
+const cancelLocataireBtn = document.getElementById("cancel-locataire-btn");
+const cancelSouscriptionBtn = document.getElementById("cancel-souscription-btn");
+
+// Fonctions pour afficher/masquer les formulaires
+function showForm(form) {
+form.classList.add("active");
+}
+
+function hideForm(form) {
+form.classList.remove("active");
+form.reset();
+}
+
+// Événements pour afficher les formulaires
+addProprietaireBtn.addEventListener("click", () => showForm(addProprietaireForm));
+addMaisonBtn.addEventListener("click", () => showForm(addMaisonForm));
+addLocataireBtn.addEventListener("click", () => showForm(addLocataireForm));
+addSouscriptionBtn.addEventListener("click", () => showForm(addSouscriptionForm));
+
+// Événements pour masquer les formulaires
+cancelProprietaireBtn.addEventListener("click", () => hideForm(addProprietaireForm));
+cancelMaisonBtn.addEventListener("click", () => hideForm(addMaisonForm));
+cancelLocataireBtn.addEventListener("click", () => hideForm(addLocataireForm));
+cancelSouscriptionBtn.addEventListener("click", () => hideForm(addSouscriptionForm));
+
+// Gestion du formulaire d'ajout de propriétaire
+addProprietaireForm.addEventListener("submit", (event) => {
+event.preventDefault();
+showLoading();
+
+const nom = document.getElementById("proprietaire-nom").value;
+const prenom = document.getElementById("proprietaire-prenom").value;
+const contact = document.getElementById("proprietaire-contact").value;
+const email = document.getElementById("proprietaire-email").value;
+const adresse = document.getElementById("proprietaire-adresse").value;
+
+addProprietaire(nom, prenom, contact, email, adresse)
+.then(() => {
+    hideForm(addProprietaireForm);
+    loadProprietaires(); // Recharger la liste
+})
+.catch((error) => {
+    console.error("Erreur lors de l'ajout du propriétaire:", error);
+    alert("Erreur lors de l'ajout du propriétaire.");
+})
+.finally(() => {
+    hideLoading();
+});
+});
+
+// Gestion du formulaire d'ajout de maison
+addMaisonForm.addEventListener("submit", (event) => {
+event.preventDefault();
+showLoading();
+
+const proprietaireId = document.getElementById("maison-proprietaire").value;
+const type = document.getElementById("maison-type").value;
+const pieces = parseInt(document.getElementById("maison-pieces").value);
+const ville = document.getElementById("maison-ville").value;
+const commune = document.getElementById("maison-commune").value;
+const quartier = document.getElementById("maison-quartier").value;
+const loyer = parseInt(document.getElementById("maison-loyer").value);
+
+addMaison(proprietaireId, type, pieces, ville, commune, quartier, loyer)
+.then(() => {
+    hideForm(addMaisonForm);
+    loadMaisons(); // Recharger la liste
+})
+.catch((error) => {
+    console.error("Erreur lors de l'ajout de la maison:", error);
+    alert("Erreur lors de l'ajout de la maison.");
+})
+.finally(() => {
+    hideLoading();
+});
+});
+
+// Gestion du formulaire d'ajout de locataire
+addLocataireForm.addEventListener("submit", (event) => {
+event.preventDefault();
+showLoading();
+
+const nom = document.getElementById("locataire-nom").value;
+const prenom = document.getElementById("locataire-prenom").value;
+const contact = document.getElementById("locataire-contact").value;
+const email = document.getElementById("locataire-email").value;
+
+addLocataire(nom, prenom, contact, email)
+.then(() => {
+    hideForm(addLocataireForm);
+    loadLocataires(); // Recharger la liste
+})
+.catch((error) => {
+    console.error("Erreur lors de l'ajout du locataire:", error);
+    alert("Erreur lors de l'ajout du locataire.");
+})
+.finally(() => {
+    hideLoading();
+});
+});
+
+// Gestion du formulaire d'ajout de souscription
+addSouscriptionForm.addEventListener("submit", (event) => {
+event.preventDefault();
+showLoading();
+
+const maisonId = document.getElementById("souscription-maison").value;
+const locataireId = document.getElementById("souscription-locataire").value;
+const caution = parseInt(document.getElementById("souscription-caution").value);
+const avance = parseInt(document.getElementById("souscription-avance").value);
+const autres = document.getElementById("souscription-autres").value;
+const dateDebut = document.getElementById("souscription-date-debut").value;
+
+addSouscription(maisonId, locataireId, caution, avance, autres, dateDebut)
+.then(() => {
+    hideForm(addSouscriptionForm);
+    loadSouscriptions(); // Recharger la liste
+})
+.catch((error) => {
+    console.error("Erreur lors de l'ajout de la souscription:", error);
+    alert("Erreur lors de l'ajout de la souscription.");
+})
+.finally(() => {
+    hideLoading();
+});
+});
+
+// Fonctions pour ajouter des données à Firebase (à adapter à votre structure de données)
+async function addProprietaire(nom, prenom, contact, email, adresse) {
+const proprietairesRef = ref(database, 'proprietaires');
+const newProprietaireRef = push(proprietairesRef);
+await set(newProprietaireRef, {
+nom: nom,
+prenom: prenom,
+contact: contact,
+email: email,
+adresse: adresse
+});
+}
+
+async function addMaison(proprietaireId, type, pieces, ville, commune, quartier, loyer) {
+const maisonsRef = ref(database, 'maisons');
+const newMaisonRef = push(maisonsRef);
+await set(newMaisonRef, {
+proprietaire: proprietaireId,
+type: type,
+pieces: pieces,
+ville: ville,
+commune: commune,
+quartier: quartier,
+loyer: loyer
+});
+}
+
+async function addLocataire(nom, prenom, contact, email) {
+const locatairesRef = ref(database, 'locataires');
+const newLocataireRef = push(locatairesRef);
+await set(newLocataireRef, {
+nom: nom,
+prenom: prenom,
+contact: contact,
+email: email
+});
+}
+
+async function addSouscription(maisonId, locataireId, caution, avance, autres, dateDebut) {
+const souscriptionsRef = ref(database, 'souscriptions');
+const newSouscriptionRef = push(souscriptionsRef);
+const maisonRef = ref(database, `maisons/${maisonId}`);
+const maisonSnapshot = await get(maisonRef);
+const loyer = maisonSnapshot.val().loyer;
+
+await set(newSouscriptionRef, {
+maison: maisonId,
+locataire: locataireId,
+caution: caution,
+avance: avance,
+autres: autres,
+dateDebut: dateDebut,
+loyer: loyer
+});
+}
+
+// Fonctions pour charger et afficher les données depuis Firebase
+function loadProprietaires() {
+showLoading();
+const proprietairesList = document.querySelector("#proprietaires-list tbody");
+proprietairesList.innerHTML = "";
+
+const proprietairesRef = ref(database, 'proprietaires');
+onValue(proprietairesRef, (snapshot) => {
+const proprietaires = snapshot.val();
+let proprietairesCount = 0;
+for (const proprietaireId in proprietaires) {
+    proprietairesCount++;
+    const proprietaire = proprietaires[proprietaireId];
+    const row = document.createElement("tr");
+    row.innerHTML = `
+        <td>${proprietaireId}</td>
+        <td>${proprietaire.nom}</td>
+        <td>${proprietaire.prenom}</td>
+        <td>${proprietaire.contact}</td>
+        <td>${proprietaire.email}</td>
+        <td>${proprietaire.adresse}</td>
+        <td class="actions-cell">
+            <button class="edit-btn" data-id="${proprietaireId}">Modifier</button>
+            <button class="delete-btn" data-id="${proprietaireId}">Supprimer</button>
+        </td>
+    `;
+    proprietairesList.appendChild(row);
+}
+document.getElementById('dashboard-proprietaires-count').textContent = proprietairesCount;
+hideLoading();
+});
+}
+
+function loadMaisons() {
+showLoading();
+const maisonsList = document.querySelector("#maisons-list tbody");
+maisonsList.innerHTML = "";
+
+const maisonsRef = ref(database, 'maisons');
+onValue(maisonsRef, (snapshot) => {
+const maisons = snapshot.val();
+let maisonsCount = 0;
+
+// Mettre à jour la liste déroulante des propriétaires dans le formulaire d'ajout de maison
+const proprietaireSelect = document.getElementById("maison-proprietaire");
+proprietaireSelect.innerHTML = '<option value="">Sélectionner Propriétaire</option>';
+const proprietairesRef = ref(database, 'proprietaires');
+get(proprietairesRef).then((proprietairesSnapshot) => {
+    const proprietaires = proprietairesSnapshot.val();
+    for (const proprietaireId in proprietaires) {
+        const proprietaire = proprietaires[proprietaireId];
+        const option = document.createElement("option");
+        option.value = proprietaireId;
+        option.text = `${proprietaire.nom} ${proprietaire.prenom}`;
+        proprietaireSelect.appendChild(option);
+    }
+});
+
+for (const maisonId in maisons) {
+    maisonsCount++;
+    const maison = maisons[maisonId];
+
+    // Récupérer le nom du propriétaire
+    get(ref(database, `proprietaires/${maison.proprietaire}`)).then((proprietaireSnapshot) => {
+        const proprietaire = proprietaireSnapshot.val();
+        const proprietaireNom = proprietaire ? `${proprietaire.nom} ${proprietaire.prenom}` : 'Propriétaire inconnu';
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${maisonId}</td>
+            <td>${proprietaireNom}</td>
+            <td>${maison.type}</td>
+            <td>${maison.pieces}</td>
+            <td>${maison.ville}, ${maison.commune}, ${maison.quartier}</td>
+            <td>${maison.loyer}</td>
+            <td class="actions-cell">
+                <button class="edit-btn" data-id="${maisonId}">Modifier</button>
+                <button class="delete-btn" data-id="${maisonId}">Supprimer</button>
+            </td>
+        `;
+        maisonsList.appendChild(row);
+    });
+}
+document.getElementById('dashboard-maisons-count').textContent = maisonsCount;
+hideLoading();
+});
+}
+
+function loadLocataires() {
+showLoading();
+const locatairesList = document.querySelector("#locataires-list tbody");
+locatairesList.innerHTML = "";
+
+const locatairesRef = ref(database, 'locataires');
+onValue(locatairesRef, (snapshot) => {
+const locataires = snapshot.val();
+let locatairesCount = 0;
+for (const locataireId in locataires) {
+    locatairesCount++;
+    const locataire = locataires[locataireId];
+    const row = document.createElement("tr");
+    row.innerHTML = `
+        <td>${locataireId}</td>
+        <td>${locataire.nom}</td>
+        <td>${locataire.prenom}</td>
+        <td>${locataire.contact}</td>
+        <td>${locataire.email}</td>
+        <td class="actions-cell">
+            <button class="edit-btn" data-id="${locataireId}">Modifier</button>
+            <button class="delete-btn" data-id="${locataireId}">Supprimer</button>
+        </td>
+    `;
+    locatairesList.appendChild(row);
+}
+document.getElementById('dashboard-locataires-count').textContent = locatairesCount;
+hideLoading();
+});
+}
+
+function loadSouscriptions() {
+showLoading();
+const souscriptionsList = document.querySelector("#souscriptions-list tbody");
+souscriptionsList.innerHTML = "";
+
+// Mettre à jour la liste déroulante des maisons dans le formulaire d'ajout de souscription
+const maisonSelect = document.getElementById("souscription-maison");
+maisonSelect.innerHTML = '<option value="">Sélectionner Maison</option>';
+const maisonsRef = ref(database, 'maisons');
+get(maisonsRef).then((maisonsSnapshot) => {
+const maisons = maisonsSnapshot.val();
+for (const maisonId in maisons) {
+    const maison = maisons[maisonId];
+    const option = document.createElement("option");
+    option.value = maisonId;
+    option.text = `${maisonId} - ${maison.ville}, ${maison.commune}, ${maison.quartier}`;
+    maisonSelect.appendChild(option);
+}
+});
+
+// Mettre à jour la liste déroulante des locataires dans le formulaire d'ajout de souscription
+const locataireSelect = document.getElementById("souscription-locataire");
+locataireSelect.innerHTML = '<option value="">Sélectionner Locataire</option>';
+const locatairesRef = ref(database, 'locataires');
+get(locatairesRef).then((locatairesSnapshot) => {
+const locataires = locatairesSnapshot.val();
+for (const locataireId in locataires) {
+    const locataire = locataires[locataireId];
+    const option = document.createElement("option");
+    option.value = locataireId;
+    option.text = `${locataire.nom} ${locataire.prenom}`;
+    locataireSelect.appendChild(option);
+}
+});
+
+const souscriptionsRef = ref(database, 'souscriptions');
+onValue(souscriptionsRef, (snapshot) => {
+const souscriptions = snapshot.val();
+let souscriptionsCount = 0;
+for (const souscriptionId in souscriptions) {
+    souscriptionsCount++;
+    const souscription = souscriptions[souscriptionId];
+    const row = document.createElement("tr");
+    row.innerHTML = `
+        <td>${souscription.maison}</td>
+        <td>${souscription.locataire}</td>
+        <td>${souscription.caution}</td>
+        <td>${souscription.avance}</td>
+        <td>${souscription.autres}</td>
+        <td>${souscription.dateDebut}</td>
+        <td>${souscription.loyer}</td>
+        <td class="actions-cell">
+            <button class="edit-btn" data-id="${souscriptionId}">Modifier</button>
+            <button class="delete-btn" data-id="${souscriptionId}">Supprimer</button>
+        </td>
+    `;
+    souscriptionsList.appendChild(row);
+}
+document.getElementById('dashboard-souscriptions-count').textContent = souscriptionsCount;
+hideLoading();
+});
+}
+
+// Délégation d'événements pour les boutons "Modifier" et "Supprimer"
+document.querySelector("#proprietaires-list tbody").addEventListener("click", handleEditDelete);
+document.querySelector("#maisons-list tbody").addEventListener("click", handleEditDelete);
+document.querySelector("#locataires-list tbody").addEventListener("click", handleEditDelete);
+document.querySelector("#souscriptions-list tbody").addEventListener("click", handleEditDelete);
+
+function handleEditDelete(event) {
+const target = event.target;
+if (target.classList.contains("edit-btn")) {
+const itemId = target.dataset.id;
+const itemType = target.closest(".content-section").id;
+// **À COMPLÉTER : Implémenter la logique de modification (ouvrir un formulaire, etc.)**
+console.log("Modifier", itemType, itemId);
+} else if (target.classList.contains("delete-btn")) {
+const itemId = target.dataset.id;
+const itemType = target.closest(".content-section").id;
+deleteItem(itemType, itemId);
+}
+}
+
+// Fonction pour supprimer un élément
+async function deleteItem(itemType, itemId) {
+showLoading();
+try {
+const itemRef = ref(database, `${itemType}/${itemId}`);
+await remove(itemRef);
+// Recharger la liste après la suppression
+if (itemType === 'proprietaires') {
+    loadProprietaires();
+} else if (itemType === 'maisons') {
+    loadMaisons();
+} else if (itemType === 'locataires') {
+    loadLocataires();
+} else if (itemType === 'souscriptions') {
+    loadSouscriptions();
+}
+} catch (error) {
+console.error(`Erreur lors de la suppression de ${itemType}:`, error);
+alert(`Erreur lors de la suppression de ${itemType}.`);
+} finally {
+hideLoading();
+}
+}
+
+// Gestion des abonnements
+const subscribeBtn = document.getElementById('subscribe-btn');
+const cancelSubscriptionBtn = document.getElementById('cancel-subscription-btn');
+
+subscribeBtn.addEventListener('click', () => {
+// Vérifier d'abord si l'utilisateur a une période d'essai active ou un abonnement actif
+if (currentUser && currentUser.subscription && (currentUser.subscription.status === 'trial' || currentUser.subscription.status === 'active')) {
+alert("Vous avez déjà un abonnement actif ou une période d'essai en cours.");
+return;
+}
+showLoading();
+FedaPay.init({
+public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp', // Remplacez par votre clé publique Fedapay
+transaction: {
+    amount: 10000,
+    description: 'Abonnement mensuel à la plateforme de gestion locative'
+},
+customer: {
+    email: 'user@example.com' // Vous pouvez récupérer l'email de l'utilisateur connecté
+},
+onComplete: async function(transaction) {
+    if (transaction.status === 'approved') {
+        // Enregistrez l'abonnement dans la base de données Firebase
+        const subscriptionData = {
+            status: 'active',
+            startDate: new Date().toISOString(),
+            endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 1 mois plus tard
+        };
+        await update(ref(database, `users/${currentUser.id}/subscription`), subscriptionData);
+        
+        // Mettre à jour l'état de l'utilisateur courant
+        if (currentUser) {
+            currentUser.subscription = subscriptionData;
+        }
+        checkUserRoleAndSubscription();
+
+        alert('Abonnement réussi!');
+        loadDashboardData(); // Rechargez les données pour mettre à jour le statut de l'abonnement
+    } else {
+        alert('Erreur lors du paiement: ' + transaction.reason);
+    }
+}
+}).open();
+hideLoading();
+});
+
+// Fonction pour charger les données du tableau de bord
+async function loadDashboardData() {
+if (!isAuthenticated) return;
+
+// Charger le nombre de propriétaires
+const proprietairesRef = ref(database, 'proprietaires');
+onValue(proprietairesRef, (snapshot) => {
+const proprietaires = snapshot.val();
+const proprietairesCount = proprietaires ? Object.keys(proprietaires).length : 0;
+document.getElementById('dashboard-proprietaires-count').textContent = proprietairesCount;
+});
+
+// Charger le nombre de locataires
+const locatairesRef = ref(database, 'locataires');
+onValue(locatairesRef, (snapshot) => {
+const locataires = snapshot.val();
+const locatairesCount = locataires ? Object.keys(locataires).length : 0;
+document.getElementById('dashboard-locataires-count').textContent = locatairesCount;
+});
+
+// Charger le nombre de maisons
+const maisonsRef = ref(database, 'maisons');
+onValue(maisonsRef, (snapshot) => {
+const maisons = snapshot.val();
+const maisonsCount = maisons ? Object.keys(maisons).length : 0;
+document.getElementById('dashboard-maisons-count').textContent = maisonsCount;
+});
+
+// Charger le nombre de souscriptions
+const souscriptionsRef = ref(database, 'souscriptions');
+onValue(souscriptionsRef, (snapshot) => {
+const souscriptions = snapshot.val();
+const souscriptionsCount = souscriptions ? Object.keys(souscriptions).length : 0;
+document.getElementById('dashboard-souscriptions-count').textContent = souscriptionsCount;
+});
+
+// Charger le nombre d'abonnements actifs
+const usersRef = ref(database, 'users');
+onValue(usersRef, (snapshot) => {
+const users = snapshot.val();
+let activeSubscriptionsCount = 0;
+for (const userId in users) {
+    const user = users[userId];
+    if (user.subscription && user.subscription.status === 'active') {
+        activeSubscriptionsCount++;
+    }
+}
+document.getElementById('dashboard-abonnements-count').textContent = activeSubscriptionsCount;
+});
+}
+
+// Appeler la fonction pour démarrer la période d'essai
+async function startTrial() {
+if (currentUser && currentUser.subscription && currentUser.subscription.status === 'trial') {
+alert("Vous avez déjà une période d'essai en cours.");
+return;
+}
+const trialEndDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 jours à partir de maintenant
+const trialData = {
+status: 'trial',
+startDate: new Date().toISOString(),
+endDate: trialEndDate.toISOString()
+};
+
+await update(ref(database, `users/${currentUser.id}/subscription`), trialData);
+if (currentUser) {
+currentUser.subscription = trialData;
+}
+checkUserRoleAndSubscription();
+alert("Période d'essai de 7 jours activée !");
+loadDashboardData(); // Rechargez les données pour mettre à jour le statut de l'abonnement
+}
+
+// Utilisation de la fonction startTrial lorsque l'utilisateur clique sur le bouton "S'abonner"
+subscribeBtn.addEventListener('click', () => {
+// Vérifier si l'utilisateur a déjà un abonnement actif
+if (currentUser && currentUser.subscription && currentUser.subscription.status === 'active') {
+alert("Vous avez déjà un abonnement actif.");
+return;
+}
+
+// Proposer à l'utilisateur de démarrer une période d'essai ou de s'abonner directement
+if (confirm("Voulez-vous démarrer une période d'essai gratuite de 7 jours ?")) {
+startTrial();
+} else {
+// Initialiser le paiement Fedapay pour l'abonnement
+initFedapayPayment();
+}
+});
+
+function initFedapayPayment() {
+showLoading();
+FedaPay.init({
+public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp', // Remplacez par votre clé publique Fedapay
+transaction: {
+    amount: 10000,
+    description: 'Abonnement mensuel à la plateforme de gestion locative'
+},
+customer: {
+    email: 'user@example.com' // Remplacez par l'email de l'utilisateur
+},
+onComplete: async function(transaction) {
+    if (transaction.status === 'approved') {
+        // Enregistrez l'abonnement dans la base de données Firebase
+        const subscriptionData = {
+            status: 'active',
+            startDate: new Date().toISOString(),
+            endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 1 mois plus tard
+        };
+        await update(ref(database, `users/${currentUser.id}/subscription`), subscriptionData);
+
+        // Mettre à jour l'état de l'utilisateur courant
+        if (currentUser) {
+            currentUser.subscription = subscriptionData;
+        }
+        checkUserRoleAndSubscription();
+
+        alert('Abonnement réussi!');
+        loadDashboardData();
+    } else {
+        alert('Erreur lors du paiement: ' + transaction.reason);
+    }
+}
+}).open();
+hideLoading();
+}
+
+cancelSubscriptionBtn.addEventListener('click', async () => {
+if (currentUser && currentUser.subscription) {
+if (confirm("Êtes-vous sûr de vouloir annuler votre abonnement ?")) {
+    // Mettre à jour le statut de l'abonnement dans Firebase
+    await update(ref(database, `users/${currentUser.id}/subscription`), { status: 'cancelled' });
+
+    // Mettre à jour l'état de l'utilisateur courant
+    currentUser.subscription.status = 'cancelled';
+    checkUserRoleAndSubscription();
+
+    alert('Abonnement annulé.');
+    loadDashboardData(); // Rechargez les données pour mettre à jour le statut de l'abonnement
+}
+} else {
+alert('Vous n\'avez pas d\'abonnement actif à annuler.');
+}
+});
+
+// Charger les données au chargement de la page
+if (isAuthenticated) {
+loadDashboardData();
+loadProprietaires();
+loadMaisons();
+loadLocataires();
+loadSouscriptions();
+}

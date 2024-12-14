@@ -854,29 +854,32 @@ loginForm.addEventListener('submit', async (event) => {
             }
         }
     
-        // Mise à jour de la création du tableau pour afficher uniquement les tickets disponibles
+        // Mise à jour de la création du tableau pour afficher uniquement les tickets disponibles avec leur nombre restant
         async function createTicketTable() {
             const table = document.querySelector('.rates-section table');
             table.innerHTML = `
                 <tr>
                     <th>Catégorie</th>
                     <th>Prix (FCFA)</th>
+                    <th>Restants</th>
                     <th>Action</th>
                 </tr>
             `;
-    
+
             for (const [category, data] of Object.entries(localTickets)) {
-                if (data.utilisateur && data.utilisateur.length > 0) {
+                const remaining = data.utilisateur ? data.utilisateur.length : 0;
+                if (remaining > 0) {
                     const price = data.prix[0];
                     const row = table.insertRow();
                     row.innerHTML = `
                         <td>${category}</td>
                         <td>${price}</td>
+                        <td>${remaining}</td>
                         <td><button onclick="window.initTicketSale('${category}')">Vendre</button></td>
                     `;
                 }
             }
-    
+
             document.querySelector('.loading-message').style.display = 'none';
             table.style.display = 'table';
         }
@@ -885,8 +888,9 @@ loginForm.addEventListener('submit', async (event) => {
         window.initTicketSale = async function(category) {
             showLoader();
             try {
-                const ticketsTotalRef = ref(db, `TicketsTotal/${category}`);
+                const ticketsTotalRef = ref(                db, `TicketsTotal/${category}`);
                 const snapshot = await get(ticketsTotalRef);
+    
                 if (snapshot.exists()) {
                     const data = snapshot.val();
                     if (!data.utilisateur || data.utilisateur.length === 0) {
@@ -1174,7 +1178,7 @@ loginForm.addEventListener('submit', async (event) => {
             tbody.innerHTML = sales
                 .sort((a, b) => b.soldAt - a.soldAt)
                 .map(sale => `
-                    <tr onclick="showTicketDetailsFromHistory('${sale.id}')" style="cursor: pointer;">
+                    <tr onclick="window.showTicketDetailsFromHistory('${sale.id}')" style="cursor: pointer;">
                         <td>${new Date(sale.soldAt).toLocaleString()}</td>
                         <td>${sale.category}</td>
                         <td>${sale.user}</td>
@@ -1191,6 +1195,7 @@ loginForm.addEventListener('submit', async (event) => {
                 const snapshot = await get(historyRef);
                 if (snapshot.exists()) {
                     const sale = snapshot.val();
+                    window.closeHistory();
                     showTicketDetails(sale);
                     hideLoader();
                 } else {
@@ -1247,9 +1252,20 @@ loginForm.addEventListener('submit', async (event) => {
             // Scroll vers le bas pour afficher le dernier message
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
-        // Fonction pour partager un ticket (exemple avec une alerte)
+        // Fonction pour partager un ticket 
         window.shareTicket = function() {
-            alert("Fonctionnalité de partage à implémenter");
+            const ticketDetails = document.getElementById('notification-message').innerText;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Détails du Ticket',
+                    text: ticketDetails,
+                })
+                .then(() => console.log('Partage réussi'))
+                .catch((error) => console.error('Erreur lors du partage:', error));
+            } else {
+                // Méthode alternative si navigator.share n'est pas supporté
+                alert("Le partage n'est pas supporté sur votre navigateur. Veuillez copier manuellement les détails du ticket.");
+            }
         };
 
         // Fonction pour copier un ticket dans le presse-papiers

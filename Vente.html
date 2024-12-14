@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Vente Tickets Cyber Campus</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -44,6 +45,11 @@
             border-radius: 12px;
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        section:hover{
+            transform: translateY(-5px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         h2 {
@@ -51,6 +57,7 @@
             margin-bottom: 16px;
             font-size: 1.5rem;
             font-weight: 600;
+            text-align: center;
         }
 
         table {
@@ -65,6 +72,12 @@
             padding: 12px 8px;
             text-align: left;
             border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        td{
+            transition: background-color 0.3s ease;
+        }
+        tr:hover td{
+            background-color: rgba(255, 255, 255, 0.1);
         }
 
         button {
@@ -200,63 +213,65 @@
             transform: translateX(-50%);
             bottom: 24px;
         }
-
         .history-section {
-    display: none;
-    background: rgba(26, 42, 108, 0.95); /* Fond plus opaque avec une teinte bleue foncée */
-    border-radius: 12px;
-    padding: 20px;
-    margin-top: 20px;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    max-width: 800px;
-    max-height: 80vh;
-    overflow-y: auto;
-    z-index: 1000;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-}
+            display: none;
+            background: rgba(26, 42, 108, 0.95); /* Fond plus opaque avec une teinte bleue foncée */
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .history-section:hover{
+            transform: translate(-50%, -50%) translateY(-5px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
-/* Amélioration du style de l'en-tête de l'historique pour plus de lisibilité */
-.history-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    position: sticky;
-    top: 0;
-    background: inherit;
-    padding: 10px 0;
-    z-index: 1;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
+        /* Amélioration du style de l'en-tête de l'historique pour plus de lisibilité */
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            position: sticky;
+            top: 0;
+            background: inherit;
+            padding: 10px 0;
+            z-index: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-/* Amélioration de la lisibilité des cartes de statistiques */
-.stat-card {
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 8px;
-    padding: 16px;
-    text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
+        /* Amélioration de la lisibilité des cartes de statistiques */
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .stat-card:hover{
+            transform: translateY(-5px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 16px;
             margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 16px;
-            text-align: center;
         }
 
         .stat-card h4 {
@@ -284,6 +299,16 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             z-index: 100;
             cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .toggle-history i{
+            transition: transform 0.3s ease;
+        }
+        .toggle-history:hover{
+            transform: scale(1.1);
+        }
+        .toggle-history:hover i{
+            transform: rotate(180deg);
         }
 
         .toggle-history:active {
@@ -509,12 +534,42 @@
             background-color: #fdbb2d;
             color: #1a2a6c;
         }
+        .loader-wrapper {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+        }
+
+        .loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #fdbb2d;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
 
     </style>
 </head>
 
 <body>
-
+    <div class="loader-wrapper" id="loaderWrapper">
+        <div class="loader"></div>
+    </div>
     <section class="login-section" id="loginSection">
         <h2>Connexion Partenaire</h2>
         <form id="loginForm">
@@ -609,6 +664,7 @@
                         <th>Catégorie</th>
                         <th>Utilisateur</th>
                         <th>Prix</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody id="historyTableBody">
@@ -631,7 +687,609 @@
     </footer>
 
     <script type="module">
-const _0x19684c=_0x1e00;function _0x1e00(_0x3d79f1,_0x2b2ba1){const _0x403748=_0x4037();return _0x1e00=function(_0x1e0045,_0x130850){_0x1e0045=_0x1e0045-0xb5;let _0x5b5c29=_0x403748[_0x1e0045];return _0x5b5c29;},_0x1e00(_0x3d79f1,_0x2b2ba1);}(function(_0x162b60,_0x26f80c){const _0x2c936a=_0x1e00,_0x2d0f9c=_0x162b60();while(!![]){try{const _0xd4b1dc=-parseInt(_0x2c936a(0xb5))/0x1*(parseInt(_0x2c936a(0x129))/0x2)+parseInt(_0x2c936a(0xe2))/0x3+-parseInt(_0x2c936a(0x134))/0x4*(-parseInt(_0x2c936a(0x107))/0x5)+parseInt(_0x2c936a(0xe7))/0x6+parseInt(_0x2c936a(0x145))/0x7*(parseInt(_0x2c936a(0x115))/0x8)+parseInt(_0x2c936a(0xef))/0x9+-parseInt(_0x2c936a(0xc8))/0xa;if(_0xd4b1dc===_0x26f80c)break;else _0x2d0f9c['push'](_0x2d0f9c['shift']());}catch(_0x5dc28e){_0x2d0f9c['push'](_0x2d0f9c['shift']());}}}(_0x4037,0x67112));import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';import{getDatabase,ref,get,set,push,remove,onChildAdded}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';const firebaseConfig={'apiKey':_0x19684c(0x12a),'authDomain':_0x19684c(0xd3),'databaseURL':_0x19684c(0xf6),'projectId':'cyber-campus-2706f','storageBucket':'cyber-campus-2706f.appspot.com','messagingSenderId':_0x19684c(0xba),'appId':'1:719410601264:web:44fd2e3757721866303cf5','measurementId':_0x19684c(0x146)},app=initializeApp(firebaseConfig),db=getDatabase(app);let ticketToSell=null,localTickets={},currentReservedTicket=null,currentVendorId='',vendors={},availableUsernames=[];async function fetchVendors(){const _0x1773b5=_0x19684c;try{const _0x570d57=ref(db,_0x1773b5(0xfb)),_0x29599d=await get(_0x570d57);_0x29599d[_0x1773b5(0xb6)]()?(vendors=_0x29599d[_0x1773b5(0x119)](),availableUsernames=Object['keys'](vendors)):console[_0x1773b5(0xdd)]('Aucun\x20vendeur\x20trouvé.');}catch(_0xf612d5){console[_0x1773b5(0xf5)](_0x1773b5(0x113),_0xf612d5);}}function _0x4037(){const _0x2e1c2d=['G-CEEFJP5LYZ','getItem','startsWith','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22timestamp\x22>','click','slice','411364daihZG','exists','notification-message','value','autocompleteSuggestions','719410601264','ceil','\x20FCFA','Aucun\x20ticket\x20disponible.','content','historyTableBody','.rates-section','input','category','TicketsTotal/','topCategory','loginForm','innerHTML','display','5460180Vyoxqr','preventDefault','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p><strong>Mot\x20de\x20passe:</strong>\x20','loginError','\x20FCFA</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn-sell\x22\x20onclick=\x22window.confirmSale()\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Confirmer\x20la\x20vente\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn-cancel\x22\x20onclick=\x22window.cancelSale()\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Annuler\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','join','Plus\x20de\x20tickets\x20disponibles','rememberMe','Nom\x20d\x27utilisateur\x20ou\x20mot\x20de\x20passe\x20incorrect.','entries','cyber-campus-2706f.firebaseapp.com','add','Ticket\x20vendu\x20avec\x20succès','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p>Voulez-vous\x20vendre\x20ce\x20ticket\x20?</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p><strong>Catégorie:</strong>\x20','</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>','username','target','price','appendChild','initTicketSale','log','min','getElementById','setItem','Erreur\x20lors\x20du\x20chargement\x20de\x20l\x27historique:','1602795VkTVeV','Erreur\x20lors\x20de\x20la\x20confirmation\x20de\x20la\x20vente','contains','textContent','toFixed','3469164KHVXwg','.rates-section\x20table','now','confirmation-buttons','proceedWithSale','div','notification-buttons','Confirmation\x20de\x20vente','338220drGgOO','block','addEventListener','getDate','Succès','table','error','https://cyber-campus-2706f-default-rtdb.firebaseio.com','closeHistory','password','filter','</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','Vendors','getDay','historySection','\x20FCFA</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','none','updatedData','createElement','cancelSale','loginSection','user','Ticket\x20vendu\x20avec\x20succès!','toLocaleString','5hZuwLM','querySelector','usernameTimestamp','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p><strong>Prix:</strong>\x20','Vendors/','Erreur','insertRow','confirmSale','style','timestamp','forEach','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Catégorie</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Prix\x20(FCFA)</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<th>Action</th>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','Erreur\x20lors\x20de\x20la\x20récupération\x20des\x20vendeurs:','Erreur\x20de\x20confirmation:','2777744OOsbaA','map','TicketsTotal','TicketsVendus','val','Impossible\x20de\x20charger\x20l\x27historique','removeItem','message','ticket-actions','messagesSection','\x27)\x22>Vendre</button></td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','flex','toggleHistory','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p><strong>Catégorie:</strong>\x20','setDate','classList','Erreur\x20de\x20synchronisation:','motDePasse','</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td><button\x20onclick=\x22window.initTicketSale(\x27','sort','4BIOgQu','AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY','<button\x20onclick=\x22hideNotification()\x22>Fermer</button>','prix','avgDaily','length','notification-title','soldAt','utilisateur','max','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>','1174604KwpVMz','Impossible\x20de\x20récupérer\x20le\x20ticket','notification','scrollHeight','checked','createIcons','Impossible\x20de\x20finaliser\x20la\x20vente','submit','/messages','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p><strong>Nom\x20d\x27utilisateur:</strong>\x20','Erreur\x20de\x20synchronisation\x20des\x20tickets.','setHours','.loading-message','scrollTop','Erreur\x20lors\x20de\x20la\x20vente:','hideNotification','reduce','7yCOipn'];_0x4037=function(){return _0x2e1c2d;};return _0x4037();}const usernameInput=document[_0x19684c(0xdf)](_0x19684c(0xd8)),passwordInput=document[_0x19684c(0xdf)](_0x19684c(0xf8)),suggestionsList=document['getElementById'](_0x19684c(0xb9));usernameInput[_0x19684c(0xf1)](_0x19684c(0xc1),()=>{const _0x1d2524=_0x19684c,_0x579382=usernameInput[_0x1d2524(0xb8)]['toLowerCase'](),_0x50b243=availableUsernames[_0x1d2524(0xf9)](_0x2ea448=>_0x2ea448['toLowerCase']()[_0x1d2524(0x148)](_0x579382));suggestionsList['innerHTML']='';if(_0x579382['length']===0x0||_0x50b243['length']===0x0){suggestionsList[_0x1d2524(0x10f)][_0x1d2524(0xc7)]=_0x1d2524(0xff);return;}_0x50b243[_0x1d2524(0x111)](_0x14b70a=>{const _0x3da0a2=_0x1d2524,_0x56dd70=document['createElement']('li');_0x56dd70[_0x3da0a2(0xe5)]=_0x14b70a,_0x56dd70[_0x3da0a2(0xf1)](_0x3da0a2(0x14a),()=>{const _0xeedca1=_0x3da0a2;usernameInput['value']=_0x14b70a,suggestionsList['innerHTML']='',suggestionsList[_0xeedca1(0x10f)]['display']=_0xeedca1(0xff);}),suggestionsList[_0x3da0a2(0xdb)](_0x56dd70);}),suggestionsList[_0x1d2524(0x10f)][_0x1d2524(0xc7)]='block';}),document[_0x19684c(0xf1)]('click',_0x6d914e=>{const _0x45a923=_0x19684c;!usernameInput['contains'](_0x6d914e['target'])&&!suggestionsList[_0x45a923(0xe4)](_0x6d914e[_0x45a923(0xd9)])&&(suggestionsList['style'][_0x45a923(0xc7)]=_0x45a923(0xff));});const rememberMeCheckbox=document['getElementById'](_0x19684c(0xd0)),storedUsername=localStorage[_0x19684c(0x147)](_0x19684c(0xd8)),storedPassword=localStorage[_0x19684c(0x147)]('password'),storedTimestamp=localStorage['getItem'](_0x19684c(0x109)),now=Date[_0x19684c(0xe9)](),twentyFourHours=0x18*0x3c*0x3c*0x3e8;storedUsername&&storedPassword&&storedTimestamp&&now-storedTimestamp<twentyFourHours&&(usernameInput['value']=storedUsername,passwordInput[_0x19684c(0xb8)]=storedPassword,rememberMeCheckbox[_0x19684c(0x138)]=!![]);const loginForm=document[_0x19684c(0xdf)](_0x19684c(0xc5)),loginError=document[_0x19684c(0xdf)](_0x19684c(0xcb)),ratesSection=document['querySelector'](_0x19684c(0xc0)),historySection=document[_0x19684c(0xdf)](_0x19684c(0xfd)),loginSection=document[_0x19684c(0xdf)](_0x19684c(0x103)),messagesSection=document['getElementById'](_0x19684c(0x11e));loginForm[_0x19684c(0xf1)](_0x19684c(0x13b),async _0x2f56f6=>{const _0x33b88f=_0x19684c;_0x2f56f6[_0x33b88f(0xc9)]();const _0xb3838c=usernameInput['value'],_0x169628=passwordInput['value'];vendors[_0xb3838c]&&vendors[_0xb3838c]['password']===_0x169628?(loginError[_0x33b88f(0x10f)][_0x33b88f(0xc7)]=_0x33b88f(0xff),ratesSection['style'][_0x33b88f(0xc7)]=_0x33b88f(0xf0),historySection['style'][_0x33b88f(0xc7)]=_0x33b88f(0xff),loginSection[_0x33b88f(0x10f)][_0x33b88f(0xc7)]=_0x33b88f(0xff),messagesSection[_0x33b88f(0x10f)][_0x33b88f(0xc7)]='block',currentVendorId=_0xb3838c,rememberMeCheckbox[_0x33b88f(0x138)]?(localStorage[_0x33b88f(0xe0)]('username',_0xb3838c),localStorage[_0x33b88f(0xe0)](_0x33b88f(0xf8),_0x169628),localStorage['setItem']('usernameTimestamp',Date['now']())):(localStorage[_0x33b88f(0x11b)](_0x33b88f(0xd8)),localStorage[_0x33b88f(0x11b)](_0x33b88f(0xf8)),localStorage['removeItem']('usernameTimestamp')),await syncTickets(),loadHistory(),listenForNewMessages(),lucide[_0x33b88f(0x139)]()):(loginError[_0x33b88f(0x10f)]['display']=_0x33b88f(0xf0),loginError[_0x33b88f(0xe5)]=_0x33b88f(0xd1));});async function syncTickets(){const _0x1781e0=_0x19684c;try{const _0x2cfec6=document['querySelector'](_0x1781e0(0x140)),_0xa72014=document[_0x1781e0(0x108)](_0x1781e0(0xe8));_0x2cfec6[_0x1781e0(0x10f)]['display']=_0x1781e0(0xf0),_0xa72014[_0x1781e0(0x10f)][_0x1781e0(0xc7)]=_0x1781e0(0xff);const _0x1fa98f=ref(db,_0x1781e0(0x117)),_0x4142f0=await get(_0x1fa98f);_0x4142f0[_0x1781e0(0xb6)]()?(localTickets=_0x4142f0['val'](),createTicketTable(),_0x2cfec6[_0x1781e0(0x10f)][_0x1781e0(0xc7)]=_0x1781e0(0xff),_0xa72014['style'][_0x1781e0(0xc7)]=_0x1781e0(0xf4)):_0x2cfec6[_0x1781e0(0xe5)]=_0x1781e0(0xbd);}catch(_0x37134d){console[_0x1781e0(0xf5)](_0x1781e0(0x125),_0x37134d),loadingMessage[_0x1781e0(0xe5)]=_0x1781e0(0x13e);}}async function createTicketTable(){const _0x48e16b=_0x19684c,_0x544979=document[_0x48e16b(0x108)](_0x48e16b(0xe8));_0x544979[_0x48e16b(0xc6)]=_0x48e16b(0x112);for(const [_0x94201b,_0x9bad3d]of Object[_0x48e16b(0xd2)](localTickets)){if(_0x9bad3d['utilisateur']&&_0x9bad3d[_0x48e16b(0x131)][_0x48e16b(0x12e)]>0x0){const _0x207935=_0x9bad3d[_0x48e16b(0x12c)][0x0],_0x1cf888=_0x544979[_0x48e16b(0x10d)]();_0x1cf888['innerHTML']='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>'+_0x94201b+_0x48e16b(0xd7)+_0x207935+_0x48e16b(0x127)+_0x94201b+_0x48e16b(0x11f);}}document[_0x48e16b(0x108)](_0x48e16b(0x140))[_0x48e16b(0x10f)][_0x48e16b(0xc7)]='none',_0x544979['style'][_0x48e16b(0xc7)]=_0x48e16b(0xf4);}window[_0x19684c(0xdc)]=async function(_0x5a4620){const _0x1340b1=_0x19684c;try{const _0x20dca1=ref(db,'TicketsTotal/'+_0x5a4620),_0x19bd96=await get(_0x20dca1);if(_0x19bd96[_0x1340b1(0xb6)]()){const _0x54ccb5=_0x19bd96[_0x1340b1(0x119)]();if(!_0x54ccb5['utilisateur']||_0x54ccb5[_0x1340b1(0x131)][_0x1340b1(0x12e)]===0x0)throw new Error(_0x1340b1(0xcf));ticketToSell={'category':_0x5a4620,'user':_0x54ccb5[_0x1340b1(0x131)][0x0],'password':_0x54ccb5[_0x1340b1(0x126)][0x0],'price':_0x54ccb5['prix'][0x0],'updatedData':{..._0x54ccb5,'utilisateur':_0x54ccb5[_0x1340b1(0x131)][_0x1340b1(0x14b)](0x1),'motDePasse':_0x54ccb5[_0x1340b1(0x126)][_0x1340b1(0x14b)](0x1),'prix':_0x54ccb5[_0x1340b1(0x12c)][_0x1340b1(0x14b)](0x1)}},showConfirmation(ticketToSell);}}catch(_0x3362fd){console[_0x1340b1(0xf5)]('Erreur:',_0x3362fd),showNotification(_0x1340b1(0x10c),_0x1340b1(0x135));}};function showConfirmation(_0x5cdd6f){const _0x7369c1=_0x19684c,_0x423fb7=document[_0x7369c1(0xdf)](_0x7369c1(0x136)),_0x486d67=document[_0x7369c1(0xdf)](_0x7369c1(0xb7)),_0x5223d4=document['getElementById']('ticket-actions'),_0x28c88d=document[_0x7369c1(0xdf)](_0x7369c1(0xea));document['getElementById'](_0x7369c1(0x12f))['textContent']=_0x7369c1(0xee),_0x486d67[_0x7369c1(0xc6)]=_0x7369c1(0xd6)+_0x5cdd6f['category']+_0x7369c1(0x10a)+_0x5cdd6f[_0x7369c1(0xda)]+_0x7369c1(0xcc),_0x28c88d[_0x7369c1(0x10f)][_0x7369c1(0xc7)]=_0x7369c1(0x120),_0x5223d4[_0x7369c1(0x10f)][_0x7369c1(0xc7)]=_0x7369c1(0xff),_0x423fb7['style'][_0x7369c1(0xc7)]='block';}window[_0x19684c(0xeb)]=async function(){const _0x23da7c=_0x19684c;if(!ticketToSell){showNotification(_0x23da7c(0x10c),'Aucun\x20ticket\x20à\x20vendre');return;}try{const _0x1589c0=ref(db,_0x23da7c(0xc3)+ticketToSell['category']);await set(_0x1589c0,ticketToSell[_0x23da7c(0x100)]);const _0x1cf372=ref(db,_0x23da7c(0x118));await push(_0x1cf372,{'category':ticketToSell[_0x23da7c(0xc2)],'user':ticketToSell[_0x23da7c(0x104)],'password':ticketToSell['password'],'price':ticketToSell[_0x23da7c(0xda)],'soldAt':Date[_0x23da7c(0xe9)](),'vendorId':currentVendorId});const _0x2ba209=ref(db,'VendorsHistory/'+currentVendorId);await push(_0x2ba209,{'category':ticketToSell[_0x23da7c(0xc2)],'user':ticketToSell[_0x23da7c(0x104)],'password':ticketToSell[_0x23da7c(0xf8)],'price':ticketToSell[_0x23da7c(0xda)],'soldAt':Date['now']()}),showTicketDetails(ticketToSell),await syncTickets();}catch(_0x402f7c){console['error'](_0x23da7c(0x142),_0x402f7c),showNotification(_0x23da7c(0x10c),_0x23da7c(0x13a));}ticketToSell=null;};function showTicketDetails(_0x35cef9){const _0x38f944=_0x19684c,_0x19d365=document[_0x38f944(0xdf)](_0x38f944(0x136)),_0x1e8c22=document[_0x38f944(0xdf)](_0x38f944(0xb7)),_0x356835=document[_0x38f944(0xdf)](_0x38f944(0x11d)),_0x1d1c89=document[_0x38f944(0xdf)]('confirmation-buttons');document[_0x38f944(0xdf)]('notification-title')['textContent']=_0x38f944(0xd5),_0x1e8c22[_0x38f944(0xc6)]=_0x38f944(0x122)+_0x35cef9[_0x38f944(0xc2)]+'</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p><strong>Nom\x20d\x27utilisateur:</strong>\x20'+_0x35cef9[_0x38f944(0x104)]+_0x38f944(0xca)+_0x35cef9['password']+_0x38f944(0x10a)+_0x35cef9['price']+_0x38f944(0xcc),_0x1d1c89[_0x38f944(0x10f)][_0x38f944(0xc7)]=_0x38f944(0xff),_0x356835[_0x38f944(0x10f)][_0x38f944(0xc7)]=_0x38f944(0x120),_0x19d365[_0x38f944(0x10f)][_0x38f944(0xc7)]='block',lucide[_0x38f944(0x139)]();}function showSaleConfirmation(_0x3b1f26){const _0xe66b91=_0x19684c,_0x46467c=document[_0xe66b91(0xdf)](_0xe66b91(0x136)),_0x5c5116=document['getElementById']('notification-message'),_0x2eaa5d=document[_0xe66b91(0xdf)](_0xe66b91(0xed));_0x5c5116[_0xe66b91(0xc6)]=_0xe66b91(0x122)+_0x3b1f26['category']+_0xe66b91(0x13d)+_0x3b1f26[_0xe66b91(0x104)]+_0xe66b91(0xca)+_0x3b1f26[_0xe66b91(0xf8)]+_0xe66b91(0x10a)+_0x3b1f26['price']+_0xe66b91(0xcc),_0x2eaa5d[_0xe66b91(0xc6)]=_0xe66b91(0xcd),_0x46467c[_0xe66b91(0x10f)][_0xe66b91(0xc7)]=_0xe66b91(0xf0),lucide['createIcons']();}window[_0x19684c(0x10e)]=async function(){const _0x251b96=_0x19684c;if(!currentReservedTicket){showNotification('Erreur','Aucun\x20ticket\x20en\x20cours\x20de\x20vente');return;}try{const _0x5babfe=ref(db,_0x251b96(0x118));await push(_0x5babfe,{...currentReservedTicket,'soldAt':Date[_0x251b96(0xe9)](),'vendorId':currentVendorId});const _0x5a59c3=ref(db,'VendorsHistory/'+currentVendorId);await push(_0x5a59c3,{...currentReservedTicket,'soldAt':Date[_0x251b96(0xe9)]()}),showNotification(_0x251b96(0xf3),_0x251b96(0x105)),currentReservedTicket=null,hideNotification(),await syncTickets();}catch(_0x4336a8){console[_0x251b96(0xf5)](_0x251b96(0x114),_0x4336a8),showNotification(_0x251b96(0x10c),_0x251b96(0xe3));}},window[_0x19684c(0x102)]=function(){currentReservedTicket=null,hideNotification();};function showNotification(_0x573e26,_0x3c35b5){const _0x23acc2=_0x19684c,_0x489d02=document['getElementById']('notification'),_0x2f710b=document[_0x23acc2(0xdf)](_0x23acc2(0x12f)),_0x1f2c89=document[_0x23acc2(0xdf)](_0x23acc2(0xb7)),_0x35f642=document[_0x23acc2(0xdf)]('notification-buttons');_0x2f710b[_0x23acc2(0xe5)]=_0x573e26,_0x1f2c89[_0x23acc2(0xe5)]=_0x3c35b5,(_0x573e26===_0x23acc2(0xf3)||_0x573e26===_0x23acc2(0x10c))&&(_0x35f642[_0x23acc2(0xc6)]=_0x23acc2(0x12b)),_0x489d02[_0x23acc2(0x10f)][_0x23acc2(0xc7)]=_0x23acc2(0xf0);}window[_0x19684c(0x143)]=function(){const _0x400ae8=_0x19684c;document[_0x400ae8(0xdf)](_0x400ae8(0x136))[_0x400ae8(0x10f)]['display']='none';},document[_0x19684c(0xf1)]('DOMContentLoaded',()=>{const _0x42345c=_0x19684c;fetchVendors(),lucide[_0x42345c(0x139)]();});async function loadHistory(){const _0xbe41e9=_0x19684c;try{const _0x383f5b=ref(db,'VendorsHistory/'+currentVendorId),_0x5768cb=await get(_0x383f5b);let _0x296e0a=[];_0x5768cb[_0xbe41e9(0xb6)]()&&(_0x296e0a=Object[_0xbe41e9(0xd2)](_0x5768cb['val']())[_0xbe41e9(0x116)](([_0x229582,_0x4333ee])=>({'id':_0x229582,..._0x4333ee}))),filterHistory(_0x296e0a);}catch(_0x1265cd){console[_0xbe41e9(0xf5)](_0xbe41e9(0xe1),_0x1265cd),showNotification(_0xbe41e9(0x10c),_0xbe41e9(0x11a));}}function filterHistory(_0x1c45e5){const _0x1069a9=_0x19684c,_0x2b4f51=document['getElementById']('periodFilter')[_0x1069a9(0xb8)],_0x4e157b=new Date(),_0x58d0f2={'today':new Date(_0x4e157b[_0x1069a9(0x13f)](0x0,0x0,0x0,0x0)),'week':new Date(_0x4e157b['setDate'](_0x4e157b[_0x1069a9(0xf2)]()-_0x4e157b[_0x1069a9(0xfc)]())),'month':new Date(_0x4e157b[_0x1069a9(0x123)](0x1)),'all':new Date(0x0)},_0x117d33=_0x1c45e5[_0x1069a9(0xf9)](_0x4244d0=>new Date(_0x4244d0[_0x1069a9(0x130)])>=_0x58d0f2[_0x2b4f51]);updateStats(_0x117d33),updateHistoryTable(_0x117d33);}function updateStats(_0x4f9cd8){const _0x57c6d3=_0x19684c,_0x21cce8=_0x4f9cd8[_0x57c6d3(0x12e)],_0x3c9536=_0x4f9cd8[_0x57c6d3(0x144)]((_0xde29ee,_0xf0f776)=>_0xde29ee+parseFloat(_0xf0f776[_0x57c6d3(0xda)]),0x0),_0x3e9c8a=_0x4f9cd8[_0x57c6d3(0x144)]((_0x41dc57,_0x431075)=>{const _0x186863=_0x57c6d3;return _0x41dc57[_0x431075[_0x186863(0xc2)]]=(_0x41dc57[_0x431075[_0x186863(0xc2)]]||0x0)+0x1,_0x41dc57;},{}),_0x879006=Object['entries'](_0x3e9c8a)[_0x57c6d3(0x128)]((_0x585d08,_0x2a305d)=>_0x2a305d[0x1]-_0x585d08[0x1])[0x0]?.[0x0]||'-',_0x8878f6=_0x4f9cd8[_0x57c6d3(0x12e)]>0x0?Math[_0x57c6d3(0x132)](0x1,Math[_0x57c6d3(0xbb)]((Date[_0x57c6d3(0xe9)]()-Math[_0x57c6d3(0xde)](..._0x4f9cd8['map'](_0x5951d9=>_0x5951d9[_0x57c6d3(0x130)])))/(0x3e8*0x3c*0x3c*0x18))):0x1,_0x21b998=(_0x21cce8/_0x8878f6)[_0x57c6d3(0xe6)](0x1);document[_0x57c6d3(0xdf)]('totalTickets')[_0x57c6d3(0xe5)]=_0x21cce8,document[_0x57c6d3(0xdf)]('totalRevenue')['textContent']=_0x3c9536[_0x57c6d3(0x106)]()+_0x57c6d3(0xbc),document[_0x57c6d3(0xdf)](_0x57c6d3(0xc4))['textContent']=_0x879006,document[_0x57c6d3(0xdf)](_0x57c6d3(0x12d))['textContent']=_0x21b998;}function updateHistoryTable(_0x1a653c){const _0x74072c=_0x19684c,_0x23e394=document[_0x74072c(0xdf)](_0x74072c(0xbf));_0x23e394[_0x74072c(0xc6)]=_0x1a653c[_0x74072c(0x128)]((_0x27a87d,_0xfc3291)=>_0xfc3291[_0x74072c(0x130)]-_0x27a87d[_0x74072c(0x130)])['map'](_0xb39d07=>_0x74072c(0x133)+new Date(_0xb39d07[_0x74072c(0x130)])[_0x74072c(0x106)]()+'</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>'+_0xb39d07[_0x74072c(0xc2)]+_0x74072c(0xd7)+_0xb39d07['user']+_0x74072c(0xd7)+_0xb39d07[_0x74072c(0xda)]+_0x74072c(0xfe))[_0x74072c(0xce)]('');}window[_0x19684c(0x121)]=function(){const _0x1dc01d=_0x19684c,_0x4fff04=document[_0x1dc01d(0xdf)](_0x1dc01d(0xfd)),_0x5a7302=_0x4fff04[_0x1dc01d(0x10f)]['display']===_0x1dc01d(0xf0);_0x4fff04['style'][_0x1dc01d(0xc7)]=_0x5a7302?_0x1dc01d(0xff):_0x1dc01d(0xf0),!_0x5a7302&&loadHistory();},window[_0x19684c(0xf7)]=function(){const _0x54f5b7=_0x19684c;document['getElementById']('historySection')['style']['display']=_0x54f5b7(0xff);},window['filterHistory']=function(){loadHistory();};function listenForNewMessages(){const _0x48f826=_0x19684c,_0x10a5f3=ref(db,_0x48f826(0x10b)+currentVendorId+_0x48f826(0x13c));onChildAdded(_0x10a5f3,_0x195853=>{const _0x2096ae=_0x48f826,_0x36ea4f=_0x195853[_0x2096ae(0x119)]();displayNewMessage(_0x36ea4f);});}function displayNewMessage(_0x4f4ca3){const _0x3607c=_0x19684c,_0x5570ff=document[_0x3607c(0xdf)]('messagesContainer'),_0x2cfb59=document[_0x3607c(0x101)](_0x3607c(0xec));_0x2cfb59[_0x3607c(0x124)][_0x3607c(0xd4)](_0x3607c(0x11c)),_0x2cfb59[_0x3607c(0xc6)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p>'+_0x4f4ca3[_0x3607c(0xbe)]+_0x3607c(0x149)+new Date(_0x4f4ca3[_0x3607c(0x110)])[_0x3607c(0x106)]()+_0x3607c(0xfa),_0x5570ff['appendChild'](_0x2cfb59),_0x5570ff[_0x3607c(0x141)]=_0x5570ff[_0x3607c(0x137)];}
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getDatabase, ref, get, set, push, remove, onChildAdded } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    
+        const firebaseConfig = {
+            apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
+            authDomain: "cyber-campus-2706f.firebaseapp.com",
+            databaseURL: "https://cyber-campus-2706f-default-rtdb.firebaseio.com",
+            projectId: "cyber-campus-2706f",
+            storageBucket: "cyber-campus-2706f.appspot.com",
+            messagingSenderId: "719410601264",
+            appId: "1:719410601264:web:44fd2e3757721866303cf5",
+            measurementId: "G-CEEFJP5LYZ"
+        };
+    
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+    
+        let ticketToSell = null;
+        let localTickets = {};
+        let currentReservedTicket = null;
+        let currentVendorId = '';
+        let vendors = {}; // Stockera les informations de connexion des partenaires
+        let availableUsernames = []; // Liste des noms d'utilisateur disponibles pour l'autocomplétion
+        window.jsPDF = window.jspdf.jsPDF;
+        // Fonction pour récupérer les informations de connexion des partenaires
+        async function fetchVendors() {
+            try {
+                const vendorsRef = ref(db, 'Vendors');
+                const snapshot = await get(vendorsRef);
+                if (snapshot.exists()) {
+                    vendors = snapshot.val();
+                    availableUsernames = Object.keys(vendors); // Mettre à jour la liste des noms d'utilisateur
+                } else {
+                    console.log("Aucun vendeur trouvé.");
+                }
+            } catch (error) {
+                console.error("Erreur lors de la récupération des vendeurs:", error);
+            }
+        }
+    
+// --- Autocomplétion ---
+const usernameInput = document.getElementById('username');
+const passwordInput = document.getElementById('password'); // Ajout pour le champ de mot de passe
+const suggestionsList = document.getElementById('autocompleteSuggestions');
+
+usernameInput.addEventListener('input', () => {
+    const inputValue = usernameInput.value.toLowerCase();
+    const suggestions = availableUsernames.filter(username => username.toLowerCase().startsWith(inputValue));
+
+    suggestionsList.innerHTML = ''; // Effacer les suggestions précédentes
+    if (inputValue.length === 0 || suggestions.length === 0) {
+        suggestionsList.style.display = 'none'; // Cacher la liste si aucune suggestion
+        return; // Sortir de la fonction si l'input est vide
+    }
+
+    suggestions.forEach(suggestion => {
+        const listItem = document.createElement('li');
+        listItem.textContent = suggestion;
+        listItem.addEventListener('click', () => {
+            usernameInput.value = suggestion;
+            suggestionsList.innerHTML = ''; // Effacer les suggestions
+            suggestionsList.style.display = 'none'; // Cacher la liste
+        });
+        suggestionsList.appendChild(listItem);
+    });
+
+    suggestionsList.style.display = 'block'; // Afficher la liste de suggestions
+});
+
+// Cacher les suggestions si on clique en dehors
+document.addEventListener('click', (event) => {
+    if (!usernameInput.contains(event.target) && !suggestionsList.contains(event.target)) {
+        suggestionsList.style.display = 'none';
+    }
+});
+
+// --- Mémorisation de l'ID et du MOT DE PASSE (DÉCONSEILLÉ) ---
+const rememberMeCheckbox = document.getElementById('rememberMe');
+
+// Pré-remplir l'ID et le MOT DE PASSE si mémorisés
+const storedUsername = localStorage.getItem('username');
+const storedPassword = localStorage.getItem('password'); // Ajout pour le mot de passe
+const storedTimestamp = localStorage.getItem('usernameTimestamp'); // Le timestamp est commun
+const now = Date.now();
+const twentyFourHours = 24 * 60 * 60 * 1000;
+
+if (storedUsername && storedPassword && storedTimestamp && (now - storedTimestamp < twentyFourHours)) {
+    usernameInput.value = storedUsername;
+    passwordInput.value = storedPassword; // Pré-remplir le mot de passe
+    rememberMeCheckbox.checked = true; // Cocher la case "Se souvenir de moi"
+}
+
+// Gestion du formulaire de connexion
+const loginForm = document.getElementById('loginForm');
+const loginError = document.getElementById('loginError');
+const ratesSection = document.querySelector('.rates-section');
+const historySection = document.getElementById('historySection');
+const loginSection = document.getElementById('loginSection');
+const messagesSection = document.getElementById('messagesSection');
+
+loginForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    showLoader();
+    const username = usernameInput.value;
+    const password = passwordInput.value;
+
+    if (vendors[username] && vendors[username].password === password) {
+        // Connexion réussie
+        loginError.style.display = 'none';
+        ratesSection.style.display = 'block';
+        historySection.style.display = 'none';
+        loginSection.style.display = 'none';
+        messagesSection.style.display = 'block';
+        currentVendorId = username; // Mettre à jour l'ID du vendeur actuel
+
+        // Mémoriser l'ID et le MOT DE PASSE si la case est cochée (DÉCONSEILLÉ)
+        if (rememberMeCheckbox.checked) {
+            localStorage.setItem('username', username);
+            localStorage.setItem('password', password); // Stocker le mot de passe
+            localStorage.setItem('usernameTimestamp', Date.now());
+        } else {
+            localStorage.removeItem('username');
+            localStorage.removeItem('password'); // Supprimer le mot de passe
+            localStorage.removeItem('usernameTimestamp');
+        }
+
+        // Charger les données et initialiser l'interface
+        await syncTickets();
+        loadHistory();
+        listenForNewMessages();
+        lucide.createIcons();
+        hideLoader();
+    } else {
+        // Identifiants incorrects
+        loginError.style.display = 'block';
+        loginError.textContent = "Nom d'utilisateur ou mot de passe incorrect.";
+        hideLoader();
+    }
+});
+
+    
+        // Fonction pour synchroniser les tickets et gérer l'affichage
+        async function syncTickets() {
+            try {
+                const loadingMessage = document.querySelector('.loading-message');
+                const table = document.querySelector('.rates-section table');
+    
+                loadingMessage.style.display = 'block';
+                table.style.display = 'none';
+    
+                const ticketsTotalRef = ref(db, 'TicketsTotal');
+                const snapshot = await get(ticketsTotalRef);
+    
+                if (snapshot.exists()) {
+                    localTickets = snapshot.val();
+                    createTicketTable();
+                    loadingMessage.style.display = 'none';
+                    table.style.display = 'table';
+                } else {
+                    loadingMessage.textContent = 'Aucun ticket disponible.';
+                }
+            } catch (error) {
+                console.error("Erreur de synchronisation:", error);
+                loadingMessage.textContent = "Erreur de synchronisation des tickets.";
+            }
+        }
+    
+        // Mise à jour de la création du tableau pour afficher uniquement les tickets disponibles
+        async function createTicketTable() {
+            const table = document.querySelector('.rates-section table');
+            table.innerHTML = `
+                <tr>
+                    <th>Catégorie</th>
+                    <th>Prix (FCFA)</th>
+                    <th>Action</th>
+                </tr>
+            `;
+    
+            for (const [category, data] of Object.entries(localTickets)) {
+                if (data.utilisateur && data.utilisateur.length > 0) {
+                    const price = data.prix[0];
+                    const row = table.insertRow();
+                    row.innerHTML = `
+                        <td>${category}</td>
+                        <td>${price}</td>
+                        <td><button onclick="window.initTicketSale('${category}')">Vendre</button></td>
+                    `;
+                }
+            }
+    
+            document.querySelector('.loading-message').style.display = 'none';
+            table.style.display = 'table';
+        }
+    
+        // Modification de la fonction initTicketSale pour demander confirmation
+        window.initTicketSale = async function(category) {
+            showLoader();
+            try {
+                const ticketsTotalRef = ref(db, `TicketsTotal/${category}`);
+                const snapshot = await get(ticketsTotalRef);
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    if (!data.utilisateur || data.utilisateur.length === 0) {
+                        throw new Error("Plus de tickets disponibles");
+                    }
+    
+                    ticketToSell = {
+                        category: category,
+                        user: data.utilisateur[0],
+                        password: data.motDePasse[0],
+                        price: data.prix[0],
+                        updatedData: {
+                            ...data,
+                            utilisateur: data.utilisateur.slice(1),
+                            motDePasse: data.motDePasse.slice(1),
+                            prix: data.prix.slice(1)
+                        }
+                    };
+    
+                    showConfirmation(ticketToSell);
+                    hideLoader();
+                }
+            } catch (error) {
+                console.error("Erreur:", error);
+                showNotification("Erreur", "Impossible de récupérer le ticket");
+                hideLoader();
+            }
+        };
+    
+        // Fonction pour afficher la confirmation
+        function showConfirmation(ticket) {
+            const notification = document.getElementById('notification');
+            const message = document.getElementById('notification-message');
+            const ticketActions = document.getElementById('ticket-actions');
+            const confirmationButtons = document.getElementById('confirmation-buttons');
+    
+            document.getElementById('notification-title').textContent = 'Confirmation de vente';
+            message.innerHTML = `
+                <p>Voulez-vous vendre ce ticket ?</p>
+                <p><strong>Catégorie:</strong> ${ticket.category}</p>
+                <p><strong>Prix:</strong> ${ticket.price} FCFA</p>
+            `;
+    
+            confirmationButtons.style.display = 'flex';
+            ticketActions.style.display = 'none';
+            notification.style.display = 'block';
+        }
+    
+        // Fonction pour procéder à la vente après confirmation
+        window.proceedWithSale = async function() {
+            showLoader();
+            if (!ticketToSell) {
+                showNotification("Erreur", "Aucun ticket à vendre");
+                hideLoader();
+                return;
+            }
+    
+            try {
+                // Mettre à jour la base de données
+                const ticketsTotalRef = ref(db, `TicketsTotal/${ticketToSell.category}`);
+                await set(ticketsTotalRef, ticketToSell.updatedData);
+    
+                // Ajouter aux tickets vendus
+                const ticketsVendusRef = ref(db, 'TicketsVendus');
+                await push(ticketsVendusRef, {
+                    category: ticketToSell.category,
+                    user: ticketToSell.user,
+                    password: ticketToSell.password,
+                    price: ticketToSell.price,
+                    soldAt: Date.now(),
+                    vendorId: currentVendorId
+                });
+    
+                // Ajouter à l'historique du vendeur
+                const vendorHistoryRef = ref(db, `VendorsHistory/${currentVendorId}`);
+                await push(vendorHistoryRef, {
+                    category: ticketToSell.category,
+                    user: ticketToSell.user,
+                    password: ticketToSell.password,
+                    price: ticketToSell.price,
+                    soldAt: Date.now()
+                });
+    
+                // Afficher les détails du ticket vendu
+                showTicketDetails(ticketToSell);
+                await syncTickets();
+                hideLoader();
+            } catch (error) {
+                console.error("Erreur lors de la vente:", error);
+                showNotification("Erreur", "Impossible de finaliser la vente");
+                hideLoader();
+            }
+    
+            ticketToSell = null;
+        };
+    
+        // Fonction pour afficher les détails après la vente
+        function showTicketDetails(ticket) {
+            const notification = document.getElementById('notification');
+            const message = document.getElementById('notification-message');
+            const ticketActions = document.getElementById('ticket-actions');
+            const confirmationButtons = document.getElementById('confirmation-buttons');
+    
+            document.getElementById('notification-title').textContent = 'Ticket vendu avec succès';
+            message.innerHTML = `
+                <p><strong>Catégorie:</strong> ${ticket.category}</p>
+                <p><strong>Nom d'utilisateur:</strong> ${ticket.user}</p>
+                <p><strong>Mot de passe:</strong> ${ticket.password}</p>
+                <p><strong>Prix:</strong> ${ticket.price} FCFA</p>
+            `;
+    
+            confirmationButtons.style.display = 'none';
+            ticketActions.style.display = 'flex';
+            notification.style.display = 'block';
+            lucide.createIcons();
+        }
+        // Afficher la confirmation de vente
+        function showSaleConfirmation(ticket) {
+            const notification = document.getElementById('notification');
+            const message = document.getElementById('notification-message');
+            const buttons = document.getElementById('notification-buttons');
+    
+            message.innerHTML = `
+                <p><strong>Catégorie:</strong> ${ticket.category}</p>
+                <p><strong>Nom d'utilisateur:</strong> ${ticket.user}</p>
+                <p><strong>Mot de passe:</strong> ${ticket.password}</p>
+                <p><strong>Prix:</strong> ${ticket.price} FCFA</p>
+            `;
+    
+            buttons.innerHTML = `
+                <button class="btn-sell" onclick="window.confirmSale()">
+                    Confirmer la vente
+                </button>
+                <button class="btn-cancel" onclick="window.cancelSale()">
+                    Annuler
+                </button>
+            `;
+    
+            notification.style.display = 'block';
+            lucide.createIcons();
+        }
+    
+        // Confirmation de la vente
+        window.confirmSale = async function() {
+            showLoader();
+            if (!currentReservedTicket) {
+                showNotification("Erreur", "Aucun ticket en cours de vente");
+                hideLoader();
+                return;
+            }
+    
+            try {
+                // Ajouter aux tickets vendus
+                const ticketsVendusRef = ref(db, 'TicketsVendus');
+                await push(ticketsVendusRef, {
+                    ...currentReservedTicket,
+                    soldAt: Date.now(),
+                    vendorId: currentVendorId
+                });
+    
+                // Ajouter à l'historique du vendeur
+                const vendorHistoryRef = ref(db, `VendorsHistory/${currentVendorId}`);
+                await push(vendorHistoryRef, {
+                    ...currentReservedTicket,
+                    soldAt: Date.now()
+                });
+    
+                showNotification("Succès", "Ticket vendu avec succès!");
+                currentReservedTicket = null;
+                hideNotification();
+                await syncTickets();
+                hideLoader();
+            } catch (error) {
+                console.error("Erreur de confirmation:", error);
+                showNotification("Erreur", "Erreur lors de la confirmation de la vente");
+                hideLoader();
+            }
+        };
+    
+        // Annulation de la vente
+        window.cancelSale = function() {
+            currentReservedTicket = null;
+            hideNotification();
+        };
+    
+        // Notifications
+        function showNotification(title, message) {
+            const notification = document.getElementById('notification');
+            const notificationTitle = document.getElementById('notification-title');
+            const notificationMessage = document.getElementById('notification-message');
+            const buttons = document.getElementById('notification-buttons');
+            const ticketActions = document.getElementById('ticket-actions');
+
+            notificationTitle.textContent = title;
+            notificationMessage.innerHTML = message;
+
+            if (title === "Succès" || title === "Erreur") {
+                buttons.style.display = 'none';
+                ticketActions.style.display = 'none';
+            } else {
+                buttons.style.display = 'flex';
+                ticketActions.style.display = 'none';
+            }
+
+            notification.style.display = 'block';
+        }
+    
+        window.hideNotification = function() {
+            document.getElementById('notification').style.display = 'none';
+        };
+    
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchVendors(); // Récupérer les informations des partenaires (et les noms d'utilisateur pour l'autocomplétion)
+            lucide.createIcons();
+            // Ne pas appeler syncTickets() ici, car il sera appelé après la connexion
+        });
+    
+        // Chargement de l'historique
+        async function loadHistory() {
+            showLoader();
+            try {
+                const historyRef = ref(db, `VendorsHistory/${currentVendorId}`);
+                const snapshot = await get(historyRef);
+    
+                let salesHistory = [];
+                if (snapshot.exists()) {
+                    salesHistory = Object.entries(snapshot.val()).map(([id, data]) => ({
+                        id,
+                        ...data
+                    }));
+                }
+                filterHistory(salesHistory);
+                hideLoader();
+            } catch (error) {
+                console.error("Erreur lors du chargement de l'historique:", error);
+                showNotification("Erreur", "Impossible de charger l'historique");
+                hideLoader();
+            }
+        }
+    
+        // Filtrage de l'historique par période
+        function filterHistory(salesHistory) {
+            const period = document.getElementById('periodFilter').value;
+            const now = new Date();
+            const startOf = {
+                today: new Date(now.setHours(0,0,0,0)),
+                week: new Date(now.setDate(now.getDate() - now.getDay())),
+                month: new Date(now.setDate(1)),
+                all: new Date(0)
+            };
+    
+            const filteredSales = salesHistory.filter(sale =>
+                new Date(sale.soldAt) >= startOf[period]
+            );
+    
+            updateStats(filteredSales);
+            updateHistoryTable(filteredSales);
+        }
+    
+        // Mise à jour des statistiques
+        function updateStats(sales) {
+            const totalTickets = sales.length;
+            const totalRevenue = sales.reduce((sum, sale) => sum + parseFloat(sale.price), 0);
+            
+            const categoryCounts = sales.reduce((acc, sale) => {
+                acc[sale.category] = (acc[sale.category] || 0) + 1;
+                return acc;
+            }, {});
+            const topCategory = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '-';
+    
+            const days = sales.length > 0 ? 
+                Math.max(1, Math.ceil((Date.now() - Math.min(...sales.map(s => s.soldAt))) / (1000 * 60 * 60 * 24))) : 1;
+            const avgDaily = (totalTickets / days).toFixed(1);
+    
+            document.getElementById('totalTickets').textContent = totalTickets;
+            document.getElementById('totalRevenue').textContent = `${totalRevenue.toLocaleString()} FCFA`;
+            document.getElementById('topCategory').textContent = topCategory;
+            document.getElementById('avgDaily').textContent = avgDaily;
+        }
+    
+        // Mise à jour du tableau d'historique
+        function updateHistoryTable(sales) {
+            const tbody = document.getElementById('historyTableBody');
+            tbody.innerHTML = sales
+                .sort((a, b) => b.soldAt - a.soldAt)
+                .map(sale => `
+                    <tr onclick="showTicketDetailsFromHistory('${sale.id}')" style="cursor: pointer;">
+                        <td>${new Date(sale.soldAt).toLocaleString()}</td>
+                        <td>${sale.category}</td>
+                        <td>${sale.user}</td>
+                        <td>${sale.price} FCFA</td>
+                        <td><i class="fa-solid fa-arrow-right"></i></td>
+                    </tr>
+                `).join('');
+        }
+
+        window.showTicketDetailsFromHistory = async function(saleId){
+            showLoader();
+            try{
+                const historyRef = ref(db, `VendorsHistory/${currentVendorId}/${saleId}`);
+                const snapshot = await get(historyRef);
+                if (snapshot.exists()) {
+                    const sale = snapshot.val();
+                    showTicketDetails(sale);
+                    hideLoader();
+                } else {
+                    showNotification("Erreur", "Ticket introuvable dans l'historique");
+                    hideLoader();
+                }
+            }catch (error){
+                console.error("Erreur lors de la récupération du ticket:", error);
+                showNotification("Erreur", "Impossible de récupérer les détails du ticket");
+                hideLoader();
+            }
+        }
+    
+        // Gestionnaire pour le bouton d'historique
+        window.toggleHistory = function() {
+            const historySection = document.getElementById('historySection');
+            const isVisible = historySection.style.display === 'block';
+            historySection.style.display = isVisible ? 'none' : 'block';
+            if (!isVisible) {
+                loadHistory();
+            }
+        };
+    
+        window.closeHistory = function() {
+            document.getElementById('historySection').style.display = 'none';
+        };
+    
+        // Ajouter la fonction de filtrage à window pour l'accès depuis le HTML
+        window.filterHistory = function() {
+            loadHistory();
+        };
+    
+        // Fonction pour écouter les nouveaux messages
+        function listenForNewMessages() {
+            const messagesRef = ref(db, `Vendors/${currentVendorId}/messages`);
+    
+            onChildAdded(messagesRef, (snapshot) => {
+                const message = snapshot.val();
+                displayNewMessage(message);
+            });
+        }
+    
+        // Fonction pour afficher un nouveau message
+        function displayNewMessage(message) {
+            const messagesContainer = document.getElementById('messagesContainer');
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.innerHTML = `
+                <p>${message.content}</p>
+                <span class="timestamp">${new Date(message.timestamp).toLocaleString()}</span>
+            `;
+            messagesContainer.appendChild(messageElement);
+    
+            // Scroll vers le bas pour afficher le dernier message
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        // Fonction pour partager un ticket (exemple avec une alerte)
+        window.shareTicket = function() {
+            alert("Fonctionnalité de partage à implémenter");
+        };
+
+        // Fonction pour copier un ticket dans le presse-papiers
+        window.copyTicket = function() {
+            const ticketDetails = document.getElementById('notification-message').innerText;
+            navigator.clipboard.writeText(ticketDetails)
+                .then(() => {
+                    showNotification("Succès", "Ticket copié dans le presse-papiers!");
+                })
+                .catch(err => {
+                    console.error("Erreur lors de la copie:", err);
+                    showNotification("Erreur", "Impossible de copier le ticket");
+                });
+        };
+
+        // Fonction pour exporter un ticket en PDF
+        window.exportToPDF = async function() {
+            showLoader();
+            const ticketDetails = document.getElementById('notification-message');
+            const pdf = new jsPDF();
+            
+            // Convertir le HTML en canvas
+            const canvas = await html2canvas(ticketDetails);
+            const imgData = canvas.toDataURL('image/png');
+
+            // Ajouter l'image au PDF
+            pdf.addImage(imgData, 'PNG', 10, 10, 190, 0);
+
+            // Sauvegarder le PDF
+            pdf.save('ticket.pdf');
+            hideLoader();
+        };
+
+        function showLoader() {
+            document.getElementById('loaderWrapper').style.display = 'block';
+        }
+
+        function hideLoader() {
+            document.getElementById('loaderWrapper').style.display = 'none';
+        }
     </script>
 </body>
 </html>

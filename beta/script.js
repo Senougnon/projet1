@@ -737,7 +737,7 @@ async function handleSubscription(subscriptionType) {
     return;
   }
 
-  const amount = subscriptionType === "monthly" ? 1 : 10000; // Correction: 1000 pour mensuel
+  const amount = subscriptionType === "monthly" ? 1000 : 10000; // Correction: 1000 pour mensuel
   const description =
     subscriptionType === "monthly"
       ? "Abonnement mensuel à la plateforme de gestion locative"

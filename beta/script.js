@@ -727,74 +727,78 @@ handleSubscription("yearly");
 });
 
 async function handleSubscription(subscriptionType) {
-// Vérifier si l'utilisateur a déjà un abonnement actif
-if (
-  currentUser &&
-  currentUser.subscription &&
-  currentUser.subscription.status === "active"
-) {
-  alert("Vous avez déjà un abonnement actif.");
-  return;
-}
+  // Vérifier si l'utilisateur a déjà un abonnement actif
+  if (
+    currentUser &&
+    currentUser.subscription &&
+    currentUser.subscription.status === "active"
+  ) {
+    alert("Vous avez déjà un abonnement actif.");
+    return;
+  }
 
-const amount = subscriptionType === "monthly" ? 1 : 10000;
-const description =
-  subscriptionType === "monthly"
-    ? "Abonnement mensuel à la plateforme de gestion locative"
-    : "Abonnement annuel à la plateforme de gestion locative";
+  const amount = subscriptionType === "monthly" ? 1000 : 10000; // Correction: 1000 pour mensuel
+  const description =
+    subscriptionType === "monthly"
+      ? "Abonnement mensuel à la plateforme de gestion locative"
+      : "Abonnement annuel à la plateforme de gestion locative";
 
-showLoading();
-FedaPay.init({
-  public_key: "pk_live_TfSz212W0xSMKK7oPEogkFmp", // Remplacez par votre clé publique Fedapay
-  transaction: {
-    amount: amount,
-    description: description,
-  },
-  customer: {
-    email: "user@example.com", // Remplacez par l'email de l'utilisateur
-  },
-  onComplete: async function (transaction) {
-    if (transaction.status === "approved") {
-      // Calculer la date d'expiration
-      const startDate = new Date();
-      const endDate = new Date(
-        subscriptionType === "monthly"
-          ? startDate.getTime() + 30 * 24 * 60 * 60 * 1000
-          : startDate.getTime() + 365 * 24 * 60 * 60 * 1000
-      );
+  showLoading();
+  FedaPay.init({
+    public_key: "pk_live_TfSz212W0xSMKK7oPEogkFmp", // Remplacez par votre clé publique Fedapay
+    transaction: {
+      amount: amount,
+      description: description,
+    },
+    customer: {
+      email: "user@example.com", // Remplacez par l'email de l'utilisateur
+    },
+    onComplete: async function (transaction) {
+      // Utilise transaction.reason pour obtenir la raison
+      if (transaction.reason === FedaPay.CHECKOUT_COMPLETED) {
+        // Calculer la date d'expiration
+        const startDate = new Date();
+        const endDate = new Date(
+          subscriptionType === "monthly"
+            ? startDate.getTime() + 30 * 24 * 60 * 60 * 1000
+            : startDate.getTime() + 365 * 24 * 60 * 60 * 1000
+        );
 
-      // Enregistrez l'abonnement dans la base de données Firebase
-      const subscriptionData = {
-        status: "active",
-        type: subscriptionType,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
-      };
-      await update(
-        ref(database, `users/${currentUser.id}/subscription`),
-        subscriptionData
-      );
+        // Enregistrez l'abonnement dans la base de données Firebase
+        const subscriptionData = {
+          status: "active",
+          type: subscriptionType,
+          startDate: startDate.toISOString(),
+          endDate: endDate.toISOString(),
+        };
+        await update(
+          ref(database, `users/${currentUser.id}/subscription`),
+          subscriptionData
+        );
 
-      // Mettre à jour l'état de l'utilisateur courant
-      if (currentUser) {
-        currentUser.subscription = subscriptionData;
-        // Mettre à jour localStorage
-        localStorage.setItem("currentUser", JSON.stringify(currentUser));
+        // Mettre à jour l'état de l'utilisateur courant
+        if (currentUser) {
+          currentUser.subscription = subscriptionData;
+          // Mettre à jour localStorage
+          localStorage.setItem("currentUser", JSON.stringify(currentUser));
+        }
+
+        checkUserRoleAndSubscription();
+        alert(
+          `Abonnement ${
+            subscriptionType === "monthly" ? "mensuel" : "annuel"
+          } réussi!`
+        );
+        loadDashboardData();
+      } else if (transaction.reason === FedaPay.DIALOG_DISMISSED) {
+        alert("Paiement annulé.");
+      } else {
+        console.log("Transaction : ", transaction);
+        alert("Erreur lors du paiement. Veuillez réessayer.");
       }
-
-      checkUserRoleAndSubscription();
-      alert(
-        `Abonnement ${
-          subscriptionType === "monthly" ? "mensuel" : "annuel"
-        } réussi!`
-      );
-      loadDashboardData();
-    } else {
-      alert("Erreur lors du paiement: " + transaction.reason);
-    }
-  },
-}).open();
-hideLoading();
+    },
+  }).open();
+  hideLoading();
 }
 
 // Fonction pour charger les données du tableau de bord

@@ -29,7 +29,13 @@ const registerForm = document.getElementById("register-form");
 const showRegisterLink = document.getElementById("show-register");
 const showLoginLink = document.getElementById("show-login");
 
-let currentUser = null; // Variable pour stocker l'utilisateur courant
+// Récupérer les données utilisateur de localStorage au chargement de la page
+let currentUser = null;
+const storedUser = localStorage.getItem('currentUser');
+if (storedUser) {
+  currentUser = JSON.parse(storedUser);
+  isAuthenticated = true;
+}
 
 // Basculer entre les formulaires de connexion et d'inscription
 showRegisterLink.addEventListener("click", () => {
@@ -104,9 +110,12 @@ loginForm.addEventListener("submit", async (event) => {
             // ... autres informations si nécessaires ...
           };
           isAuthenticated = true;
+          // Stocker les données utilisateur dans localStorage
+          localStorage.setItem('currentUser', JSON.stringify(currentUser));
           checkUserRoleAndSubscription();
           hideAuthSection();
           loadDashboardData();
+          initializeDataLoad(); // Initialiser le chargement des données ici
           userFound = true;
           break;
         }
@@ -125,53 +134,95 @@ loginForm.addEventListener("submit", async (event) => {
   }
 });
 
-// Fonction pour vérifier le rôle de l'utilisateur et son statut d'abonnement
+// Fonction pour vérifier et mettre à jour le statut de l'abonnement
+async function checkAndUpdateSubscriptionStatus() {
+    if (currentUser && currentUser.subscription) {
+      const today = new Date();
+      const subscriptionEndDate = new Date(currentUser.subscription.endDate);
+  
+      if (today > subscriptionEndDate) {
+        // Abonnement expiré
+        currentUser.subscription.status = "expired";
+        await update(ref(database, `users/${currentUser.id}/subscription`), {
+          status: "expired",
+        });
+  
+        // Mettre à jour localStorage
+        localStorage.setItem("currentUser", JSON.stringify(currentUser));
+  
+        // Alerter l'utilisateur
+        alert(
+          "Votre abonnement a expiré. Veuillez renouveler votre abonnement pour continuer à utiliser les fonctionnalités premium."
+        );
+  
+        checkUserRoleAndSubscription(); // Mettre à jour l'interface utilisateur
+      } else {
+        // Vérifier si l'abonnement expire bientôt (par exemple, dans 2 jours)
+        const daysUntilExpiration = Math.round(
+          (subscriptionEndDate - today) / (1000 * 60 * 60 * 24)
+        );
+        if (daysUntilExpiration <= 2) {
+          alert(
+            `Votre abonnement expirera dans ${daysUntilExpiration} jour(s). Pensez à le renouveler.`
+          );
+        }
+      }
+    }
+  }
+
 function checkUserRoleAndSubscription() {
     if (currentUser) {
-        // Vérifier le rôle
-        const isAdmin = currentUser.role === 'admin';
-        const addProprietaireBtn = document.getElementById('add-proprietaire-btn');
-        const addMaisonBtn = document.getElementById('add-maison-btn');
-        const addLocataireBtn = document.getElementById('add-locataire-btn');
-        const addSouscriptionBtn = document.getElementById('add-souscription-btn');
+      // Vérifier le rôle
+      const isAdmin = currentUser.role === "admin";
+      const addProprietaireBtn = document.getElementById("add-proprietaire-btn");
+      const addMaisonBtn = document.getElementById("add-maison-btn");
+      const addLocataireBtn = document.getElementById("add-locataire-btn");
+      const addSouscriptionBtn = document.getElementById("add-souscription-btn");
   
-// ... suite du code JavaScript (script.js) ...
-
-if (addProprietaireBtn) {
-    addProprietaireBtn.style.display = isAdmin ? 'block' : 'none';
-}
-if (addMaisonBtn) {
-    addMaisonBtn.style.display = isAdmin ? 'block' : 'none';
-}
-if (addLocataireBtn) {
-    addLocataireBtn.style.display = isAdmin ? 'block' : 'none';
-}
-if (addSouscriptionBtn) {
-    addSouscriptionBtn.style.display = isAdmin ? 'block' : 'none';
-}
-
-// Vérifier l'abonnement
-const userSubscription = currentUser.subscription;
-const isSubscribed = userSubscription && userSubscription.status === 'active';
-const subscribeBtn = document.getElementById('subscribe-btn');
-const cancelSubscriptionBtn = document.getElementById('cancel-subscription-btn');
-const trialInfo = document.getElementById('trial-info');
-
-if (isSubscribed) {
-    // Utilisateur abonné
-    document.getElementById('abonnement-status-text').textContent = 'Abonné';
-    subscribeBtn.style.display = 'none';
-    cancelSubscriptionBtn.style.display = 'block';
-    trialInfo.style.display = 'none';
-} else {
-    // Utilisateur non abonné
-    document.getElementById('abonnement-status-text').textContent = 'Non abonné';
-    subscribeBtn.style.display = 'block';
-    cancelSubscriptionBtn.style.display = 'none';
-    trialInfo.style.display = 'block';
-}
-}
-}
+      if (addProprietaireBtn) {
+        addProprietaireBtn.style.display = isAdmin ? "block" : "none";
+      }
+      if (addMaisonBtn) {
+        addMaisonBtn.style.display = isAdmin ? "block" : "none";
+      }
+      if (addLocataireBtn) {
+        addLocataireBtn.style.display = isAdmin ? "block" : "none";
+      }
+      if (addSouscriptionBtn) {
+        addSouscriptionBtn.style.display = isAdmin ? "block" : "none";
+      }
+  
+      // Vérifier l'abonnement
+      const userSubscription = currentUser.subscription;
+      const isSubscribed =
+        userSubscription && userSubscription.status === "active";
+      const subscribeBtn = document.getElementById("subscribe-monthly-btn");
+      const subscribeAnnuelBtn = document.getElementById("subscribe-yearly-btn")
+      const cancelSubscriptionBtn = document.getElementById(
+        "cancel-subscription-btn"
+      );
+      const trialInfo = document.getElementById("trial-info");
+  
+      if (isSubscribed) {
+        // Utilisateur abonné
+        document.getElementById("abonnement-status-text").textContent = "Abonné";
+        subscribeBtn.style.display = "none";
+        subscribeAnnuelBtn.style.display = "none";
+        cancelSubscriptionBtn.style.display = "block";
+        trialInfo.style.display = "none";
+      } else {
+        // Utilisateur non abonné
+        document.getElementById("abonnement-status-text").textContent =
+          "Non abonné";
+        subscribeBtn.style.display = "block";
+        subscribeAnnuelBtn.style.display = "block";
+        cancelSubscriptionBtn.style.display = "none";
+        trialInfo.style.display = "block";
+      }
+      // Mettre à jour localStorage avec le statut de l'abonnement
+      localStorage.setItem("currentUser", JSON.stringify(currentUser));
+    }
+  }
 
 // Fonction pour hacher le mot de passe (méthode simple pour l'exemple)
 function simpleHash(str) {
@@ -200,17 +251,19 @@ authSection.style.display = "none";
 const tabs = document.querySelectorAll(".nav-button");
 const contentSections = document.querySelectorAll(".content-section");
 
+// Gestion des onglets
 tabs.forEach(tab => {
-tab.addEventListener("click", () => {
-const target = tab.dataset.target;
-
-tabs.forEach(t => t.classList.remove("active"));
-tab.classList.add("active");
-
-contentSections.forEach(s => s.classList.remove("active"));
-document.getElementById(target).classList.add("active");
-});
-});
+    tab.addEventListener("click", () => {
+      const target = tab.dataset.target;
+  
+      // Vérifier l'accès avant de changer d'onglet
+      checkUserAccess(target);
+  
+      // Mettre à jour l'état des boutons de navigation
+      tabs.forEach(t => t.classList.remove("active"));
+      tab.classList.add("active"); // Activer l'onglet cliqué
+    });
+  });
 
 // Fonctions pour afficher/masquer le chargement
 function showLoading() {
@@ -417,186 +470,201 @@ loyer: loyer
 });
 }
 
-// Fonctions pour charger et afficher les données depuis Firebase
 function loadProprietaires() {
-showLoading();
-const proprietairesList = document.querySelector("#proprietaires-list tbody");
-proprietairesList.innerHTML = "";
+    showLoading();
+    const proprietairesList = document.querySelector("#proprietaires-list tbody");
+    proprietairesList.innerHTML = "";
 
-const proprietairesRef = ref(database, 'proprietaires');
-onValue(proprietairesRef, (snapshot) => {
-const proprietaires = snapshot.val();
-let proprietairesCount = 0;
-for (const proprietaireId in proprietaires) {
-    proprietairesCount++;
-    const proprietaire = proprietaires[proprietaireId];
-    const row = document.createElement("tr");
-    row.innerHTML = `
-        <td>${proprietaireId}</td>
-        <td>${proprietaire.nom}</td>
-        <td>${proprietaire.prenom}</td>
-        <td>${proprietaire.contact}</td>
-        <td>${proprietaire.email}</td>
-        <td>${proprietaire.adresse}</td>
-        <td class="actions-cell">
-            <button class="edit-btn" data-id="${proprietaireId}">Modifier</button>
-            <button class="delete-btn" data-id="${proprietaireId}">Supprimer</button>
-        </td>
-    `;
-    proprietairesList.appendChild(row);
-}
-document.getElementById('dashboard-proprietaires-count').textContent = proprietairesCount;
-hideLoading();
-});
+    const proprietairesRef = ref(database, 'proprietaires');
+    onValue(proprietairesRef, (snapshot) => {
+        const proprietaires = snapshot.val();
+        let proprietairesCount = 0;
+        let index = 1; // Initialiser le compteur
+        for (const proprietaireId in proprietaires) {
+            proprietairesCount++;
+            const proprietaire = proprietaires[proprietaireId];
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${index}</td> 
+                <td>${proprietaire.nom}</td>
+                <td>${proprietaire.prenom}</td>
+                <td>${proprietaire.contact}</td>
+                <td>${proprietaire.email}</td>
+                <td>${proprietaire.adresse}</td>
+                <td class="actions-cell">
+                    <button class="edit-btn" data-id="${proprietaireId}">Modifier</button>
+                    <button class="delete-btn" data-id="${proprietaireId}">Supprimer</button>
+                </td>
+            `;
+            proprietairesList.appendChild(row);
+            index++; // Incrémenter le compteur après chaque ligne
+        }
+        document.getElementById('dashboard-proprietaires-count').textContent = proprietairesCount;
+        hideLoading();
+    }, {
+        onlyOnce: true
+    });
 }
 
 function loadMaisons() {
-showLoading();
-const maisonsList = document.querySelector("#maisons-list tbody");
-maisonsList.innerHTML = "";
+    showLoading();
+    const maisonsList = document.querySelector("#maisons-list tbody");
+    maisonsList.innerHTML = "";
 
-const maisonsRef = ref(database, 'maisons');
-onValue(maisonsRef, (snapshot) => {
-const maisons = snapshot.val();
-let maisonsCount = 0;
+    const maisonsRef = ref(database, 'maisons');
+    onValue(maisonsRef, (snapshot) => {
+        const maisons = snapshot.val();
+        let maisonsCount = 0;
+        let index = 1; // Initialiser le compteur
 
-// Mettre à jour la liste déroulante des propriétaires dans le formulaire d'ajout de maison
-const proprietaireSelect = document.getElementById("maison-proprietaire");
-proprietaireSelect.innerHTML = '<option value="">Sélectionner Propriétaire</option>';
-const proprietairesRef = ref(database, 'proprietaires');
-get(proprietairesRef).then((proprietairesSnapshot) => {
-    const proprietaires = proprietairesSnapshot.val();
-    for (const proprietaireId in proprietaires) {
-        const proprietaire = proprietaires[proprietaireId];
-        const option = document.createElement("option");
-        option.value = proprietaireId;
-        option.text = `${proprietaire.nom} ${proprietaire.prenom}`;
-        proprietaireSelect.appendChild(option);
-    }
-});
+        // Mettre à jour la liste déroulante des propriétaires
+        const proprietaireSelect = document.getElementById("maison-proprietaire");
+        proprietaireSelect.innerHTML = '<option value="">Sélectionner Propriétaire</option>';
+        const proprietairesRef = ref(database, 'proprietaires');
+        get(proprietairesRef).then((proprietairesSnapshot) => {
+            const proprietaires = proprietairesSnapshot.val();
+            for (const proprietaireId in proprietaires) {
+                const proprietaire = proprietaires[proprietaireId];
+                const option = document.createElement("option");
+                option.value = proprietaireId;
+                option.text = `${proprietaire.nom} ${proprietaire.prenom}`;
+                proprietaireSelect.appendChild(option);
+            }
+        });
 
-for (const maisonId in maisons) {
-    maisonsCount++;
-    const maison = maisons[maisonId];
+        for (const maisonId in maisons) {
+            maisonsCount++;
+            const maison = maisons[maisonId];
 
-    // Récupérer le nom du propriétaire
-    get(ref(database, `proprietaires/${maison.proprietaire}`)).then((proprietaireSnapshot) => {
-        const proprietaire = proprietaireSnapshot.val();
-        const proprietaireNom = proprietaire ? `${proprietaire.nom} ${proprietaire.prenom}` : 'Propriétaire inconnu';
+            // Récupérer le nom du propriétaire
+            get(ref(database, `proprietaires/${maison.proprietaire}`)).then((proprietaireSnapshot) => {
+                const proprietaire = proprietaireSnapshot.val();
+                const proprietaireNom = proprietaire ? `${proprietaire.nom} ${proprietaire.prenom}` : 'Propriétaire inconnu';
 
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${maisonId}</td>
-            <td>${proprietaireNom}</td>
-            <td>${maison.type}</td>
-            <td>${maison.pieces}</td>
-            <td>${maison.ville}, ${maison.commune}, ${maison.quartier}</td>
-            <td>${maison.loyer}</td>
-            <td class="actions-cell">
-                <button class="edit-btn" data-id="${maisonId}">Modifier</button>
-                <button class="delete-btn" data-id="${maisonId}">Supprimer</button>
-            </td>
-        `;
-        maisonsList.appendChild(row);
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${index}</td> 
+                    <td>${proprietaireNom}</td>
+                    <td>${maison.type}</td>
+                    <td>${maison.pieces}</td>
+                    <td>${maison.ville}, ${maison.commune}, ${maison.quartier}</td>
+                    <td>${maison.loyer}</td>
+                    <td class="actions-cell">
+                        <button class="edit-btn" data-id="${maisonId}">Modifier</button>
+                        <button class="delete-btn" data-id="${maisonId}">Supprimer</button>
+                    </td>
+                `;
+                maisonsList.appendChild(row);
+                index++; // Incrémenter le compteur
+            });
+        }
+        document.getElementById('dashboard-maisons-count').textContent = maisonsCount;
+        hideLoading();
+    }, {
+        onlyOnce: true
     });
-}
-document.getElementById('dashboard-maisons-count').textContent = maisonsCount;
-hideLoading();
-});
 }
 
 function loadLocataires() {
-showLoading();
-const locatairesList = document.querySelector("#locataires-list tbody");
-locatairesList.innerHTML = "";
+  showLoading();
+  const locatairesList = document.querySelector("#locataires-list tbody");
+  locatairesList.innerHTML = "";
 
-const locatairesRef = ref(database, 'locataires');
-onValue(locatairesRef, (snapshot) => {
-const locataires = snapshot.val();
-let locatairesCount = 0;
-for (const locataireId in locataires) {
-    locatairesCount++;
-    const locataire = locataires[locataireId];
-    const row = document.createElement("tr");
-    row.innerHTML = `
-        <td>${locataireId}</td>
-        <td>${locataire.nom}</td>
-        <td>${locataire.prenom}</td>
-        <td>${locataire.contact}</td>
-        <td>${locataire.email}</td>
-        <td class="actions-cell">
-            <button class="edit-btn" data-id="${locataireId}">Modifier</button>
-            <button class="delete-btn" data-id="${locataireId}">Supprimer</button>
-        </td>
-    `;
-    locatairesList.appendChild(row);
-}
-document.getElementById('dashboard-locataires-count').textContent = locatairesCount;
-hideLoading();
-});
+  const locatairesRef = ref(database, 'locataires');
+  onValue(locatairesRef, (snapshot) => {
+      const locataires = snapshot.val();
+      let locatairesCount = 0;
+      let index = 1; // Initialiser le compteur
+      for (const locataireId in locataires) {
+          locatairesCount++;
+          const locataire = locataires[locataireId];
+          const row = document.createElement("tr");
+          row.innerHTML = `
+              <td>${index}</td> 
+              <td>${locataire.nom}</td>
+              <td>${locataire.prenom}</td>
+              <td>${locataire.contact}</td>
+              <td>${locataire.email}</td>
+              <td class="actions-cell">
+                  <button class="edit-btn" data-id="${locataireId}">Modifier</button>
+                  <button class="delete-btn" data-id="${locataireId}">Supprimer</button>
+              </td>
+          `;
+          locatairesList.appendChild(row);
+          index++; // Incrémenter le compteur
+      }
+      document.getElementById('dashboard-locataires-count').textContent = locatairesCount;
+      hideLoading();
+  }, {
+      onlyOnce: true
+  });
 }
 
 function loadSouscriptions() {
-showLoading();
-const souscriptionsList = document.querySelector("#souscriptions-list tbody");
-souscriptionsList.innerHTML = "";
+  showLoading();
+  const souscriptionsList = document.querySelector("#souscriptions-list tbody");
+  souscriptionsList.innerHTML = "";
 
-// Mettre à jour la liste déroulante des maisons dans le formulaire d'ajout de souscription
-const maisonSelect = document.getElementById("souscription-maison");
-maisonSelect.innerHTML = '<option value="">Sélectionner Maison</option>';
-const maisonsRef = ref(database, 'maisons');
-get(maisonsRef).then((maisonsSnapshot) => {
-const maisons = maisonsSnapshot.val();
-for (const maisonId in maisons) {
-    const maison = maisons[maisonId];
-    const option = document.createElement("option");
-    option.value = maisonId;
-    option.text = `${maisonId} - ${maison.ville}, ${maison.commune}, ${maison.quartier}`;
-    maisonSelect.appendChild(option);
-}
-});
+  // Mettre à jour la liste déroulante des maisons
+  const maisonSelect = document.getElementById("souscription-maison");
+  maisonSelect.innerHTML = '<option value="">Sélectionner Maison</option>';
+  const maisonsRef = ref(database, 'maisons');
+  get(maisonsRef).then((maisonsSnapshot) => {
+      const maisons = maisonsSnapshot.val();
+      for (const maisonId in maisons) {
+          const maison = maisons[maisonId];
+          const option = document.createElement("option");
+          option.value = maisonId;
+          option.text = `${maisonId} - ${maison.ville}, ${maison.commune}, ${maison.quartier}`;
+          maisonSelect.appendChild(option);
+      }
+  });
 
-// Mettre à jour la liste déroulante des locataires dans le formulaire d'ajout de souscription
-const locataireSelect = document.getElementById("souscription-locataire");
-locataireSelect.innerHTML = '<option value="">Sélectionner Locataire</option>';
-const locatairesRef = ref(database, 'locataires');
-get(locatairesRef).then((locatairesSnapshot) => {
-const locataires = locatairesSnapshot.val();
-for (const locataireId in locataires) {
-    const locataire = locataires[locataireId];
-    const option = document.createElement("option");
-    option.value = locataireId;
-    option.text = `${locataire.nom} ${locataire.prenom}`;
-    locataireSelect.appendChild(option);
-}
-});
+  // Mettre à jour la liste déroulante des locataires
+  const locataireSelect = document.getElementById("souscription-locataire");
+  locataireSelect.innerHTML = '<option value="">Sélectionner Locataire</option>';
+  const locatairesRef = ref(database, 'locataires');
+  get(locatairesRef).then((locatairesSnapshot) => {
+      const locataires = locatairesSnapshot.val();
+      for (const locataireId in locataires) {
+          const locataire = locataires[locataireId];
+          const option = document.createElement("option");
+          option.value = locataireId;
+          option.text = `${locataire.nom} ${locataire.prenom}`;
+          locataireSelect.appendChild(option);
+      }
+  });
 
-const souscriptionsRef = ref(database, 'souscriptions');
-onValue(souscriptionsRef, (snapshot) => {
-const souscriptions = snapshot.val();
-let souscriptionsCount = 0;
-for (const souscriptionId in souscriptions) {
-    souscriptionsCount++;
-    const souscription = souscriptions[souscriptionId];
-    const row = document.createElement("tr");
-    row.innerHTML = `
-        <td>${souscription.maison}</td>
-        <td>${souscription.locataire}</td>
-        <td>${souscription.caution}</td>
-        <td>${souscription.avance}</td>
-        <td>${souscription.autres}</td>
-        <td>${souscription.dateDebut}</td>
-        <td>${souscription.loyer}</td>
-        <td class="actions-cell">
-            <button class="edit-btn" data-id="${souscriptionId}">Modifier</button>
-            <button class="delete-btn" data-id="${souscriptionId}">Supprimer</button>
-        </td>
-    `;
-    souscriptionsList.appendChild(row);
-}
-document.getElementById('dashboard-souscriptions-count').textContent = souscriptionsCount;
-hideLoading();
-});
+  const souscriptionsRef = ref(database, 'souscriptions');
+  onValue(souscriptionsRef, (snapshot) => {
+      const souscriptions = snapshot.val();
+      let souscriptionsCount = 0;
+      let index = 1; // Initialiser le compteur
+      for (const souscriptionId in souscriptions) {
+          souscriptionsCount++;
+          const souscription = souscriptions[souscriptionId];
+          const row = document.createElement("tr");
+          row.innerHTML = `
+              <td>${souscription.maison}</td>
+              <td>${souscription.locataire}</td>
+              <td>${souscription.caution}</td>
+              <td>${souscription.avance}</td>
+              <td>${souscription.autres}</td>
+              <td>${souscription.dateDebut}</td>
+              <td>${souscription.loyer}</td>
+              <td class="actions-cell">
+                  <button class="edit-btn" data-id="${souscriptionId}">Modifier</button>
+                  <button class="delete-btn" data-id="${souscriptionId}">Supprimer</button>
+              </td>
+          `;
+          souscriptionsList.appendChild(row);
+          index++; // Incrémenter le compteur
+      }
+      document.getElementById('dashboard-souscriptions-count').textContent = souscriptionsCount;
+      hideLoading();
+  }, {
+      onlyOnce: true
+  });
 }
 
 // Délégation d'événements pour les boutons "Modifier" et "Supprimer"
@@ -627,13 +695,13 @@ const itemRef = ref(database, `${itemType}/${itemId}`);
 await remove(itemRef);
 // Recharger la liste après la suppression
 if (itemType === 'proprietaires') {
-    loadProprietaires();
+  loadProprietaires();
 } else if (itemType === 'maisons') {
-    loadMaisons();
+  loadMaisons();
 } else if (itemType === 'locataires') {
-    loadLocataires();
+  loadLocataires();
 } else if (itemType === 'souscriptions') {
-    loadSouscriptions();
+  loadSouscriptions();
 }
 } catch (error) {
 console.error(`Erreur lors de la suppression de ${itemType}:`, error);
@@ -644,50 +712,90 @@ hideLoading();
 }
 
 // Gestion des abonnements
-const subscribeBtn = document.getElementById('subscribe-btn');
-const cancelSubscriptionBtn = document.getElementById('cancel-subscription-btn');
+const subscribeMonthlyBtn = document.getElementById("subscribe-monthly-btn");
+const subscribeYearlyBtn = document.getElementById("subscribe-yearly-btn");
+const cancelSubscriptionBtn = document.getElementById("cancel-subscription-btn");
 
-subscribeBtn.addEventListener('click', () => {
-// Vérifier d'abord si l'utilisateur a une période d'essai active ou un abonnement actif
-if (currentUser && currentUser.subscription && (currentUser.subscription.status === 'trial' || currentUser.subscription.status === 'active')) {
-alert("Vous avez déjà un abonnement actif ou une période d'essai en cours.");
-return;
+// Abonnement mensuel
+subscribeMonthlyBtn.addEventListener("click", () => {
+handleSubscription("monthly");
+});
+
+// Abonnement annuel
+subscribeYearlyBtn.addEventListener("click", () => {
+handleSubscription("yearly");
+});
+
+async function handleSubscription(subscriptionType) {
+// Vérifier si l'utilisateur a déjà un abonnement actif
+if (
+  currentUser &&
+  currentUser.subscription &&
+  currentUser.subscription.status === "active"
+) {
+  alert("Vous avez déjà un abonnement actif.");
+  return;
 }
+
+const amount = subscriptionType === "monthly" ? 1 : 10000;
+const description =
+  subscriptionType === "monthly"
+    ? "Abonnement mensuel à la plateforme de gestion locative"
+    : "Abonnement annuel à la plateforme de gestion locative";
+
 showLoading();
 FedaPay.init({
-public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp', // Remplacez par votre clé publique Fedapay
-transaction: {
-    amount: 10000,
-    description: 'Abonnement mensuel à la plateforme de gestion locative'
-},
-customer: {
-    email: 'user@example.com' // Vous pouvez récupérer l'email de l'utilisateur connecté
-},
-onComplete: async function(transaction) {
-    if (transaction.status === 'approved') {
-        // Enregistrez l'abonnement dans la base de données Firebase
-        const subscriptionData = {
-            status: 'active',
-            startDate: new Date().toISOString(),
-            endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 1 mois plus tard
-        };
-        await update(ref(database, `users/${currentUser.id}/subscription`), subscriptionData);
-        
-        // Mettre à jour l'état de l'utilisateur courant
-        if (currentUser) {
-            currentUser.subscription = subscriptionData;
-        }
-        checkUserRoleAndSubscription();
+  public_key: "pk_live_TfSz212W0xSMKK7oPEogkFmp", // Remplacez par votre clé publique Fedapay
+  transaction: {
+    amount: amount,
+    description: description,
+  },
+  customer: {
+    email: "user@example.com", // Remplacez par l'email de l'utilisateur
+  },
+  onComplete: async function (transaction) {
+    if (transaction.status === "approved") {
+      // Calculer la date d'expiration
+      const startDate = new Date();
+      const endDate = new Date(
+        subscriptionType === "monthly"
+          ? startDate.getTime() + 30 * 24 * 60 * 60 * 1000
+          : startDate.getTime() + 365 * 24 * 60 * 60 * 1000
+      );
 
-        alert('Abonnement réussi!');
-        loadDashboardData(); // Rechargez les données pour mettre à jour le statut de l'abonnement
+      // Enregistrez l'abonnement dans la base de données Firebase
+      const subscriptionData = {
+        status: "active",
+        type: subscriptionType,
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+      };
+      await update(
+        ref(database, `users/${currentUser.id}/subscription`),
+        subscriptionData
+      );
+
+      // Mettre à jour l'état de l'utilisateur courant
+      if (currentUser) {
+        currentUser.subscription = subscriptionData;
+        // Mettre à jour localStorage
+        localStorage.setItem("currentUser", JSON.stringify(currentUser));
+      }
+
+      checkUserRoleAndSubscription();
+      alert(
+        `Abonnement ${
+          subscriptionType === "monthly" ? "mensuel" : "annuel"
+        } réussi!`
+      );
+      loadDashboardData();
     } else {
-        alert('Erreur lors du paiement: ' + transaction.reason);
+      alert("Erreur lors du paiement: " + transaction.reason);
     }
-}
+  },
 }).open();
 hideLoading();
-});
+}
 
 // Fonction pour charger les données du tableau de bord
 async function loadDashboardData() {
@@ -731,10 +839,10 @@ onValue(usersRef, (snapshot) => {
 const users = snapshot.val();
 let activeSubscriptionsCount = 0;
 for (const userId in users) {
-    const user = users[userId];
-    if (user.subscription && user.subscription.status === 'active') {
-        activeSubscriptionsCount++;
-    }
+  const user = users[userId];
+  if (user.subscription && user.subscription.status === 'active') {
+      activeSubscriptionsCount++;
+  }
 }
 document.getElementById('dashboard-abonnements-count').textContent = activeSubscriptionsCount;
 });
@@ -756,6 +864,8 @@ endDate: trialEndDate.toISOString()
 await update(ref(database, `users/${currentUser.id}/subscription`), trialData);
 if (currentUser) {
 currentUser.subscription = trialData;
+// Mettre à jour localStorage
+localStorage.setItem('currentUser', JSON.stringify(currentUser));
 }
 checkUserRoleAndSubscription();
 alert("Période d'essai de 7 jours activée !");
@@ -779,66 +889,80 @@ initFedapayPayment();
 }
 });
 
-function initFedapayPayment() {
-showLoading();
-FedaPay.init({
-public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp', // Remplacez par votre clé publique Fedapay
-transaction: {
-    amount: 10000,
-    description: 'Abonnement mensuel à la plateforme de gestion locative'
-},
-customer: {
-    email: 'user@example.com' // Remplacez par l'email de l'utilisateur
-},
-onComplete: async function(transaction) {
-    if (transaction.status === 'approved') {
-        // Enregistrez l'abonnement dans la base de données Firebase
-        const subscriptionData = {
-            status: 'active',
-            startDate: new Date().toISOString(),
-            endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() // 1 mois plus tard
-        };
-        await update(ref(database, `users/${currentUser.id}/subscription`), subscriptionData);
-
+cancelSubscriptionBtn.addEventListener("click", async () => {
+  if (currentUser && currentUser.subscription) {
+      if (confirm("Êtes-vous sûr de vouloir annuler votre abonnement ?")) {
+        // Mettre à jour le statut de l'abonnement dans Firebase
+        await update(ref(database, `users/${currentUser.id}/subscription`), { status: 'cancelled' });
+    
         // Mettre à jour l'état de l'utilisateur courant
-        if (currentUser) {
-            currentUser.subscription = subscriptionData;
-        }
+        currentUser.subscription.status = 'cancelled';
+        
+        // Mettre à jour localStorage
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
         checkUserRoleAndSubscription();
-
-        alert('Abonnement réussi!');
-        loadDashboardData();
+    
+        alert('Abonnement annulé.');
+        loadDashboardData(); // Rechargez les données pour mettre à jour le statut de l'abonnement
+      }
     } else {
-        alert('Erreur lors du paiement: ' + transaction.reason);
+      alert('Vous n\'avez pas d\'abonnement actif à annuler.');
     }
-}
-}).open();
-hideLoading();
-}
-
-cancelSubscriptionBtn.addEventListener('click', async () => {
-if (currentUser && currentUser.subscription) {
-if (confirm("Êtes-vous sûr de vouloir annuler votre abonnement ?")) {
-    // Mettre à jour le statut de l'abonnement dans Firebase
-    await update(ref(database, `users/${currentUser.id}/subscription`), { status: 'cancelled' });
-
-    // Mettre à jour l'état de l'utilisateur courant
-    currentUser.subscription.status = 'cancelled';
-    checkUserRoleAndSubscription();
-
-    alert('Abonnement annulé.');
-    loadDashboardData(); // Rechargez les données pour mettre à jour le statut de l'abonnement
-}
-} else {
-alert('Vous n\'avez pas d\'abonnement actif à annuler.');
-}
-});
-
-// Charger les données au chargement de la page
-if (isAuthenticated) {
-loadDashboardData();
-loadProprietaires();
-loadMaisons();
-loadLocataires();
-loadSouscriptions();
-}
+    });
+    
+    // Fonction de déconnexion
+    function logout() {
+      localStorage.removeItem('currentUser');
+      isAuthenticated = false;
+      currentUser = null;
+      // Rediriger vers la page de connexion ou actualiser la page
+      window.location.href = 'index.html'; // Redirection vers la page de connexion
+    }
+    
+    // Ajout d'un bouton de déconnexion (exemple)
+    const logoutButton = document.createElement('button');
+    logoutButton.id = 'logout-btn';
+    logoutButton.textContent = 'Déconnexion';
+    document.body.appendChild(logoutButton); // Ajoutez-le à l'endroit approprié dans votre HTML
+    
+    // Gestionnaire d'événement pour la déconnexion
+    document.getElementById('logout-btn').addEventListener('click', logout);
+    
+    function checkUserAccess(targetSectionId = null) {
+      if (currentUser && currentUser.subscription && (currentUser.subscription.status === 'active' || currentUser.subscription.status === 'trial')) {
+        // Utilisateur autorisé - ne rien faire
+        if (targetSectionId) {
+          // Afficher la section cible
+          contentSections.forEach(s => s.classList.remove("active"));
+          document.getElementById(targetSectionId).classList.add("active");
+        }
+      } else {
+        // Utilisateur non autorisé - rediriger vers la section d'abonnement
+        alert("Vous devez avoir un abonnement actif ou une période d'essai pour accéder à cette section.");
+        contentSections.forEach(s => s.classList.remove("active"));
+        document.getElementById("abonnements").classList.add("active"); // Afficher la section d'abonnement
+    
+        // Mettre à jour l'état du bouton de navigation "Abonnements"
+        tabs.forEach(t => t.classList.remove("active"));
+        const abonnementTab = document.querySelector('[data-target="abonnements"]');
+        if (abonnementTab) {
+          abonnementTab.classList.add("active");
+        }
+      }
+    }
+    // Initialisation du chargement des données
+    function initializeDataLoad() {
+      if (isAuthenticated) {
+        checkUserRoleAndSubscription();
+        checkAndUpdateSubscriptionStatus()
+        loadDashboardData();
+        loadProprietaires();
+        loadMaisons();
+        loadLocataires();
+        loadSouscriptions();
+      }
+    }
+    
+    // Appeler initializeDataLoad au chargement de la page
+    initializeDataLoad();

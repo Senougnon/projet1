@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Utilisateurs</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="user-management-container">
+        <h2>Gestion des Utilisateurs</h2>
+
+        <!-- Tableau des utilisateurs -->
+        <table class="user-table" id="user-table">
+            <thead>
+                <tr>
+                    <th>Nom d'utilisateur</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Les utilisateurs seront ajoutés ici -->
+            </tbody>
+        </table>
+
+        <!-- Formulaire pour ajouter/modifier un utilisateur -->
+        <div class="user-form-container">
+            <h3>Ajouter/Modifier un utilisateur</h3>
+            <form id="user-form">
+                <input type="text" id="username" placeholder="Nom d'utilisateur" required>
+                <input type="password" id="password" placeholder="Mot de passe">
+                <select id="status">
+                    <option value="Visiteur">Visiteur</option>
+                    <option value="Vendeur">Vendeur</option>
+                    <option value="Partenaire">Partenaire</option>
+                    <option value="Admin">Admin</option>
+                </select>
+                <button type="submit">Enregistrer</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getDatabase, ref, set, onValue, remove, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
+            authDomain: "cyber-campus-2706f.firebaseapp.com",
+            databaseURL: "https://cyber-campus-2706f-default-rtdb.firebaseio.com",
+            projectId: "cyber-campus-2706f",
+            storageBucket: "cyber-campus-2706f.appspot.com",
+            messagingSenderId: "719410601264",
+            appId: "1:719410601264:web:44fd2e3757721866303cf5",
+            measurementId: "G-CEEFJP5LYZ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const userTable = document.getElementById('user-table').querySelector('tbody');
+            const userForm = document.getElementById('user-form');
+            let selectedUser = null;
+
+            // Charger les utilisateurs
+            const usersRef = ref(db, 'users');
+            onValue(usersRef, (snapshot) => {
+                const users = snapshot.val();
+                userTable.innerHTML = '';
+                for (const username in users) {
+                    addUserToTable(username, users[username]);
+                }
+            });
+
+            // Gérer la soumission du formulaire
+            userForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const status = document.getElementById('status').value;
+
+                if (selectedUser) {
+                    // Modifier un utilisateur existant
+                    const userRef = ref(db, 'users/' + selectedUser);
+                    const updatedData = { status: status };
+                    if (password) {
+                        updatedData.password = password;
+                    }
+                    update(userRef, updatedData)
+                        .then(() => {
+                            alert('Utilisateur modifié avec succès.');
+                            selectedUser = null;
+                            userForm.reset();
+                        })
+                        .catch((error) => {
+                            console.error('Erreur lors de la modification de l\'utilisateur:', error);
+                            alert('Erreur lors de la modification de l\'utilisateur.');
+                        });
+                } else {
+                    // Ajouter un nouvel utilisateur
+                    const newUserRef = ref(db, 'users/' + username);
+                    set(newUserRef, { password: password, status: status })
+                        .then(() => {
+                            alert('Utilisateur ajouté avec succès.');
+                            userForm.reset();
+                        })
+                        .catch((error) => {
+                            console.error('Erreur lors de l\'ajout de l\'utilisateur:', error);
+                            alert('Erreur lors de l\'ajout de l\'utilisateur.');
+                        });
+                }
+            });
+
+            function addUserToTable(username, user) {
+                const row = userTable.insertRow();
+                row.insertCell().textContent = username;
+                row.insertCell().textContent = user.status;
+                const actionsCell = row.insertCell();
+
+                // Bouton Modifier
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Modifier';
+                editButton.addEventListener('click', () => {
+                    selectedUser = username;
+                    document.getElementById('username').value = username;
+                    document.getElementById('status').value = user.status;
+                    // Ne pas remplir le champ de mot de passe pour des raisons de sécurité
+                    document.getElementById('password').value = '';
+                });
+                actionsCell.appendChild(editButton);
+
+                // Bouton Supprimer
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Supprimer';
+                deleteButton.addEventListener('click', () => {
+                    if (confirm(`Êtes-vous sûr de vouloir supprimer l'utilisateur ${username} ?`)) {
+                        const userRef = ref(db, 'users/' + username);
+                        remove(userRef)
+                            .then(() => alert('Utilisateur supprimé avec succès.'))
+                            .catch((error) => {
+                                console.error('Erreur lors de la suppression de l\'utilisateur:', error);
+                                alert('Erreur lors de la suppression de l\'utilisateur.');
+                            });
+                    }
+                });
+                actionsCell.appendChild(deleteButton);
+            }
+        });
+    </script>
+</body>
+</html>

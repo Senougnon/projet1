@@ -1,0 +1,260 @@
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --background-color: #f8f9fa;
+    --text-color: #333;
+    --sidebar-width: 240px;
+    --topbar-height: 60px;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    display: flex;
+    min-height: 100vh;
+}
+
+.wrapper {
+    display: flex;
+    width: 100%;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: var(--sidebar-width);
+    background-color: var(--secondary-color);
+    color: #fff;
+    padding: 20px;
+    height: 100vh;
+    position: fixed;
+    transition: transform 0.3s ease; /* Ajout d'une transition pour le menu */
+}
+
+.sidebar-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    color: #fff;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 0;
+}
+
+.nav-link {
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: #fff;
+    text-decoration: none;
+}
+
+.nav-link i {
+    margin-right: 10px;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    background-color: var(--primary-color);
+}
+
+.sidebar-footer {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+/* Content Styles */
+.content {
+    flex-grow: 1;
+    padding: 20px;
+    margin-left: var(--sidebar-width);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    overflow-y: auto;
+    transition: margin-left 0.3s ease; /* Ajout d'une transition pour le contenu */
+}
+
+.top-bar {
+    height: var(--topbar-height);
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* Espacement entre les éléments */
+}
+
+.top-bar #user-info {
+    margin-right: auto; /* Pousse le bouton du menu vers la droite */
+}
+
+/* Bouton pour afficher/masquer le menu (responsive) */
+#sidebar-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    display: none; /* Caché par défaut sur les grands écrans */
+}
+
+/* Overlay and Auth Forms Styles */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    display: none;
+}
+
+.auth-forms {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    z-index: 11;
+    width: 300px;
+    max-width: 90%;
+    display: none;
+}
+
+.auth-form {
+    display: none;
+}
+
+.auth-form h2 {
+    margin-top: 0;
+}
+
+.auth-form input,
+.auth-form select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.auth-form button {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--primary-color);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.auth-form p {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.auth-form a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-100%); /* Menu masqué par défaut */
+        position: fixed;
+        z-index: 100; /* S'assurer que le menu est au-dessus du contenu */
+    }
+
+    .sidebar.open {
+        transform: translateX(0); /* Afficher le menu */
+    }
+
+    .content {
+        margin-left: 0; /* Pas de marge quand le menu est masqué */
+    }
+
+    .top-bar {
+        position: static;
+    }
+
+    .sidebar-footer {
+        position: static;
+        margin-top: 20px;
+    }
+
+    #sidebar-toggle {
+        display: block; /* Afficher le bouton sur les petits écrans */
+    }
+
+    .page-content{
+        height: calc(100vh - var(--topbar-height));
+    }
+
+    .page-content iframe{
+        height: 100%;
+    }
+}
+
+/* Theme Toggle Styles */
+#toggle-theme {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+}
+
+body.dark-mode {
+    --background-color: #121212;
+    --text-color: #eee;
+    --secondary-color: #333;
+    --primary-color: #00cc99;
+}
+
+body.dark-mode .content {
+    background-color: #121212;
+    color: #eee;
+}
+
+body.dark-mode .sidebar {
+    background-color: #333;
+}
+
+body.dark-mode .nav-link:hover,
+body.dark-mode .nav-link.active {
+    background-color: #00cc99;
+    color: #121212;
+}
+
+body.dark-mode .auth-forms {
+    background-color: #333;
+    color: #eee;
+}
+
+body.dark-mode .auth-forms input,
+body.dark-mode .auth-forms select {
+    background-color: #121212;
+    color: #eee;
+    border-color: #00cc99;
+}
+
+body.dark-mode .auth-forms a {
+    color: #00cc99;
+}

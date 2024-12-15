@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accueil - Gestion Zone Wi-Fi</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+    <div class="wrapper">
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-wifi"></i> Gestion Zone Wi-Fi</h3>
+            </div>
+            <ul class="nav-links">
+                <li data-page="http://fedapay.netlify.app/a4" class="nav-link"><i class="fas fa-tachometer-alt"></i> Dashboard Admin</li>
+                <li data-page="http://fedapay.netlify.app/a3" class="nav-link"><i class="fas fa-ticket-alt"></i> Gestion Tickets</li>
+                <li data-page="http://fedapay.netlify.app/vente" class="nav-link"><i class="fas fa-shopping-cart"></i> Vente Tickets</li>
+                <li data-page="https://ccyber.netlify.app/" class="nav-link"><i class="fas fa-chart-line"></i> Inventaire</li>
+                <li id="user-management-link" data-page="user-management.html" class="nav-link"><i class="fas fa-users-cog"></i> Gestion Utilisateurs</li>
+            </ul>
+            <div class="sidebar-footer">
+                <button id="toggle-theme"><i class="fas fa-moon"></i></button>
+                <button id="logout-btn" style="display: none;"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
+            </div>
+        </nav>
+
+        <main class="content">
+            <header class="top-bar">
+                <div id="user-info"></div>
+                <button id="sidebar-toggle" aria-label="Ouvrir/fermer le menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </header>
+            <div class="page-content" id="page-content">
+                <!-- Le contenu des pages sera chargé ici -->
+            </div>
+        </main>
+
+        <div class="overlay" id="overlay"></div>
+
+        <div class="auth-forms" id="auth-forms">
+            <form id="login-form" class="auth-form" style="display: none;">
+                <h2>Connexion</h2>
+                <input type="text" id="login-username" placeholder="Nom d'utilisateur" required>
+                <input type="password" id="login-password" placeholder="Mot de passe" required>
+                <button type="submit">Se connecter</button>
+                <p>Pas encore de compte? <a href="#" id="show-signup">S'inscrire</a></p>
+            </form>
+
+            <form id="signup-form" class="auth-form" style="display: none;">
+                <h2>Inscription</h2>
+                <input type="text" id="signup-username" placeholder="Nom d'utilisateur" required>
+                <input type="password" id="signup-password" placeholder="Mot de passe" required>
+                <input type="hidden" id="signup-status" value="Visiteur"> <!-- Statut par défaut -->
+                <button type="submit">S'inscrire</button>
+                <p>Déjà un compte? <a href="#" id="show-login">Se connecter</a></p>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
+            authDomain: "cyber-campus-2706f.firebaseapp.com",
+            databaseURL: "https://cyber-campus-2706f-default-rtdb.firebaseio.com",
+            projectId: "cyber-campus-2706f",
+            storageBucket: "cyber-campus-2706f.appspot.com",
+            messagingSenderId: "719410601264",
+            appId: "1:719410601264:web:44fd2e3757721866303cf5",
+            measurementId: "G-CEEFJP5LYZ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const showSignupLink = document.getElementById('show-signup');
+            const showLoginLink = document.getElementById('show-login');
+            const loginForm = document.getElementById('login-form');
+            const signupForm = document.getElementById('signup-form');
+            const overlay = document.getElementById('overlay');
+            const authForms = document.getElementById('auth-forms');
+            const logoutBtn = document.getElementById('logout-btn');
+            const userManagementLink = document.getElementById('user-management-link');
+
+            //Vérifier si un utilisateur est déjà connecté
+            checkSessionUser();
+
+            // Basculer vers le formulaire d'inscription
+            showSignupLink.addEventListener('click', () => {
+                loginForm.style.display = 'none';
+                signupForm.style.display = 'block';
+                overlay.style.display = 'block';
+                authForms.style.display = 'block';
+            });
+
+            // Basculer vers le formulaire de connexion
+            showLoginLink.addEventListener('click', () => {
+                signupForm.style.display = 'none';
+                loginForm.style.display = 'block';
+                overlay.style.display = 'block';
+                authForms.style.display = 'block';
+            });
+
+            // Gérer la soumission du formulaire d'inscription
+            signupForm.addEventListener('submit', handleSignup);
+
+            // Gérer la soumission du formulaire de connexion
+            loginForm.addEventListener('submit', handleLogin);
+
+            // Gérer la déconnexion
+            logoutBtn.addEventListener('click', logout);
+
+            // Initialiser l'affichage des liens de navigation
+            updateNavigationLinks();
+
+            function checkSessionUser(){
+                const storedUser = sessionStorage.getItem('currentUser');
+                if(storedUser){
+                    currentUser = JSON.parse(storedUser);
+                    loginSuccess(currentUser.username, currentUser.status);
+                } else{
+                    showLoginForm();
+                }
+            }
+
+            function showLoginForm() {
+                signupForm.style.display = 'none';
+                loginForm.style.display = 'block';
+                overlay.style.display = 'block';
+                authForms.style.display = 'block';
+            }
+
+            function handleSignup(event) {
+                event.preventDefault();
+                const username = document.getElementById('signup-username').value;
+                const password = document.getElementById('signup-password').value;
+                const status = "Visiteur"; // Statut par défaut
+
+                const usersRef = ref(db, 'users/' + username);
+                get(usersRef).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        alert('Ce nom d\'utilisateur est déjà utilisé.');
+                    } else {
+                        set(usersRef, { password: password, status: status })
+                            .then(() => {
+                                alert('Inscription réussie ! Connectez-vous.');
+                                signupForm.style.display = 'none';
+                                loginForm.style.display = 'block';
+                            })
+                            .catch((error) => {
+                                console.error('Erreur lors de la création du compte:', error);
+                                alert('Erreur lors de la création du compte.');
+                            });
+                    }
+                });
+            }
+
+            function handleLogin(event) {
+                event.preventDefault();
+                const username = document.getElementById('login-username').value;
+                const password = document.getElementById('login-password').value;
+
+                const userRef = ref(db, 'users/' + username);
+                get(userRef).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const user = snapshot.val();
+                        if (user.password === password) {
+                            loginSuccess(username, user.status);
+                        } else {
+                            alert('Mot de passe incorrect.');
+                        }
+                    } else {
+                        alert('Utilisateur introuvable.');
+                    }
+                }).catch((error) => {
+                    console.error('Erreur lors de la connexion:', error);
+                    alert('Erreur lors de la connexion.');
+                });
+            }
+
+            function loginSuccess(username, status) {
+                currentUser = { username, status };
+                sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateNavigationLinks();
+
+                document.getElementById('user-info').textContent = `Connecté: ${username} (${status})`;
+                overlay.style.display = 'none';
+                authForms.style.display = 'none';
+                logoutBtn.style.display = 'block';
+
+                // Redirection en fonction du statut
+                if (status === 'Admin') {
+                    loadPage('http://fedapay.netlify.app/a4');
+                    showUserManagementLink();
+                } else {
+                    // Rediriger les utilisateurs non-admin vers une page par défaut
+                    loadPage('http://fedapay.netlify.app/vente');
+                }
+            }
+
+            function loadPage(pageUrl) {
+                if (!pageUrl) return;
+
+                // Utiliser un iframe pour charger la page web
+                document.getElementById('page-content').innerHTML = `<iframe src="${pageUrl}" width="100%" height="900px" frameborder="0"></iframe>`;
+            }
+
+            function logout() {
+                currentUser = null;
+                sessionStorage.removeItem('currentUser');
+                updateNavigationLinks();
+
+                document.getElementById('user-info').textContent = '';
+                overlay.style.display = 'block';
+                authForms.style.display = 'block';
+                loginForm.style.display = 'block';
+                signupForm.style.display = 'none';
+                logoutBtn.style.display = 'none';
+
+                const pageContent = document.getElementById('page-content');
+                pageContent.innerHTML = '';
+            }
+
+            function updateNavigationLinks() {
+                const navLinks = document.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    link.style.display = 'none';
+                });
+
+                if (currentUser) {
+                    switch (currentUser.status) {
+                        case 'Admin':
+                            navLinks.forEach(link => link.style.display = 'block');
+                            break;
+                        case 'Partenaire':
+                        case 'Vendeur':
+                            document.querySelector('[data-page="http://fedapay.netlify.app/vente"]').style.display = 'block';
+                            break;
+                        case 'Visiteur':
+                            // Les visiteurs n'ont pas de liens de navigation spécifiques pour le moment
+                            break;
+                    }
+                }
+            }
+
+            function showUserManagementLink() {
+                userManagementLink.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

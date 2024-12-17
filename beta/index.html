@@ -353,7 +353,7 @@
         });
 
         function initiatePayment(plan) {
-            const amount = plan === 'monthly' ? 1 : 10000;
+            const amount = plan === 'monthly' ? 1000 : 10000;
             const planDescription = plan === 'monthly' ? 'Abonnement mensuel' : 'Abonnement annuel';
 
             FedaPay.init({
@@ -376,31 +376,33 @@
         }
 
         async function handleSuccessfulPayment(plan, response) {
-            const startDate = new Date();
-            const endDate = new Date(startDate);
-            if (plan === 'monthly') {
-                endDate.setMonth(endDate.getMonth() + 1);
-            } else {
-                endDate.setFullYear(endDate.getFullYear() + 1);
-            }
+    const startDate = new Date();
+    const endDate = new Date(startDate);
+    if (plan === 'monthly') {
+        endDate.setMonth(endDate.getMonth() + 1);
+    } else {
+        endDate.setFullYear(endDate.getFullYear() + 1);
+    }
 
-            const subscriptionData = {
-                status: 'active',
-                startDate: startDate.toISOString(),
-                endDate: endDate.toISOString(),
-                transactionId: response.id, // Utilisez response.id au lieu de transaction.id
-                plan: plan
-            };
+    const subscriptionData = {
+        status: 'active',
+        startDate: startDate.toISOString(),
+        endDate: endDate.toISOString(),
+        transactionId: response.transaction.id,
+        plan: plan
+    };
 
-            try {
-                await adminRef.set(subscriptionData);
-                checkSubscriptionStatus();
-                alert(`Abonnement ${plan === 'monthly' ? 'mensuel' : 'annuel'} réussi!`);
-            } catch (error) {
-                console.error('Erreur lors de la mise à jour de l\'abonnement:', error);
-                alert('Erreur lors de la mise à jour de l\'abonnement.');
-            }
-        }
+    try {
+        await adminRef.set(subscriptionData);
+        checkSubscriptionStatus();
+        alert(`Abonnement ${plan === 'monthly' ? 'mensuel' : 'annuel'} réussi!`);
+    } catch (error) {
+        console.error('Erreur lors de la mise à jour de l\'abonnement:', error);
+        console.error('Détails de la réponse de FedaPay:', response);
+        console.error('Données d\'abonnement tentées:', subscriptionData);
+        alert('Erreur lors de la mise à jour de l\'abonnement.');
+    }
+}
 
         async function cancelSubscription() {
             try {

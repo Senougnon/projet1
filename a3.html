@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des tickets totaux</title>
+    <title>Gestion des tickets</title>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
+            /* ... (vos variables CSS) ... */
             --primary-color: #3498db;
             --secondary-color: #2ecc71;
             --danger-color: #e74c3c;
@@ -286,15 +287,41 @@
             font-size: 12px;
         }
     }
+      .database-selector {
+        margin-bottom: 20px;
+    }
+
+    .database-selector select {
+        padding: 10px;
+        border: 1px solid #bdc3c7;
+        border-radius: 4px;
+        font-size: 16px;
+        background-color: white;
+        color: var(--text-color);
+        cursor: pointer;
+    }
+
+    .database-selector select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+    }
     </style>
 </head>
 <body>
-<!-- Remplacez le bouton de déconnexion existant par celui-ci -->
 <button onclick="logout()" class="logout-button">
     <i class="fas fa-sign-out-alt"></i> Déconnexion
 </button>
     <div class="container">
-        <h1>Gestion des tickets totaux</h1>
+        <h1>Gestion des tickets</h1>
+
+        <div class="database-selector">
+            <label for="databaseSelect">Choisir la base de données : </label>
+            <select id="databaseSelect" onchange="changeDatabase()">
+                <option value="TicketsTotal">TicketsTotal</option>
+                <option value="TicketsTransit">TicketsTransit</option>
+            </select>
+        </div>
+
         <div class="action-row">
             <div>
                 <button onclick="exportTickets()">Exporter tous les tickets</button>
@@ -327,6 +354,8 @@
     <div id="editTicketModal" class="modal">
         <div class="modal-content">
             <h2>Modifier le ticket</h2>
+            <input type="text" id="editId" placeholder="ID" disabled>
+            <input type="text" id="editCategory" placeholder="Catégorie">
             <input type="text" id="editPassword" placeholder="Mot de passe">
             <input type="text" id="editPrice" placeholder="Prix">
             <input type="text" id="editUser" placeholder="Utilisateur">
@@ -353,6 +382,7 @@
     <div id="addTicketModal" class="modal">
         <div class="modal-content">
             <h2>Ajouter un nouveau ticket</h2>
+            <input type="text" id="newCategory" placeholder="Catégorie">
             <input type="text" id="newPassword" placeholder="Mot de passe">
             <input type="text" id="newPrice" placeholder="Prix">
             <input type="text" id="newUser" placeholder="Utilisateur">
@@ -386,10 +416,12 @@ const firebaseConfig = {
         let tempCategory = null;
         let currentEditingTicket = null;
         let currentEditingCategory = null;
+        let currentDatabase = 'TicketsTotal';
 
         // Variables pour stocker les informations d'édition
         let editingCategory = '';
         let editingIndex = -1;
+        let editingId = '';
 
             // Vérification immédiate avant tout chargement
     (function() {
@@ -423,9 +455,9 @@ const firebaseConfig = {
 
         function loadTickets() {
             showLoading();
-            const ticketsRef = database.ref('TicketsTotal');
+            const ticketsRef = database.ref(currentDatabase);
             ticketsRef.on('value', (snapshot) => {
-                allTickets = snapshot.val();
+                allTickets = snapshot.val() || {};
                 displayTickets(allTickets);
                 hideLoading();
             }, (error) => {
@@ -434,81 +466,243 @@ const firebaseConfig = {
                 alert("Erreur lors du chargement des tickets. Veuillez réessayer.");
             });
         }
+// Fonction pour afficher les tickets en fonction de la base de données sélectionnée
+function displayTickets(tickets, searchTerm = '') {
+    const categoriesContainer = document.getElementById('ticketCategories');
+    categoriesContainer.innerHTML = '';
 
-        function displayTickets(tickets, searchTerm = '') {
-            const categoriesContainer = document.getElementById('ticketCategories');
-            categoriesContainer.innerHTML = '';
-            
-            for (let category in tickets) {
-                const categoryTickets = tickets[category];
-                const categoryHtml = `
-                    <div class="category-section">
-                        <div class="category-header">
-                            <div class="category-title">
-                                <h2>${category}</h2>
-                                <i class="fas fa-thumbtack pin-icon" onclick="editCategory('${category}')"></i>
-                            </div>
-                            <div>
-                                <button class="add-ticket-btn" onclick="showAddTicketModal('${category}')">
-                                    <i class="fas fa-plus"></i> Ajouter un ticket
-                                </button>
-                                <label for="importFile_${category}" class="file-input-label">
-                                    <i class="fas fa-file-import"></i> Importer dans ${category}
-                                </label>
-                                <input type="file" id="importFile_${category}" 
-                                    accept=".json,.csv,.txt" 
-                                    style="display: none;" 
-                                    onchange="importTicketsToCategory('${category}', event)">
-                            </div>
-                        </div>
-                        <button onclick="deleteAllTicketsInCategory('${category}')">Supprimer tous les tickets de ${category}</button>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Sélectionner</th>
-                                    <th>Mot de passe</th>
-                                    <th>Prix</th>
-                                    <th>Utilisateur</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="ticketsBody_${category}">
-                            </tbody>
-                        </table>
-                        <button onclick="deleteSelectedTickets('${category}')">Supprimer les tickets sélectionnés de ${category}</button>
+    if (currentDatabase === 'TicketsTotal') {
+        displayTicketsTotal(tickets, searchTerm);
+    } else if (currentDatabase === 'TicketsTransit') {
+        displayTicketsTransit(tickets, searchTerm);
+    }
+}
+
+// Fonction pour afficher les tickets de TicketsTotal
+function displayTicketsTotal(tickets, searchTerm = '') {
+    const categoriesContainer = document.getElementById('ticketCategories');
+    for (let category in tickets) {
+        const categoryTickets = tickets[category];
+        const categoryHtml = `
+            <div class="category-section">
+                <div class="category-header">
+                    <div class="category-title">
+                        <h2>${category}</h2>
+                        <i class="fas fa-thumbtack pin-icon" onclick="editCategory('${category}')"></i>
                     </div>
-                `;
-                categoriesContainer.innerHTML += categoryHtml;
-
-                const ticketsBody = document.getElementById(`ticketsBody_${category}`);
-                for (let i = 0; i < categoryTickets.motDePasse.length; i++) {
-                    if (searchTerm && !matchesSearch(categoryTickets, i, searchTerm)) continue;
-                    const row = `
+                    <div>
+                        <button class="add-ticket-btn" onclick="showAddTicketModal('${category}')">
+                            <i class="fas fa-plus"></i> Ajouter un ticket
+                        </button>
+                        <label for="importFile_${category}" class="file-input-label">
+                            <i class="fas fa-file-import"></i> Importer dans ${category}
+                        </label>
+                        <input type="file" id="importFile_${category}" 
+                            accept=".json,.csv,.txt" 
+                            style="display: none;" 
+                            onchange="importTicketsToCategory('${category}', event)">
+                    </div>
+                </div>
+                <button onclick="deleteAllTicketsInCategory('${category}')">Supprimer tous les tickets de ${category}</button>
+                <table>
+                    <thead>
                         <tr>
-                            <td><input type="checkbox" name="ticketSelect_${category}" value="${i}"></td>
-                            <td>${highlightMatch(categoryTickets.motDePasse[i], searchTerm)}</td>
-                            <td>${highlightMatch(categoryTickets.prix[i], searchTerm)}</td>
-                            <td>${highlightMatch(categoryTickets.utilisateur[i], searchTerm)}</td>
-                            <td>
-                                <button class="edit-btn" onclick="editTicket('${category}', ${i})">
-                                    <i class="fas fa-edit"></i> Modifier
-                                </button>
-                                <button class="delete-btn" onclick="deleteTicket('${category}', ${i})">
-                                    <i class="fas fa-trash"></i> Supprimer
-                                </button>
-                            </td>
+                            <th>Sélectionner</th>
+                            <th>Mot de passe</th>
+                            <th>Prix</th>
+                            <th>Utilisateur</th>
+                            <th>Actions</th>
                         </tr>
-                    `;
-                    ticketsBody.innerHTML += row;
-                }
-            }
-        }
+                    </thead>
+                    <tbody id="ticketsBody_${category}">
+                        ${generateTicketRowsTotal(category, categoryTickets, searchTerm)}
+                    </tbody>
+                </table>
+                <button onclick="deleteSelectedTickets('${category}')">Supprimer les tickets sélectionnés de ${category}</button>
+            </div>
+        `;
+        categoriesContainer.innerHTML += categoryHtml;
+    }
+}
 
-        function editTicket(category, index) {
+// Fonction pour générer les lignes de tableau pour TicketsTotal
+function generateTicketRowsTotal(category, categoryTickets, searchTerm) {
+    let rows = '';
+    for (let i = 0; i < categoryTickets.motDePasse.length; i++) {
+        if (searchTerm && !matchesSearchTotal(categoryTickets, i, searchTerm)) continue;
+        rows += `
+            <tr>
+                <td><input type="checkbox" name="ticketSelect_${category}" value="${i}"></td>
+                <td>${highlightMatch(categoryTickets.motDePasse[i], searchTerm)}</td>
+                <td>${highlightMatch(categoryTickets.prix[i], searchTerm)}</td>
+                <td>${highlightMatch(categoryTickets.utilisateur[i], searchTerm)}</td>
+                <td>
+                    <button class="edit-btn" onclick="editTicketTotal('${category}', ${i})">
+                        <i class="fas fa-edit"></i> Modifier
+                    </button>
+                    <button class="delete-btn" onclick="deleteTicket('${category}', ${i})">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </button>
+                </td>
+            </tr>
+        `;
+    }
+    return rows;
+}
+
+// Fonction pour afficher les tickets de TicketsTransit
+function displayTicketsTransit(tickets, searchTerm = '') {
+    const categoriesContainer = document.getElementById('ticketCategories');
+    categoriesContainer.innerHTML = '';
+
+    const categoryHtml = `
+        <div class="category-section">
+            <div class="category-header">
+                <div class="category-title">
+                    <h2>Tickets en transit</h2>
+                </div>
+                <div>
+                    <button class="add-ticket-btn" onclick="showAddTicketModal(null)">
+                        <i class="fas fa-plus"></i> Ajouter un ticket
+                    </button>
+                    <label for="importFile_Transit" class="file-input-label">
+                        <i class="fas fa-file-import"></i> Importer dans TicketsTransit
+                    </label>
+                    <input type="file" id="importFile_Transit" 
+                        accept=".json,.csv,.txt" 
+                        style="display: none;" 
+                        onchange="importTicketsToCategory('TicketsTransit', event)">
+                </div>
+            </div>
+            <button onclick="deleteAllTicketsInCategory(null)">Supprimer tous les tickets</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sélectionner</th>
+                        <th>ID</th>
+                        <th>Catégorie</th>
+                        <th>Mot de passe</th>
+                        <th>Prix</th>
+                        <th>Utilisateur</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="ticketsBody_Transit">
+                    ${generateTicketRowsTransit(tickets, searchTerm)}
+                </tbody>
+            </table>
+            <button onclick="deleteSelectedTickets(null)">Supprimer les tickets sélectionnés</button>
+        </div>
+    `;
+
+    categoriesContainer.innerHTML = categoryHtml;
+}
+
+// Fonction pour générer les lignes de tableau pour TicketsTransit
+function generateTicketRowsTransit(tickets, searchTerm) {
+    let rows = '';
+    for (let id in tickets) {
+        const ticket = tickets[id];
+        if (searchTerm && !matchesSearchTransit(ticket, searchTerm)) continue;
+        rows += `
+            <tr>
+                <td><input type="checkbox" name="ticketSelect_Transit" value="${id}"></td>
+                <td>${highlightMatch(id, searchTerm)}</td>
+                <td>${highlightMatch(ticket.category, searchTerm)}</td>
+                <td>${highlightMatch(ticket.password, searchTerm)}</td>
+                <td>${highlightMatch(ticket.price, searchTerm)}</td>
+                <td>${highlightMatch(ticket.user, searchTerm)}</td>
+                <td>
+                    <button class="edit-btn" onclick="editTicketTransit('${id}')">
+                        <i class="fas fa-edit"></i> Modifier
+                    </button>
+                    <button class="delete-btn" onclick="deleteTicket('${id}', null)">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </button>
+                </td>
+            </tr>
+        `;
+    }
+    return rows;
+}
+
+function editTicketTransit(id) {
+    const ticket = allTickets[id];
+    if (ticket) {
+        editingId = id;
+        document.getElementById('editId').value = id;
+        document.getElementById('editCategory').value = ticket.category;
+        document.getElementById('editPassword').value = ticket.password;
+        document.getElementById('editPrice').value = ticket.price;
+        document.getElementById('editUser').value = ticket.user;
+        document.getElementById('editTicketModal').style.display = 'block';
+    } else {
+        alert("Ticket introuvable.");
+    }
+}
+
+function saveTicketEdit() {
+    const newPassword = document.getElementById('editPassword').value;
+    const newPrice = document.getElementById('editPrice').value;
+    const newUser = document.getElementById('editUser').value;
+    const newCategory = document.getElementById('editCategory').value;
+
+    if (!newPassword || !newPrice || !newUser || !newCategory) {
+        alert('Tous les champs sont obligatoires');
+        return;
+    }
+
+    showLoading();
+
+    if (currentDatabase === 'TicketsTotal') {
+        const categoryData = allTickets[editingCategory];
+        categoryData.motDePasse[editingIndex] = newPassword;
+        categoryData.prix[editingIndex] = newPrice;
+        categoryData.utilisateur[editingIndex] = newUser;
+
+        const updates = {
+            [`${currentDatabase}/${editingCategory}`]: categoryData
+        };
+
+        database.ref().update(updates)
+            .then(() => {
+                hideLoading();
+                closeEditModal();
+                alert('Ticket modifié avec succès!');
+            })
+            .catch(error => {
+                console.error("Erreur lors de la modification:", error);
+                hideLoading();
+                alert('Erreur lors de la modification du ticket');
+            });
+    } else if (currentDatabase === 'TicketsTransit') {
+        const ticketRef = database.ref(`${currentDatabase}/${editingId}`);
+        ticketRef.update({
+            category: newCategory,
+            password: newPassword,
+            price: newPrice,
+            user: newUser
+        })
+        .then(() => {
+            hideLoading();
+            closeEditModal();
+            alert('Ticket modifié avec succès!');
+        })
+        .catch(error => {
+            console.error("Erreur lors de la modification:", error);
+            hideLoading();
+            alert('Erreur lors de la modification du ticket');
+        });
+    }
+}
+
+        function editTicketTotal(category, index) {
             editingCategory = category;
             editingIndex = index;
             const ticket = allTickets[category];
             
+            document.getElementById('editId').value = '';
+            document.getElementById('editCategory').value = category;
             document.getElementById('editPassword').value = ticket.motDePasse[index];
             document.getElementById('editPrice').value = ticket.prix[index];
             document.getElementById('editUser').value = ticket.utilisateur[index];
@@ -516,38 +710,7 @@ const firebaseConfig = {
             document.getElementById('editTicketModal').style.display = 'block';
         }
 
-        function saveTicketEdit() {
-            const newPassword = document.getElementById('editPassword').value;
-            const newPrice = document.getElementById('editPrice').value;
-            const newUser = document.getElementById('editUser').value;
-
-            if (!newPassword || !newPrice || !newUser) {
-                alert('Tous les champs sont obligatoires');
-                return;
-            }
-
-            showLoading();
-            const updates = {};
-            const categoryData = allTickets[editingCategory];
-            
-            categoryData.motDePasse[editingIndex] = newPassword;
-            categoryData.prix[editingIndex] = newPrice;
-            categoryData.utilisateur[editingIndex] = newUser;
-
-            updates[`TicketsTotal/${editingCategory}`] = categoryData;
-
-            database.ref().update(updates)
-                .then(() => {
-                    hideLoading();
-                    closeEditModal();
-                    alert('Ticket modifié avec succès!');
-                })
-                .catch(error => {
-                    console.error("Erreur lors de la modification:", error);
-                    hideLoading();
-                    alert('Erreur lors de la modification du ticket');
-                });
-        }
+        
 
         function importTicketsToCategory(category, event) {
             const file = event.target.files[0];
@@ -579,111 +742,191 @@ const firebaseConfig = {
 
         function handleJsonImportToCategory(jsonContent, category) {
             const importedData = JSON.parse(jsonContent);
-            
-            // Si le JSON contient directement les tableaux de tickets
-            let ticketsToImport;
-            if (importedData.motDePasse) {
-                ticketsToImport = importedData;
-            } 
-            // Si le JSON contient des catégories
-            else if (importedData[category]) {
-                ticketsToImport = importedData[category];
-            } else {
-                hideLoading();
-                alert('Format JSON invalide ou catégorie non trouvée');
-                return;
+
+            // Structure pour les tickets en transit
+            if (currentDatabase === 'TicketsTransit') {
+                for (let id in importedData) {
+                    if (!importedData[id].category || !importedData[id].password || !importedData[id].price || !importedData[id].user) {
+                        hideLoading();
+                        alert('Format JSON invalide pour TicketsTransit');
+                        return;
+                    }
+                }
+            } else { // Structure pour TicketsTotal
+                if (category === 'TicketsTransit') {
+                    for (let id in importedData) {
+                        if (!importedData[id].category || !importedData[id].password || !importedData[id].price || !importedData[id].user) {
+                            hideLoading();
+                            alert('Format JSON invalide pour TicketsTransit');
+                            return;
+                        }
+                    }
+                } else if (!importedData[category] || !importedData[category].motDePasse || !importedData[category].prix || !importedData[category].utilisateur) {
+                    hideLoading();
+                    alert('Format JSON invalide pour TicketsTotal');
+                    return;
+                }
             }
 
-            mergeTicketsToCategory(category, ticketsToImport);
+            mergeTicketsToCategory(category, importedData);
         }
 
         function handleCsvImportToCategory(csvContent, category) {
             const lines = csvContent.split('\n');
-            const tickets = {
-                motDePasse: [],
-                prix: [],
-                utilisateur: []
-            };
+            let tickets = {};
 
-            // Skip header line
-            for (let i = 1; i < lines.length; i++) {
-                if (!lines[i].trim()) continue;
-                
-                const values = lines[i].split(',');
-                tickets.utilisateur.push(values[0].trim());
-                tickets.motDePasse.push(values[1].trim());
-                if (values[3]) { // Si le prix est inclus dans le CSV
-                    tickets.prix.push(values[3].trim());
+            // Si l'importation est pour TicketsTransit
+            if (currentDatabase === 'TicketsTransit') {
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+                    const values = lines[i].split(',');
+                    const id = values[0] ? values[0].trim() : `id-${Date.now()}-${i}`;
+                    tickets[id] = {
+                        id: id,
+                        category: values[1] ? values[1].trim() : 'N/A',
+                        password: values[2] ? values[2].trim() : '',
+                        price: values[3] ? values[3].trim() : '',
+                        user: values[4] ? values[4].trim() : ''
+                    };
                 }
-            }
+                mergeTicketsToCategory(null, tickets);
+            } else { // Si l'importation est pour TicketsTotal
+                const tickets = {
+                    motDePasse: [],
+                    prix: [],
+                    utilisateur: []
+                };
 
-            if (!tickets.prix.length) {
-                tempImportData = { [category]: tickets };
-                tempCategory = category;
-                showPriceModal(category);
-            } else {
-                mergeTicketsToCategory(category, tickets);
+                // Skip header line
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+                    
+                    const values = lines[i].split(',');
+                    tickets.utilisateur.push(values[0].trim());
+                    tickets.motDePasse.push(values[1].trim());
+                    if (values[3]) { // Si le prix est inclus dans le CSV
+                        tickets.prix.push(values[3].trim());
+                    }
+                }
+
+                if (!tickets.prix.length) {
+                    tempImportData = { [category]: tickets };
+                    tempCategory = category;
+                    showPriceModal(category);
+                } else {
+                    mergeTicketsToCategory(category, tickets);
+                }
             }
         }
 
         function handleTxtImportToCategory(txtContent, category) {
             const lines = txtContent.split('\n');
-            const tickets = {
-                motDePasse: [],
-                prix: [],
-                utilisateur: []
-            };
-            const regex = /add name="([^"]+)" password="([^"]+)"/;
+            let tickets = {};
 
-            for (let line of lines) {
-                line = line.trim();
-                if (!line || line === '/ip hotspot user') continue;
-
-                const match = line.match(regex);
-                if (match) {
-                    const [_, name, password] = match;
-                    tickets.utilisateur.push(name);
-                    tickets.motDePasse.push(password);
-                }
-            }
-
-            if (tickets.motDePasse.length > 0) {
-                tempImportData = { [category]: tickets };
-                tempCategory = category;
-                showPriceModal(category);
-            } else {
-                hideLoading();
-                alert('Aucun ticket valide trouvé dans le fichier');
-            }
-        }
-
-        function mergeTicketsToCategory(category, newTickets) {
-            if (!allTickets[category]) {
-                allTickets[category] = {
+            if (currentDatabase === 'TicketsTransit') {
+                const regex = /add name="([^"]+)" password="([^"]+)" profile="([^"]+)"/;
+                let tempTickets = {
                     motDePasse: [],
                     prix: [],
                     utilisateur: []
                 };
+
+                for (let line of lines) {
+                    line = line.trim();
+                    if (!line || line === '/ip hotspot user') continue;
+                    const match = line.match(regex);
+                    if (match) {
+                        const [_, name, password, profile] = match;
+                        tempTickets.utilisateur.push(name);
+                        tempTickets.motDePasse.push(password);
+                        tempTickets.prix.push(profile);
+                    }
+                }
+                for(let i = 0; i < tempTickets.utilisateur.length; i++) {
+                    const id = `id-${Date.now()}-${i}`;
+                    tickets[id] = {
+                        id,
+                        category: "Cadeau",
+                        password: tempTickets.motDePasse[i],
+                        price: '1',
+                        user: tempTickets.utilisateur[i]
+                    }
+                }
+
+                if (Object.keys(tickets).length > 0) {
+                    mergeTicketsToCategory(null, tickets);
+                } else {
+                    hideLoading();
+                    alert('Aucun ticket valide trouvé dans le fichier pour TicketsTransit');
+                }
+            } else { // Si l'importation est pour TicketsTotal
+                const regex = /add name="([^"]+)" password="([^"]+)" profile="([^"]+)"/;
+                for (let line of lines) {
+                    line = line.trim();
+                    if (!line || line === '/ip hotspot user') continue;
+
+                    const match = line.match(regex);
+                    if (match) {
+                        const [_, name, password, profile] = match;
+                        if (!tickets[profile]) {
+                            tickets[profile] = {
+                                motDePasse: [],
+                                prix: [],
+                                utilisateur: []
+                            };
+                        }
+
+                        tickets[profile].utilisateur.push(name);
+                        tickets[profile].motDePasse.push(password);
+                    }
+                }
+
+                if (Object.keys(tickets).length === 0) {
+                    hideLoading();
+                    alert('Aucun ticket valide n\'a été trouvé dans le fichier');
+                    return;
+                }
+
+                tempImportData = tickets;
+                const firstCategory = Object.keys(tickets)[0];
+                showPriceModal(firstCategory);
+            }
+        }
+
+        function mergeTicketsToCategory(category, newTickets) {
+            let updates = {};
+
+            if (currentDatabase === 'TicketsTransit') {
+                for (let id in newTickets) {
+                    updates[`${currentDatabase}/${id}`] = newTickets[id];
+                }
+            } else {
+                if (!allTickets[category]) {
+                    allTickets[category] = {
+                        motDePasse: [],
+                        prix: [],
+                        utilisateur: []
+                    };
+                }
+                const currentTickets = allTickets[category];
+                const mergedTickets = {
+                    motDePasse: [...currentTickets.motDePasse, ...newTickets.motDePasse],
+                    prix: [...currentTickets.prix, ...newTickets.prix],
+                    utilisateur: [...currentTickets.utilisateur, ...newTickets.utilisateur]
+                };
+                updates[`${currentDatabase}/${category}`] = mergedTickets;
             }
 
-            const currentTickets = allTickets[category];
-            
-            const mergedTickets = {
-                motDePasse: [...currentTickets.motDePasse, ...newTickets.motDePasse],
-                prix: [...currentTickets.prix, ...newTickets.prix],
-                utilisateur: [...currentTickets.utilisateur, ...newTickets.utilisateur]
-            };
-
-            database.ref(`TicketsTotal/${category}`).set(mergedTickets)
-                .then(() => {
-                    hideLoading();
-                    alert(`Importation réussie dans la catégorie ${category} ! Les nouveaux tickets ont été ajoutés aux existants.`);
-                })
-                .catch((error) => {
-                    console.error("Erreur lors de l'importation:", error);
-                    hideLoading();
-                    alert("Erreur lors de l'importation. Veuillez réessayer.");
-                });
+            database.ref().update(updates)
+            .then(() => {
+                hideLoading();
+                alert(`Importation réussie dans ${category || 'TicketsTransit'}!`);
+            })
+            .catch((error) => {
+                console.error("Erreur lors de l'importation:", error);
+                hideLoading();
+                alert("Erreur lors de l'importation. Veuillez réessayer.");
+            });
         }
 
         function editCategory(category) {
@@ -709,8 +952,8 @@ const firebaseConfig = {
             const categoryData = allTickets[currentEditingCategory];
             
             const updates = {
-                [`TicketsTotal/${currentEditingCategory}`]: null,
-                [`TicketsTotal/${newCategoryName}`]: categoryData
+                [`${currentDatabase}/${currentEditingCategory}`]: null,
+                [`${currentDatabase}/${newCategoryName}`]: categoryData
             };
 
             database.ref().update(updates)
@@ -731,37 +974,58 @@ const firebaseConfig = {
             document.getElementById('newPassword').value = '';
             document.getElementById('newPrice').value = '';
             document.getElementById('newUser').value = '';
+            document.getElementById('newCategory').value = '';
             document.getElementById('addTicketModal').style.display = 'block';
         }
 
         function saveNewTicket() {
-            const password = document.getElementById('newPassword').value.trim();
-            const price = document.getElementById('newPrice').value.trim();
-            const user = document.getElementById('newUser').value.trim();
-
-            if (!password || !price || !user) {
-                alert('Tous les champs sont obligatoires');
-                return;
-            }
-
             showLoading();
-            const categoryData = allTickets[currentEditingCategory];
-            
-            categoryData.motDePasse.push(password);
-            categoryData.prix.push(price);
-            categoryData.utilisateur.push(user);
+            if (currentDatabase === 'TicketsTransit') {
+                const id = `id-${Date.now()}`; // Générer un ID unique pour TicketsTransit
+                const newTicket = {
+                    id: id, // Ajout de l'ID
+                    category: document.getElementById('newCategory').value.trim(),
+                    password: document.getElementById('newPassword').value.trim(),
+                    price: document.getElementById('newPrice').value.trim(),
+                    user: document.getElementById('newUser').value.trim()
+                };
+                
+                database.ref(`${currentDatabase}/${id}`).set(newTicket)
+                    .then(() => {
+                        hideLoading();
+                        closeAddTicketModal();
+                        alert('Ticket ajouté avec succès dans TicketsTransit!');
+                    })
+                    .catch(error => {
+                        console.error("Erreur lors de l'ajout du ticket:", error);
+                        hideLoading();
+                        alert('Erreur lors de l\'ajout du ticket');
+                    });
+            } else {
+                const category = currentEditingCategory;
+                const newTicket = {
+                    password: document.getElementById('newPassword').value.trim(),
+                    price: document.getElementById('newPrice').value.trim(),
+                    user: document.getElementById('newUser').value.trim()
+                };
 
-            database.ref(`TicketsTotal/${currentEditingCategory}`).set(categoryData)
-                .then(() => {
-                    hideLoading();
-                    closeAddTicketModal();
-                    alert('Ticket ajouté avec succès!');
-                })
-                .catch(error => {
-                    console.error("Erreur lors de l'ajout du ticket:", error);
-                    hideLoading();
-                    alert('Erreur lors de l\'ajout du ticket');
-                });
+                const categoryData = allTickets[category] || { motDePasse: [], prix: [], utilisateur: [] };
+                categoryData.motDePasse.push(newTicket.password);
+                categoryData.prix.push(newTicket.price);
+                categoryData.utilisateur.push(newTicket.user);
+
+                database.ref(`${currentDatabase}/${category}`).set(categoryData)
+                    .then(() => {
+                        hideLoading();
+                        closeAddTicketModal();
+                        alert('Ticket ajouté avec succès dans TicketsTotal!');
+                    })
+                    .catch(error => {
+                        console.error("Erreur lors de l'ajout du ticket:", error);
+                        hideLoading();
+                        alert('Erreur lors de l\'ajout du ticket');
+                    });
+            }
         }
 
         function closeEditModal() {
@@ -780,12 +1044,31 @@ const firebaseConfig = {
             currentEditingCategory = null;
         }
 
-        function matchesSearch(categoryTickets, index, searchTerm) {
-            const lowerSearchTerm = searchTerm.toLowerCase();
-            return categoryTickets.motDePasse[index].toLowerCase().includes(lowerSearchTerm) ||
-                   categoryTickets.prix[index].toLowerCase().includes(lowerSearchTerm) ||
-                   categoryTickets.utilisateur[index].toLowerCase().includes(lowerSearchTerm);
-        }
+function matchesSearchTotal(categoryTickets, index, searchTerm) {
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    return categoryTickets.motDePasse[index].toLowerCase().includes(lowerSearchTerm) ||
+           categoryTickets.prix[index].toLowerCase().includes(lowerSearchTerm) ||
+           categoryTickets.utilisateur[index].toLowerCase().includes(lowerSearchTerm);
+}
+
+function matchesSearchTransit(ticket, searchTerm) {
+    const lowerSearchTerm = searchTerm.toLowerCase();
+    return (ticket.id && ticket.id.toLowerCase().includes(lowerSearchTerm)) ||
+           (ticket.category && ticket.category.toLowerCase().includes(lowerSearchTerm)) ||
+           (ticket.password && ticket.password.toLowerCase().includes(lowerSearchTerm)) ||
+           (ticket.price && ticket.price.toLowerCase().includes(lowerSearchTerm)) ||
+           (ticket.user && ticket.user.toLowerCase().includes(lowerSearchTerm));
+}
+
+// Modifiez la fonction matchesSearch pour utiliser la fonction appropriée en fonction de la base de données
+function matchesSearch(data, index, searchTerm) {
+    if (currentDatabase === 'TicketsTotal') {
+        return matchesSearchTotal(data, index, searchTerm);
+    } else if (currentDatabase === 'TicketsTransit') {
+        return matchesSearchTransit(data, searchTerm);
+    }
+    return false;
+}
 
         function highlightMatch(text, searchTerm) {
             if (!searchTerm) return text;
@@ -793,29 +1076,42 @@ const firebaseConfig = {
             return text.replace(regex, match => `<span class="highlight">${match}</span>`);
         }
 
-        function deleteTicket(category, index) {
+        function deleteTicket(id, category) {
             if (confirm('Êtes-vous sûr de vouloir supprimer ce ticket ?')) {
                 showLoading();
-                const categoryData = allTickets[category];
-                categoryData.motDePasse.splice(index, 1);
-                categoryData.prix.splice(index, 1);
-                categoryData.utilisateur.splice(index, 1);
-                
-                database.ref(`TicketsTotal/${category}`).set(categoryData)
-                    .then(() => {
-                        hideLoading();
-                        alert('Ticket supprimé avec succès!');
-                    })
-                    .catch(error => {
-                        console.error("Erreur lors de la suppression:", error);
-                        hideLoading();
-                        alert('Erreur lors de la suppression du ticket');
-                    });
+                if (currentDatabase === 'TicketsTransit') {
+                    database.ref(`${currentDatabase}/${id}`).remove()
+                        .then(() => {
+                            hideLoading();
+                            alert('Ticket supprimé avec succès!');
+                        })
+                        .catch(error => {
+                            console.error("Erreur lors de la suppression:", error);
+                            hideLoading();
+                            alert('Erreur lors de la suppression du ticket');
+                        });
+                } else {
+                    const categoryData = allTickets[category];
+                    categoryData.motDePasse.splice(editingIndex, 1);
+                    categoryData.prix.splice(editingIndex, 1);
+                    categoryData.utilisateur.splice(editingIndex, 1);
+                    
+                    database.ref(`${currentDatabase}/${category}`).set(categoryData)
+                        .then(() => {
+                            hideLoading();
+                            alert('Ticket supprimé avec succès!');
+                        })
+                        .catch(error => {
+                            console.error("Erreur lors de la suppression:", error);
+                            hideLoading();
+                            alert('Erreur lors de la suppression du ticket');
+                        });
+                }
             }
         }
 
         function deleteSelectedTickets(category) {
-            const selectedTickets = document.querySelectorAll(`input[name="ticketSelect_${category}"]:checked`);
+            const selectedTickets = document.querySelectorAll(`input[name^="ticketSelect_${category || 'Transit'}"]:checked`);
             if (selectedTickets.length === 0) {
                 alert('Veuillez sélectionner au moins un ticket à supprimer');
                 return;
@@ -823,18 +1119,29 @@ const firebaseConfig = {
 
             if (confirm('Êtes-vous sûr de vouloir supprimer les tickets sélectionnés ?')) {
                 showLoading();
-                const categoryData = allTickets[category];
-                const indices = Array.from(selectedTickets)
-                    .map(checkbox => parseInt(checkbox.value))
-                    .sort((a, b) => b - a);
+                const updates = {};
 
-                indices.forEach(index => {
-                    categoryData.motDePasse.splice(index, 1);
-                    categoryData.prix.splice(index, 1);
-                    categoryData.utilisateur.splice(index, 1);
-                });
+                if (currentDatabase === 'TicketsTransit') {
+                    selectedTickets.forEach(checkbox => {
+                        const ticketId = checkbox.value;
+                        updates[`${currentDatabase}/${ticketId}`] = null;
+                    });
+                } else {
+                    const categoryData = allTickets[category];
+                    const indices = Array.from(selectedTickets)
+                        .map(checkbox => parseInt(checkbox.value))
+                        .sort((a, b) => b - a);
 
-                database.ref(`TicketsTotal/${category}`).set(categoryData)
+                    indices.forEach(index => {
+                        categoryData.motDePasse.splice(index, 1);
+                        categoryData.prix.splice(index, 1);
+                        categoryData.utilisateur.splice(index, 1);
+                    });
+
+                    updates[`${currentDatabase}/${category}`] = categoryData;
+                }
+
+                database.ref().update(updates)
                     .then(() => {
                         hideLoading();
                         alert('Tickets sélectionnés supprimés avec succès!');
@@ -848,22 +1155,35 @@ const firebaseConfig = {
         }
 
         function deleteAllTicketsInCategory(category) {
-            if (confirm(`Êtes-vous sûr de vouloir supprimer TOUS les tickets de la catégorie ${category} ?`)) {
+            if (confirm(`Êtes-vous sûr de vouloir supprimer TOUS les tickets de ${category || 'TicketsTransit'} ?`)) {
                 showLoading();
-                database.ref(`TicketsTotal/${category}`).set({
-                    motDePasse: [],
-                    prix: [],
-                    utilisateur: []
-                })
-                .then(() => {
-                    hideLoading();
-                    alert('Tous les tickets de la catégorie ont été supprimés avec succès!');
-                })
-                .catch(error => {
-                    console.error("Erreur lors de la suppression:", error);
-                    hideLoading();
-                    alert('Erreur lors de la suppression des tickets');
-                });
+                if (currentDatabase === 'TicketsTransit') {
+                    database.ref(currentDatabase).set({})
+                        .then(() => {
+                            hideLoading();
+                            alert('Tous les tickets ont été supprimés avec succès!');
+                        })
+                        .catch(error => {
+                            console.error("Erreur lors de la suppression:", error);
+                            hideLoading();
+                            alert('Erreur lors de la suppression des tickets');
+                        });
+                } else {
+                    database.ref(`${currentDatabase}/${category}`).set({
+                        motDePasse: [],
+                        prix: [],
+                        utilisateur: []
+                    })
+                    .then(() => {
+                        hideLoading();
+                        alert('Tous les tickets de la catégorie ont été supprimés avec succès!');
+                    })
+                    .catch(error => {
+                        console.error("Erreur lors de la suppression:", error);
+                        hideLoading();
+                        alert('Erreur lors de la suppression des tickets');
+                    });
+                }
             }
         }
 
@@ -871,7 +1191,7 @@ const firebaseConfig = {
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allTickets, null, 2));
             const downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "tickets_export.json");
+            downloadAnchorNode.setAttribute("download", `tickets_export_${currentDatabase}.json`);
             document.body.appendChild(downloadAnchorNode);
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
@@ -880,28 +1200,36 @@ const firebaseConfig = {
         function exportFilteredTickets() {
             const searchTerm = document.getElementById('searchBar').value.trim();
             const filteredTickets = {};
-            
-            for (let category in allTickets) {
-                const categoryTickets = allTickets[category];
-                filteredTickets[category] = {
-                    motDePasse: [],
-                    prix: [],
-                    utilisateur: []
-                };
-                
-                for (let i = 0; i < categoryTickets.motDePasse.length; i++) {
-                    if (!searchTerm || matchesSearch(categoryTickets, i, searchTerm)) {
-                        filteredTickets[category].motDePasse.push(categoryTickets.motDePasse[i]);
-                        filteredTickets[category].prix.push(categoryTickets.prix[i]);
-                        filteredTickets[category].utilisateur.push(categoryTickets.utilisateur[i]);
+
+            if (currentDatabase === 'TicketsTransit') {
+                for (let id in allTickets) {
+                    if (!searchTerm || matchesSearchTransit(allTickets[id], searchTerm)) {
+                        filteredTickets[id] = allTickets[id];
+                    }
+                }
+            } else {
+                for (let category in allTickets) {
+                    const categoryTickets = allTickets[category];
+                    filteredTickets[category] = {
+                        motDePasse: [],
+                        prix: [],
+                        utilisateur: []
+                    };
+
+                    for (let i = 0; i < categoryTickets.motDePasse.length; i++) {
+                        if (!searchTerm || matchesSearchTotal(categoryTickets, i, searchTerm)) {
+                            filteredTickets[category].motDePasse.push(categoryTickets.motDePasse[i]);
+                            filteredTickets[category].prix.push(categoryTickets.prix[i]);
+                            filteredTickets[category].utilisateur.push(categoryTickets.utilisateur[i]);
+                        }
                     }
                 }
             }
-            
+
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(filteredTickets, null, 2));
             const downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "filtered_tickets_export.json");
+            downloadAnchorNode.setAttribute("download", `filtered_tickets_export_${currentDatabase}.json`);
             document.body.appendChild(downloadAnchorNode);
             downloadAnchorNode.click();
             downloadAnchorNode.remove();
@@ -911,19 +1239,27 @@ const firebaseConfig = {
             const importedData = JSON.parse(jsonContent);
             if (confirm('Êtes-vous sûr de vouloir importer ces tickets ? Les nouveaux tickets seront ajoutés aux tickets existants.')) {
                 const updates = {};
-                for (let category in importedData) {
-                    if (allTickets[category]) {
-                        // Fusion des tickets existants avec les nouveaux
-                        updates[`TicketsTotal/${category}`] = {
-                            motDePasse: [...allTickets[category].motDePasse, ...importedData[category].motDePasse],
-                            prix: [...allTickets[category].prix, ...importedData[category].prix],
-                            utilisateur: [...allTickets[category].utilisateur, ...importedData[category].utilisateur]
-                        };
-                    } else {
-                        // Nouvelle catégorie
-                        updates[`TicketsTotal/${category}`] = importedData[category];
+
+                if (currentDatabase === 'TicketsTransit') {
+                    for (let id in importedData) {
+                        updates[`${currentDatabase}/${id}`] = importedData[id];
+                    }
+                } else {
+                    for (let category in importedData) {
+                        if (allTickets[category]) {
+                            // Fusion des tickets existants avec les nouveaux
+                            updates[`${currentDatabase}/${category}`] = {
+                                motDePasse: [...allTickets[category].motDePasse, ...importedData[category].motDePasse],
+                                prix: [...allTickets[category].prix, ...importedData[category].prix],
+                                utilisateur: [...allTickets[category].utilisateur, ...importedData[category].utilisateur]
+                            };
+                        } else {
+                            // Nouvelle catégorie
+                            updates[`${currentDatabase}/${category}`] = importedData[category];
+                        }
                     }
                 }
+
                 database.ref().update(updates)
                     .then(() => {
                         hideLoading();
@@ -943,63 +1279,116 @@ const firebaseConfig = {
             const lines = csvContent.split('\n');
             const tickets = {};
 
-            for (let i = 1; i < lines.length; i++) {
-                if (!lines[i].trim()) continue;
-                
-                const values = lines[i].split(',');
-                const category = values[2].trim(); // Profile column
-
-                if (!tickets[category]) {
-                    tickets[category] = {
-                        motDePasse: [],
-                        prix: [],
-                        utilisateur: []
+            if (currentDatabase === 'TicketsTransit') {
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+                    const values = lines[i].split(',');
+                    const id = values[0] ? values[0].trim() : `id-${Date.now()}-${i}`;
+                    tickets[id] = {
+                        id: id,
+                        category: values[1] ? values[1].trim() : 'N/A',
+                        password: values[2] ? values[2].trim() : '',
+                        price: values[3] ? values[3].trim() : '',
+                        user: values[4] ? values[4].trim() : ''
                     };
                 }
+                mergeTicketsToCategory(null, tickets);
+            } else {
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+                    const values = lines[i].split(',');
+                    const category = values[2].trim(); // Profile column
 
-                tickets[category].utilisateur.push(values[0].trim());
-                tickets[category].motDePasse.push(values[1].trim());
-            }
-
-            tempImportData = tickets;
-            const firstCategory = Object.keys(tickets)[0];
-            showPriceModal(firstCategory);
-        }
-
-        function handleTxtImport(txtContent) {
-            const lines = txtContent.split('\n');
-            const tickets = {};
-            const regex = /add name="([^"]+)" password="([^"]+)" profile="([^"]+)"/;
-
-            for (let line of lines) {
-                line = line.trim();
-                if (!line || line === '/ip hotspot user') continue;
-
-                const match = line.match(regex);
-                if (match) {
-                    const [_, name, password, profile] = match;
-                    if (!tickets[profile]) {
-                        tickets[profile] = {
+                    if (!tickets[category]) {
+                        tickets[category] = {
                             motDePasse: [],
                             prix: [],
                             utilisateur: []
                         };
                     }
 
-                    tickets[profile].utilisateur.push(name);
-                    tickets[profile].motDePasse.push(password);
+                    tickets[category].utilisateur.push(values[0].trim());
+                    tickets[category].motDePasse.push(values[1].trim());
                 }
-            }
 
-            if (Object.keys(tickets).length === 0) {
-                hideLoading();
-                alert('Aucun ticket valide n\'a été trouvé dans le fichier');
-                return;
+                tempImportData = tickets;
+                const firstCategory = Object.keys(tickets)[0];
+                showPriceModal(firstCategory);
             }
+        }
 
-            tempImportData = tickets;
-            const firstCategory = Object.keys(tickets)[0];
-            showPriceModal(firstCategory);
+        function handleTxtImport(txtContent) {
+            const lines = txtContent.split('\n');
+            let tickets = {};
+
+            if (currentDatabase === 'TicketsTransit') {
+                const regex = /add name="([^"]+)" password="([^"]+)" profile="([^"]+)"/;
+                let tempTickets = {
+                    motDePasse: [],
+                    prix: [],
+                    utilisateur: []
+                };
+
+                for (let line of lines) {
+                    line = line.trim();
+                    if (!line || line === '/ip hotspot user') continue;
+                    const match = line.match(regex);
+                    if (match) {
+                        const [_, name, password, profile] = match;
+                        tempTickets.utilisateur.push(name);
+                        tempTickets.motDePasse.push(password);
+                        tempTickets.prix.push(profile);
+                    }
+                }
+                for(let i = 0; i < tempTickets.utilisateur.length; i++) {
+                    const id = `id-${Date.now()}-${i}`;
+                    tickets[id] = {
+                        id,
+                        category: "Cadeau",
+                        password: tempTickets.motDePasse[i],
+                        price: '1',
+                        user: tempTickets.utilisateur[i]
+                    }
+                }
+
+                if (Object.keys(tickets).length > 0) {
+                    mergeTicketsToCategory(null, tickets);
+                } else {
+                    hideLoading();
+                    alert('Aucun ticket valide trouvé dans le fichier pour TicketsTransit');
+                }
+            } else { // Si l'importation est pour TicketsTotal
+                const regex = /add name="([^"]+)" password="([^"]+)" profile="([^"]+)"/;
+                for (let line of lines) {
+                    line = line.trim();
+                    if (!line || line === '/ip hotspot user') continue;
+
+                    const match = line.match(regex);
+                    if (match) {
+                        const [_, name, password, profile] = match;
+                        if (!tickets[profile]) {
+                            tickets[profile] = {
+                                motDePasse: [],
+                                prix: [],
+                                utilisateur: []
+                            };
+                        }
+
+                        tickets[profile].utilisateur.push(name);
+                        tickets[profile].motDePasse.push(password);
+                    }
+                }
+
+                if (Object.keys(tickets).length === 0) {
+                    hideLoading();
+                    alert('Aucun ticket valide n\'a été trouvé dans le fichier');
+                    return;
+                }
+
+                tempImportData = tickets;
+                const firstCategory = Object.keys(tickets)[0];
+                showPriceModal(firstCategory);
+            }
         }
 
         function showPriceModal(category) {
@@ -1043,14 +1432,14 @@ const firebaseConfig = {
                 for (let category in tempImportData) {
                     if (allTickets[category]) {
                         // Fusion des tickets existants avec les nouveaux
-                        updates[`TicketsTotal/${category}`] = {
+                        updates[`${currentDatabase}/${category}`] = {
                             motDePasse: [...allTickets[category].motDePasse, ...tempImportData[category].motDePasse],
                             prix: [...allTickets[category].prix, ...tempImportData[category].prix],
                             utilisateur: [...allTickets[category].utilisateur, ...tempImportData[category].utilisateur]
                         };
                     } else {
                         // Nouvelle catégorie
-                        updates[`TicketsTotal/${category}`] = tempImportData[category];
+                        updates[`${currentDatabase}/${category}`] = tempImportData[category];
                     }
                 }
                 
@@ -1110,24 +1499,33 @@ const firebaseConfig = {
             if (confirm('Êtes-vous sûr de vouloir supprimer tous les tickets correspondant à votre recherche ?')) {
                 showLoading();
                 const updates = {};
-                for (let category in allTickets) {
-                    const categoryTickets = allTickets[category];
-                    const newCategoryData = {
-                        motDePasse: [],
-                        prix: [],
-                        utilisateur: []
-                    };
-                    
-                    for (let i = 0; i < categoryTickets.motDePasse.length; i++) {
-                        if (!matchesSearch(categoryTickets, i, searchTerm)) {
-                            newCategoryData.motDePasse.push(categoryTickets.motDePasse[i]);
-                            newCategoryData.prix.push(categoryTickets.prix[i]);
-                            newCategoryData.utilisateur.push(categoryTickets.utilisateur[i]);
+
+                if (currentDatabase === 'TicketsTransit') {
+                    for (let id in allTickets) {
+                        if (matchesSearchTransit(allTickets[id], searchTerm)) {
+                            updates[`${currentDatabase}/${id}`] = null;
                         }
                     }
-                    updates[`TicketsTotal/${category}`] = newCategoryData;
+                } else {
+                    for (let category in allTickets) {
+                        const categoryTickets = allTickets[category];
+                        const newCategoryData = {
+                            motDePasse: [],
+                            prix: [],
+                            utilisateur: []
+                        };
+
+                        for (let i = 0; i < categoryTickets.motDePasse.length; i++) {
+                            if (!matchesSearchTotal(categoryTickets, i, searchTerm)) {
+                                newCategoryData.motDePasse.push(categoryTickets.motDePasse[i]);
+                                newCategoryData.prix.push(categoryTickets.prix[i]);
+                                newCategoryData.utilisateur.push(categoryTickets.utilisateur[i]);
+                            }
+                        }
+                        updates[`${currentDatabase}/${category}`] = newCategoryData;
+                    }
                 }
-                
+
                 database.ref().update(updates)
                     .then(() => {
                         hideLoading();
@@ -1159,6 +1557,11 @@ const firebaseConfig = {
     return true;
 }
 
+function changeDatabase() {
+    currentDatabase = document.getElementById('databaseSelect').value;
+    loadTickets();
+}
+
 // Modifiez la fonction window.onload
 window.onload = () => {
     if (checkAuth()) {
@@ -1172,12 +1575,15 @@ function logout() {
     window.location.replace('login.html');
 }
 
-
         // Écouteur d'événement pour la recherche
         document.getElementById('searchBar').addEventListener('input', searchTickets);
 
         // Chargement initial des tickets
-        window.onload = loadTickets;
+        window.onload = () => {
+    if (checkAuth()) {
+        loadTickets();
+    }
+};
     </script>
 </body>
 </html>

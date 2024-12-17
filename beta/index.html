@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -318,25 +319,25 @@
         venteMenuItem.addEventListener('click', (event) => {
             event.preventDefault();
             checkUserAccess();
-            // window.location.href = 'PageVenteTicket.html'; //ligne commenté pour corriger le probleme de redirection vers un page qui n'existe pas
+            window.location.href = 'PageVenteTicket.html';
         });
 
         inventaireMenuItem.addEventListener('click', (event) => {
             event.preventDefault();
             checkUserAccess();
-            // window.location.href = 'AdminVentePartenaires.html'; //ligne commenté pour corriger le probleme de redirection vers un page qui n'existe pas
+            window.location.href = 'AdminVentePartenaires.html';
         });
 
         stockMenuItem.addEventListener('click', (event) => {
             event.preventDefault();
             checkUserAccess();
-            // window.location.href = 'Stock.html'; //ligne commenté pour corriger le probleme de redirection vers un page qui n'existe pas
+            window.location.href = 'Stock.html';
         });
 
         administrationMenuItem.addEventListener('click', (event) => {
             event.preventDefault();
             checkUserAccess();
-            // window.location.href = 'a3.html'; //ligne commenté pour corriger le probleme de redirection vers un page qui n'existe pas
+            window.location.href = 'a3.html';
         });
 
         subscribeMonthlyButton.addEventListener('click', () => {
@@ -364,20 +365,17 @@
                 customer: {
                     email: 'admin@example.com', // Email de l'administrateur
                 },
-                onComplete: function(transaction) {
-                    if (transaction.reason === FedaPay.CHECKOUT_COMPLETED) {
-                        handleSuccessfulPayment(plan, transaction);
-                    } else if(transaction.reason === FedaPay.DIALOG_DISMISSED) {
-                        alert("Paiement annulé.");
-                    } else {
-                        console.log("Transaction : ", transaction);
-                        alert('Paiement échoué. Veuillez réessayer.');
+                onComplete: async function(response) {
+                        if (response.reason === FedaPay.DIALOG_DISMISSED) {
+                            alert('Paiement échoué.');
+                        } else if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
+                            handleSuccessfulPayment(plan, response);
+                        }
                     }
-                }
             }).open();
         }
 
-        async function handleSuccessfulPayment(plan, transaction) {
+        async function handleSuccessfulPayment(plan, response) {
             const startDate = new Date();
             const endDate = new Date(startDate);
             if (plan === 'monthly') {
@@ -390,7 +388,7 @@
                 status: 'active',
                 startDate: startDate.toISOString(),
                 endDate: endDate.toISOString(),
-                transactionId: transaction.id,
+                transactionId: response.id, // Utilisez response.id au lieu de transaction.id
                 plan: plan
             };
 

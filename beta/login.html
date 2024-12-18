@@ -111,64 +111,7 @@
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
-            authDomain: "cyber-campus-2706f.firebaseapp.com",
-            databaseURL: "https://cyber-campus-2706f-default-rtdb.firebaseio.com",
-            projectId: "cyber-campus-2706f",
-            storageBucket: "cyber-campus-2706f.appspot.com",
-            messagingSenderId: "719410601264",
-            appId: "1:719410601264:web:44fd2e3757721866303cf5",
-            measurementId: "G-CEEFJP5LYZ"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        async function login(event) {
-            event.preventDefault();
-            
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('errorMessage');
-            
-            try {
-                const adminRef = database.ref('admins');
-                const snapshot = await adminRef.once('value');
-                const admins = snapshot.val();
-
-                const admin = Object.values(admins).find(admin => 
-                    admin.username === username && admin.password === password
-                );
-
-                if (admin) {
-                    // Vérification du statut de l'abonnement
-                    const subscriptionRef = database.ref('admin/subscription');
-                    const subscriptionSnapshot = await subscriptionRef.once('value');
-                    const subscription = subscriptionSnapshot.val();
-
-                    if (subscription && subscription.status === 'active' && new Date(subscription.endDate) > new Date()) {
-                        // Abonnement actif, connexion réussie
-                        sessionStorage.setItem('isLoggedIn', 'true');
-                        window.location.href = 'a3.html';
-                    } else {
-                        // Abonnement inactif ou expiré, redirection vers index.html
-                        errorMessage.textContent = 'Votre abonnement n\'est pas actif. Veuillez vous abonner.';
-                        errorMessage.style.display = 'block';
-                        setTimeout(() => {
-                            window.location.href = 'index.html';
-                        }, 3000); // Redirection après 3 secondes
-                    }
-                } else {
-                    errorMessage.textContent = 'Nom d\'utilisateur ou mot de passe incorrect';
-                    errorMessage.style.display = 'block';
-                }
-            } catch (error) {
-                console.error('Erreur de connexion:', error);
-                errorMessage.textContent = 'Une erreur est survenue. Veuillez réessayer.';
-                errorMessage.style.display = 'block';
-            }
-        }
+function _0x4249(){const _0x3cade9=['error','4051999aLgRtV','admins','preventDefault','once','textContent','val','value','Votre\x20abonnement\x20n\x27est\x20pas\x20actif.\x20Veuillez\x20vous\x20abonner.','G-XH1RH6DYK5','Une\x20erreur\x20est\x20survenue.\x20Veuillez\x20réessayer.','href','location','4206120ERLlyJ','Erreur\x20de\x20connexion:','admin/subscription','isLoggedIn','endDate','https://cyberdemo-a38fc-default-rtdb.firebaseio.com','style','cyberdemo-a38fc.firebaseapp.com','560596573477','block','6RRDWwi','100dckEGM','2710235wFqVoo','getElementById','values','active','1:560596573477:web:f576224af5650fc081cecc','username','8977848BIxxtO','cyberdemo-a38fc.firebasestorage.app','password','database','find','Nom\x20d\x27utilisateur\x20ou\x20mot\x20de\x20passe\x20incorrect','4413qnDYcX','index.html','4832955hmPRko','135195syoOwK','AIzaSyCqYu8n0ct6KcMhiEvTKO74mh824PrNXfk','initializeApp','a3.html'];_0x4249=function(){return _0x3cade9;};return _0x4249();}const _0x322537=_0x47d2;(function(_0x437e1b,_0x20e9fc){const _0x58fb52=_0x47d2,_0x192232=_0x437e1b();while(!![]){try{const _0x1bcab8=parseInt(_0x58fb52(0xef))/0x1+parseInt(_0x58fb52(0x10b))/0x2*(-parseInt(_0x58fb52(0x118))/0x3)+parseInt(_0x58fb52(0x100))/0x4+-parseInt(_0x58fb52(0x10c))/0x5+-parseInt(_0x58fb52(0x10a))/0x6*(-parseInt(_0x58fb52(0xf4))/0x7)+-parseInt(_0x58fb52(0x112))/0x8+parseInt(_0x58fb52(0x11a))/0x9;if(_0x1bcab8===_0x20e9fc)break;else _0x192232['push'](_0x192232['shift']());}catch(_0x18bf69){_0x192232['push'](_0x192232['shift']());}}}(_0x4249,0x89e0d));const firebaseConfig={'apiKey':_0x322537(0xf0),'authDomain':_0x322537(0x107),'databaseURL':_0x322537(0x105),'projectId':'cyberdemo-a38fc','storageBucket':_0x322537(0x113),'messagingSenderId':_0x322537(0x108),'appId':_0x322537(0x110),'measurementId':_0x322537(0xfc)};function _0x47d2(_0x39d814,_0x3cab06){const _0x424971=_0x4249();return _0x47d2=function(_0x47d258,_0x3dc0ac){_0x47d258=_0x47d258-0xef;let _0x5350fc=_0x424971[_0x47d258];return _0x5350fc;},_0x47d2(_0x39d814,_0x3cab06);}firebase[_0x322537(0xf1)](firebaseConfig);const database=firebase[_0x322537(0x115)]();async function login(_0x54cf47){const _0x2623e4=_0x322537;_0x54cf47[_0x2623e4(0xf6)]();const _0x5b026b=document['getElementById'](_0x2623e4(0x111))[_0x2623e4(0xfa)],_0x1e3996=document[_0x2623e4(0x10d)](_0x2623e4(0x114))[_0x2623e4(0xfa)],_0x345e62=document[_0x2623e4(0x10d)]('errorMessage');try{const _0xc1e775=database['ref'](_0x2623e4(0xf5)),_0xce616d=await _0xc1e775[_0x2623e4(0xf7)](_0x2623e4(0xfa)),_0xdd72ca=_0xce616d[_0x2623e4(0xf9)](),_0x218848=Object[_0x2623e4(0x10e)](_0xdd72ca)[_0x2623e4(0x116)](_0x585df2=>_0x585df2[_0x2623e4(0x111)]===_0x5b026b&&_0x585df2['password']===_0x1e3996);if(_0x218848){const _0x7a35c=database['ref'](_0x2623e4(0x102)),_0x24e1ed=await _0x7a35c['once'](_0x2623e4(0xfa)),_0x47ee6e=_0x24e1ed[_0x2623e4(0xf9)]();_0x47ee6e&&_0x47ee6e['status']===_0x2623e4(0x10f)&&new Date(_0x47ee6e[_0x2623e4(0x104)])>new Date()?(sessionStorage['setItem'](_0x2623e4(0x103),'true'),window[_0x2623e4(0xff)][_0x2623e4(0xfe)]=_0x2623e4(0xf2)):(_0x345e62[_0x2623e4(0xf8)]=_0x2623e4(0xfb),_0x345e62[_0x2623e4(0x106)]['display']=_0x2623e4(0x109),setTimeout(()=>{const _0x1a1bd1=_0x2623e4;window[_0x1a1bd1(0xff)][_0x1a1bd1(0xfe)]=_0x1a1bd1(0x119);},0xbb8));}else _0x345e62['textContent']=_0x2623e4(0x117),_0x345e62[_0x2623e4(0x106)]['display']=_0x2623e4(0x109);}catch(_0x4eb380){console[_0x2623e4(0xf3)](_0x2623e4(0x101),_0x4eb380),_0x345e62['textContent']=_0x2623e4(0xfd),_0x345e62[_0x2623e4(0x106)]['display']=_0x2623e4(0x109);}}
     </script>
 </body>
 </html>

@@ -594,6 +594,57 @@
             text-align: center;
             max-width: 80%;
         }
+        .subscription-required {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .subscription-required-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .subscription-required-content h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .subscription-required-content p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .subscription-required-content button {
+            background-color: #fdbb2d;
+            color: #1a2a6c;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin: 0 10px;
+        }
+
+        .subscription-required-content button:hover {
+            background-color: #e6a727;
+        }
 
     </style>
 </head>
@@ -719,10 +770,19 @@
         <div class="anitext">PROPULSE PAR EVISIONS</div>
     </footer>
 
+    <div id="subscriptionRequiredModal" class="subscription-required" style="display: none;">
+        <div class="subscription-required-content">
+            <h2>Abonnement Requis</h2>
+            <p>Un abonnement actif est nécessaire pour accéder à cette fonctionnalité.</p>
+            <button onclick="redirectToSubscription()">S'abonner</button>
+            <button onclick="hideSubscriptionRequiredModal()">Fermer</button>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-
+        import { getDatabase, ref, get, set, push, remove, onChildAdded } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+    
         const firebaseConfig = {
             apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
             authDomain: "cyber-campus-2706f.firebaseapp.com",
@@ -733,34 +793,10 @@
             appId: "1:719410601264:web:44fd2e3757721866303cf5",
             measurementId: "G-CEEFJP5LYZ"
         };
-
+    
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const adminRef = ref(db, 'admin/subscription');
-
-        // Fonction pour vérifier le statut de l'abonnement
-        function checkSubscriptionStatus() {
-            onValue(adminRef, (snapshot) => {
-                const subscription = snapshot.val();
-                if (!subscription || subscription.status !== 'active') {
-                    alert("Un abonnement actif est requis pour accéder à cette page.");
-                    window.location.href = 'index.html'; // Redirige vers la page d'accueil
-                }
-            });
-        }
-
-        // Vérification de l'abonnement
-        function checkSubscription() {
-            checkSubscriptionStatus();
-            // ... autres initialisations ...
-        }
-
-        // Appeler checkSubscription au chargement de la page
-        document.addEventListener('DOMContentLoaded', () => {
-            checkSubscription();
-        });
-
-
     
         let ticketToSell = null;
         let localTickets = {};
@@ -946,7 +982,7 @@ loginForm.addEventListener('submit', async (event) => {
         window.initTicketSale = async function(category) {
             showLoader();
             try {
-                const ticketsTotalRef = ref(                db, `TicketsTotal/${category}`);
+                const ticketsTotalRef = ref(db, `TicketsTotal/${category}`);
                 const snapshot = await get(ticketsTotalRef);
     
                 if (snapshot.exists()) {
@@ -1159,22 +1195,6 @@ loginForm.addEventListener('submit', async (event) => {
         window.hideNotification = function() {
             document.getElementById('notification').style.display = 'none';
         };
-    
-        // Initialisation
-        document.addEventListener('DOMContentLoaded', () => {
-            showPageLoader();
-            processConnectedTickets()
-                .then(() => {
-                  fetchVendors();
-                  lucide.createIcons();
-                  hidePageLoader();
-                })
-                .catch((error) => {
-                    console.error("Erreur lors du traitement des tickets :", error);
-                    hidePageLoader();
-                    showNotification("Erreur", "Une erreur est survenue lors de l'initialisation.");
-                });
-        });
     
         // Chargement de l'historique
         async function loadHistory() {
@@ -1545,6 +1565,67 @@ loginForm.addEventListener('submit', async (event) => {
                 showNotification("Erreur", "Erreur lors de la vente automatique du ticket.");
             }
         }
+
+        function showSubscriptionRequiredModal() {
+            subscriptionRequiredModal.style.display = 'flex';
+        }
+
+        function hideSubscriptionRequiredModal() {
+            subscriptionRequiredModal.style.display = 'none';
+        }
+
+        function redirectToSubscription() {
+            window.location.href = 'index.html';
+            
+        }
+        async function checkSubscriptionStatus() {
+            const pageLoaderMessage = document.getElementById('pageLoaderMessage');
+            pageLoaderMessage.textContent = "Vérification de l'abonnement...";
+
+            try {
+                const snapshot = await get(adminRef);
+                const subscription = snapshot.val();
+                const now = new Date();
+
+                if (subscription && subscription.status === 'active') {
+                    const endDate = new Date(subscription.endDate);
+                    if (endDate < now) {
+                        // Abonnement expiré
+                        pageLoaderMessage.textContent = "Abonnement expiré";
+                        showSubscriptionRequiredModal();
+                        await adminRef.update({ status: 'expired' });
+                    } else {
+                        // Abonnement actif
+                        pageLoaderMessage.textContent = "Abonnement actif";
+                    }
+                } else {
+                    // Pas d'abonnement
+                    pageLoaderMessage.textContent = "Pas d'abonnement actif";
+                    showSubscriptionRequiredModal();
+                }
+            } catch (error) {
+                console.error("Erreur lors de la vérification de l'abonnement :", error);
+                pageLoaderMessage.textContent = "Erreur lors de la vérification de l'abonnement";
+                showNotification("Erreur", "Erreur lors de la vérification de l'abonnement.");
+            }
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            showPageLoader();
+            processConnectedTickets()
+                .then(() => checkSubscriptionStatus())
+                .then(() => {
+                  fetchVendors();
+                  lucide.createIcons();
+                  hidePageLoader();
+                })
+                .catch((error) => {
+                    console.error("Erreur lors du traitement des tickets :", error);
+                    hidePageLoader();
+                    showNotification("Erreur", "Une erreur est survenue lors de l'initialisation.");
+                });
+        });
     </script>
 </body>
 </html>

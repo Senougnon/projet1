@@ -13,6 +13,7 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
+const adminRef = database.ref('admin/subscription');
 
 const loginForm = document.getElementById('loginForm');
 const signupForm = document.getElementById('signupForm');
@@ -123,12 +124,26 @@ function loginSuccess(username) {
     signupContainer.style.display = 'none';
     dashboardContainer.style.display = 'block';
     userInfoElement.textContent = `Utilisateur: ${username}`;
-    updateTable();
-    updateStockTables();
-    updateAnalysis();
+    checkSubscriptionStatus()
+        .then(isSubscribed => {
+            if (isSubscribed) {
+                // Continuer avec les opérations normales si l'utilisateur est abonné
+                updateTable();
+                updateStockTables();
+                updateAnalysis();
 
-    // Attacher la fonction d'écoute des modifications
-    listenForSalesDataChanges();
+                // Attacher la fonction d'écoute des modifications
+                listenForSalesDataChanges();
+            } else {
+                // Afficher la modale si l'utilisateur n'est pas abonné
+                showSubscriptionRequiredModal();
+            }
+        })
+        .catch(error => {
+            console.error("Erreur lors de la vérification de l'abonnement :", error);
+            // Gérer l'erreur, par exemple en affichant un message à l'utilisateur
+            alert("Erreur lors de la vérification de l'abonnement.");
+        });
 }
 
 // Fonction pour écouter les modifications en temps réel dans Firebase
@@ -651,6 +666,43 @@ function updateStockTables(startDate, endDate) {
 
         setupSort(stockTable);
     });
+}
+
+function showSubscriptionRequiredModal() {
+    document.getElementById('subscriptionRequiredModal').style.display = 'flex';
+}
+
+function hideSubscriptionRequiredModal() {
+    document.getElementById('subscriptionRequiredModal').style.display = 'none';
+}
+
+function redirectToSubscription() {
+    window.location.href = 'index.html';
+}
+async function checkSubscriptionStatus() {
+    try {
+        const snapshot = await adminRef.once('value');
+        const subscription = snapshot.val();
+        const now = new Date();
+
+        if (subscription && subscription.status === 'active') {
+            const endDate = new Date(subscription.endDate);
+            if (endDate >= now) {
+                // Abonnement actif
+                return true;
+            } else {
+                // Abonnement expiré
+                await adminRef.update({ status: 'expired' });
+                return false;
+            }
+        } else {
+            // Pas d'abonnement actif
+            return false;
+        }
+    } catch (error) {
+        console.error("Erreur lors de la vérification de l'abonnement :", error);
+        throw error; // Propager l'erreur pour la gérer dans le flux d'appel
+    }
 }
 
 // Initial setup

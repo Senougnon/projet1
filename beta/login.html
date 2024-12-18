@@ -133,20 +133,8 @@
             const errorMessage = document.getElementById('errorMessage');
             
             try {
-                // Vérification de l'abonnement
-                const adminRef = database.ref('admin/subscription');
-                const adminSnapshot = await adminRef.once('value');
-                const subscription = adminSnapshot.val();
-
-                if (!subscription || subscription.status !== 'active') {
-                    errorMessage.textContent = "L'abonnement n'est pas actif. Accès refusé.";
-                    errorMessage.style.display = 'block';
-                    return; // Arrêter la connexion si l'abonnement n'est pas actif
-                }
-
-                // Vérification des identifiants de l'administrateur
-                const adminsRef = database.ref('admins');
-                const snapshot = await adminsRef.once('value');
+                const adminRef = database.ref('admins');
+                const snapshot = await adminRef.once('value');
                 const admins = snapshot.val();
 
                 const admin = Object.values(admins).find(admin => 
@@ -154,10 +142,23 @@
                 );
 
                 if (admin) {
-                    // Stockage de la session
-                    sessionStorage.setItem('isLoggedIn', 'true');
-                    // Redirection vers la page principale
-                    window.location.href = 'a3.html';
+                    // Vérification du statut de l'abonnement
+                    const subscriptionRef = database.ref('admin/subscription');
+                    const subscriptionSnapshot = await subscriptionRef.once('value');
+                    const subscription = subscriptionSnapshot.val();
+
+                    if (subscription && subscription.status === 'active' && new Date(subscription.endDate) > new Date()) {
+                        // Abonnement actif, connexion réussie
+                        sessionStorage.setItem('isLoggedIn', 'true');
+                        window.location.href = 'a3.html';
+                    } else {
+                        // Abonnement inactif ou expiré, redirection vers index.html
+                        errorMessage.textContent = 'Votre abonnement n\'est pas actif. Veuillez vous abonner.';
+                        errorMessage.style.display = 'block';
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 3000); // Redirection après 3 secondes
+                    }
                 } else {
                     errorMessage.textContent = 'Nom d\'utilisateur ou mot de passe incorrect';
                     errorMessage.style.display = 'block';

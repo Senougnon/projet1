@@ -597,28 +597,18 @@ themeToggle.addEventListener('click', () => {
     setTheme(!isDarkTheme);
 });
 
-// Fonction pour détecter et appliquer le thème du système
-function applySystemTheme() {
-    // Vérifie si le navigateur supporte la détection du thème système
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme)').media !== 'not all') {
-        // Vérifie si le thème système est sombre
-        const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        // Applique le thème approprié
-        setTheme(isDarkMode);
-        
-        // Écoute les changements de thème système
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            setTheme(e.matches);
-        });
-    } else {
-        // Si la détection du thème système n'est pas supportée, utilise le thème sombre par défaut
-        setTheme(true);
-    }
-}
 
-// Appelle la fonction au chargement de la page
-document.addEventListener('DOMContentLoaded', applySystemTheme);
+
+// Appelle la fonction au chargement de la page (Modifié)
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialisation du thème basé sur les préférences sauvegardées ou clair par défaut
+    const savedTheme = localStorage.getItem('darkTheme');
+    if (savedTheme !== null) {
+        setTheme(savedTheme === 'true');
+    } else {
+        setTheme(false); // Appliquer le thème clair par défaut
+    }
+});
 
 // Date filtering for stock table
 document.getElementById('filterStockDates').addEventListener('click', function() {

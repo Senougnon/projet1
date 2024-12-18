@@ -1626,6 +1626,8 @@ loginForm.addEventListener('submit', async (event) => {
                     showNotification("Erreur", "Une erreur est survenue lors de l'initialisation.");
                 });
         });
+        window.redirectToSubscription = redirectToSubscription;
+        window.hideSubscriptionRequiredModal = redirectToSubscription;
     </script>
 </body>
 </html>

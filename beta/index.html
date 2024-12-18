@@ -353,7 +353,7 @@
         });
 
         function initiatePayment(plan) {
-            const amount = plan === 'monthly' ? 1 : 10000;
+            const amount = plan === 'monthly' ? 1000 : 10000;
             const planDescription = plan === 'monthly' ? 'Abonnement mensuel' : 'Abonnement annuel';
 
             FedaPay.init({

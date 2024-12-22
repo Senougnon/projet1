@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -6,448 +5,442 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion Cyber Campus</title>
     <style>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
-}
-
-body {
-    background: linear-gradient(135deg, #970158, #00026e, #000000);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    color: #fff;
-    overflow-x: hidden;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-header {
-    background-color: rgba(0, 0, 0, 0.5);
-    padding: 20px 0;
-    position: relative;
-    overflow: hidden;
-}
-
-.header-image {
-    width: 100%;
-    height: 300px;
-    object-fit: cover;
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: -1;
-}
-
-.img1 {
-    animation: slide1 10s linear infinite;
-}
-
-.img2 {
-    animation: slide2 10s linear infinite;
-}
-
-.logo {
-    font-size: 2.5em;
-    color: white;
-    text-align: center;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-    position: relative;
-    z-index: 2;
-}
-
-.logo::before {
-    content: '';
-    font-size: 0.8em;
-    margin-right: 10px;
-    animation: rotate 5s linear infinite;
-    display: inline-block;
-}
-
-@keyframes rotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.moon {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    font-size: 2em;
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
-}
-
-nav {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 20px;
-}
-
-.nav-button {
-    background-color: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
-}
-
-.nav-button::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.5s, height 0.5s;
-}
-
-.nav-button:hover::before {
-    width: 300px;
-    height: 300px;
-}
-
-@keyframes buttonPulse {
-    0% { background-color: #fdbb2d; color: #1a2a6c; }
-    50% { background-color: #1a2a6c; color: #fdbb2d; }
-    100% { background-color: #fdbb2d; color: #1a2a6c; }
-}
-
-.nav-button.animate-pay {
-    animation: buttonPulse 3s ease-in-out infinite;
-}
-
-@keyframes textChange {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-}
-
-.nav-button.animate-pay {
-    animation: textChange 0.5s ease-in-out, buttonPulse 3s ease-in-out infinite;
-}
-
-main {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    margin-top: 40px;
-    position: relative;
-}
-
-.login-section, .rates-section, .locations-section, .products-section {
-    background-color: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.login-section:hover, .rates-section:hover, .locations-section:hover, .products-section:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
-}
-
-.login-section {
-    flex-basis: 100%;
-}
-
-.rates-section, .locations-section, .products-section {
-    flex-basis: calc(33.333% - 20px);
-}
-
-h2 {
-    color: white;
-    margin-bottom: 15px;
-    position: relative;
-    display: inline-block;
-}
-
-h2::after {
-    content: '';
-    position: absolute;
-    bottom: -5px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background-color: #fdbb2d;
-    transition: width 0.3s;
-}
-
-.login-section:hover h2::after,
-.rates-section:hover h2::after,
-.locations-section:hover h2::after,
-.products-section:hover h2::after {
-    width: 100%;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-}
-
-input {
-    margin-bottom: 10px;
-    padding: 10px;
-    border: none;
-    border-radius: 25px;
-    background-color: rgb(253, 242, 221);
-    color: white;
-    transition: background-color 0.3s;
-}
-
-input:focus {
-    background-color: rgba(255, 255, 255, 0.3);
-    outline: none;
-}
-
-button {
-    background-color: #fdbb2d;
-    color: #1a2a6c;
-    border: none;
-    padding: 10px;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-weight: bold;
-}
-
-button:hover {
-    background-color: #1a2a6c;
-    color: #fdbb2d;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    color: white;
-}
-
-th, td {
-    padding: 8px;
-    text-align: left;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-ul {
-    list-style-type: none;
-}
-
-li {
-    margin-bottom: 5px;
-    position: relative;
-    padding-left: 20px;
-}
-
-li::before {
-    content: '➤';
-    position: absolute;
-    left: 0;
-    color: #fdbb2d;
-}
-
-.animated-text-container {
-    overflow: hidden;
-    height: 50px;
-}
-
-.animated-text {
-    animation: scrollText 10s linear infinite;
-}
-
-@keyframes scrollText {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-50px); }
-}
-
-footer {
-    margin-top: auto;
-    text-align: center;
-    padding: 20px;
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-@keyframes slide1 {
-    0% { transform: translateX(0); }
-    50% { transform: translateX(-100%); }
-    100% { transform: translateX(0); }
-}
-
-@keyframes slide2 {
-    0% { transform: translateX(100%); }
-    50% { transform: translateX(0); }
-    100% { transform: translateX(100%); }
-}
-
-@media (max-width: 768px) {
-    .rates-section, .locations-section, .products-section {
-        flex-basis: 100%;
-    }
-}
-
-.notification {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    padding: 30px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    display: none;
-    color: #1a2a6c;
-    text-align: center;
-}
-
-.notification h2 {
-    color: #1a2a6c;
-    margin-bottom: 20px;
-}
-
-.notification p {
-    margin-bottom: 15px;
-}
-
-.close-icon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    cursor: pointer;
-    font-size: 20px;
-}
-
-#ticket-select {
-    margin-bottom: 20px;
-}
-
-#nomTicket {
-    width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-}
-
-#paymentFrame {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0);
-    z-index: 1000;
-}
-
-#paymentFrame > div {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    margin: 0% auto;
-    background-color: rgba(253, 255, 223, 0);
-    border-radius: 3px;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#paymentIframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-
-#closePaymentFrame {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    z-index: 1001;
-    background: none;
-    border: none;
-    font-size: 50px;
-    cursor: pointer;
-    color: #ffffff;
-}
-
-#paymentIframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-
-.delete-button {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-weight: bold;
-    margin: 10px;
-}
-
-.delete-button:hover {
-    background-color: #d32f2f;
-}
-
-.notification.error {
-    background-color: #fdd;
-    border: 1px solid #faa;
-    color: #f00;
-}
-
-.notification .ticket-info {
-    margin-bottom: 15px;
-    text-align: left;
-}
-
-.notification .ticket-info p {
-    margin-bottom: 5px;
-}
-
-.notification .login-button,
-.notification .delete-button {
-    display: inline-block;
-    margin: 0 10px;
-}
-
-.notification .login-button {
-    background-color: #fdbb2d;
-    color: #1a2a6c;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-weight: bold;
-}
-
-.notification .login-button:hover {
-    background-color: #1a2a6c;
-    color: #fdbb2d;
-}
+        /* ... (Votre CSS ici) ... */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #970158, #00026e, #000000);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .img1 {
+            animation: slide1 10s linear infinite;
+        }
+
+        .img2 {
+            animation: slide2 10s linear infinite;
+        }
+
+        .logo {
+            font-size: 2.5em;
+            color: white;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo::before {
+            content: '';
+            font-size: 0.8em;
+            margin-right: 10px;
+            animation: rotate 5s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .moon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2em;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .nav-button {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s, height 0.5s;
+        }
+
+        .nav-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        @keyframes buttonPulse {
+            0% { background-color: #fdbb2d; color: #1a2a6c; }
+            50% { background-color: #1a2a6c; color: #fdbb2d; }
+            100% { background-color: #fdbb2d; color: #1a2a6c; }
+        }
+
+        .nav-button.animate-pay {
+            animation: buttonPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes textChange {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .nav-button.animate-pay {
+            animation: textChange 0.5s ease-in-out, buttonPulse 3s ease-in-out infinite;
+        }
+
+        main {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 40px;
+            position: relative;
+        }
+
+        .login-section, .rates-section, .locations-section, .products-section {
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .login-section:hover, .rates-section:hover, .locations-section:hover, .products-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-section {
+            flex-basis: 100%;
+        }
+
+        .rates-section, .locations-section, .products-section {
+            flex-basis: calc(33.333% - 20px);
+        }
+
+        h2 {
+            color: white;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #fdbb2d;
+            transition: width 0.3s;
+        }
+
+        .login-section:hover h2::after,
+        .rates-section:hover h2::after,
+        .locations-section:hover h2::after,
+        .products-section:hover h2::after {
+            width: 100%;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: none;
+            border-radius: 25px;
+            background-color: rgb(253, 242, 221);
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        input:focus {
+            background-color: rgba(255, 255, 255, 0.3);
+            outline: none;
+        }
+
+        button {
+            background-color: #fdbb2d;
+            color: #1a2a6c;
+            border: none;
+            padding: 10px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #1a2a6c;
+            color: #fdbb2d;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: white;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        ul {
+            list-style-type: none;
+        }
+
+        li {
+            margin-bottom: 5px;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        li::before {
+            content: '➤';
+            position: absolute;
+            left: 0;
+            color: #fdbb2d;
+        }
+
+        .animated-text-container {
+            overflow: hidden;
+            height: 50px;
+        }
+
+        .animated-text {
+            animation: scrollText 10s linear infinite;
+        }
+
+        @keyframes scrollText {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-50px); }
+        }
+
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes slide1 {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(-100%); }
+            100% { transform: translateX(0); }
+        }
+
+        @keyframes slide2 {
+            0% { transform: translateX(100%); }
+            50% { transform: translateX(0); }
+            100% { transform: translateX(100%); }
+        }
+
+        @media (max-width: 768px) {
+            .rates-section, .locations-section, .products-section {
+                flex-basis: 100%;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            display: none;
+            color: #1a2a6c;
+            text-align: center;
+        }
+
+        .notification h2 {
+            color: #1a2a6c;
+            margin-bottom: 20px;
+        }
+
+        .notification p {
+            margin-bottom: 15px;
+        }
+
+        .close-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        #ticket-select {
+            margin-bottom: 20px;
+        }
+
+        #nomTicket {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        #paymentFrame {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+
+        #paymentFrame > div {
+            position: relative;
+            width: 80%;
+            height: 80%;
+            margin: 5% auto;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #closePaymentFrame {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #1a2a6c;
+        }
+
+        #paymentIframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .delete-button {
+            background-color: #f44336; 
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        .delete-button:hover {
+            background-color: #d32f2f; 
+        }
+
+        .notification.error { 
+            background-color: #fdd; 
+            border: 1px solid #faa; 
+            color: #f00; 
+        }
+
+        .notification .ticket-info {
+           
+            margin-bottom: 15px;
+            text-align: left; 
+        }
+
+        .notification .ticket-info p {
+            margin-bottom: 5px; 
+        }
+
+        .notification .login-button,
+        .notification .delete-button {
+            display: inline-block; 
+            margin: 0 10px; 
+        }
+
+        .notification .login-button {
+            background-color: #fdbb2d; 
+            color: #1a2a6c;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+
+        .notification .login-button:hover {
+            background-color: #1a2a6c;
+            color: #fdbb2d;
+        }
+
     </style>
 
     $(if chap-id)
@@ -472,28 +465,64 @@ footer {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://unpkg.com/jsqr@latest/dist/jsQR.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getDatabase, ref, get, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
-            authDomain: "cyber-campus-2706f.firebaseapp.com",
-            databaseURL: "https://cyber-campus-2706f-default-rtdb.firebaseio.com",
-            projectId: "cyber-campus-2706f",
-            storageBucket: "cyber-campus-2706f.appspot.com",
-            messagingSenderId: "719410601264",
-            appId: "1:719410601264:web:44fd2e3757721866303cf5",
-            measurementId: "G-CEEFJP5LYZ"
+            apiKey: "AIzaSyDlpP8jqtmVqNAES51e18nXzY1a_f2YaFs",
+            authDomain: "sic-wifi-zone.firebaseapp.com",
+            databaseURL: "https://sic-wifi-zone-default-rtdb.firebaseio.com",
+            projectId: "sic-wifi-zone",
+            storageBucket: "sic-wifi-zone.firebasestorage.app",
+            messagingSenderId: "538299261046",
+            appId: "1:538299261046:web:45ba9618a8cd3cb225ff57",
+            measurementId: "G-SPJ3LG1FY5"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const adminRef = ref(db, 'admin/subscription');
 
-        let localTickets = {}; 
+        let localTickets = {};
 
+        // Fonction pour vérifier le statut de l'abonnement
+        async function checkSubscriptionStatus() {
+            try {
+                const snapshot = await get(adminRef);
+                const subscription = snapshot.val();
+                const now = new Date();
+
+                if (subscription && subscription.status === 'active') {
+                    const endDate = new Date(subscription.endDate);
+                    if (endDate < now) {
+                        // Abonnement expiré
+                        await adminRef.update({ status: 'expired' });
+                        return false;
+                    } else {
+                        // Abonnement actif
+                        return true;
+                    }
+                } else {
+                    // Pas d'abonnement
+                    return false;
+                }
+            } catch (error) {
+                console.error("Erreur lors de la vérification de l'abonnement :", error);
+                return false;
+            }
+        }
+
+        // Fonction pour synchroniser les tickets
         async function syncTickets() {
             try {
+                const isActive = await checkSubscriptionStatus();
+                if (!isActive) {
+                    document.querySelector('.rates-section .loading-message').textContent = 'Pas d\'abonnement actif';
+                    return;
+                }
+
                 const ticketsTotalRef = ref(db, 'TicketsTotal');
                 const snapshot = await get(ticketsTotalRef);
                 localTickets = snapshot.val() || {};
@@ -505,7 +534,7 @@ footer {
                 for (const ticketId in ticketsVendus) {
                     const ticketVendu = ticketsVendus[ticketId];
                     const ticketName = Object.keys(localTickets).find(
-                        (key) => localTickets[key].utilisateur.includes(ticketVendu.user) 
+                        (key) => localTickets[key].utilisateur.includes(ticketVendu.user)
                     );
 
                     if (ticketName) {
@@ -535,20 +564,167 @@ footer {
             setInterval(syncTickets, 5000);
         });
 
-        function storeTicketLocally(ticketData) {
-            localStorage.setItem('storedTicket', JSON.stringify(ticketData));
+        // Fonction pour stocker le ticket de connexion localement
+        function storeLoginTicket(username, password) {
+            localStorage.setItem('TicketConnecté', JSON.stringify({
+                user: username,
+                password: password
+            }));
+            console.log("Ticket de connexion stocké:", username);
         }
 
-        function updateButtonText() {
-            const payButton = document.querySelector('.nav-button.animate-pay');
-            const storedTicket = localStorage.getItem('storedTicket');
+        // Écouteur d'événement pour le formulaire de connexion
+        document.login.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.login.username.value;
+            const password = document.login.password.value;
+            storeLoginTicket(username, password);
+            this.submit();
+        });
 
-            if (storedTicket) {
-                payButton.textContent = 'Voir mon ticket';
-            } else {
-                payButton.textContent = 'Payer un ticket';
+        // Fonction pour gérer le stockage des tickets en transit
+        async function storeTicketEnTransit(category) {
+            const ticket = await synchronizeAndReserveTicket(category);
+            if (!ticket) {
+                throw new Error("Aucun ticket disponible pour cette catégorie.");
+            }
+
+            const transitRef = ref(db, 'TicketsTransit');
+            const newTicketRef = push(transitRef);
+            await set(newTicketRef, {
+                id: newTicketRef.key,
+                category: category,
+                ...ticket
+            });
+            console.log("Ticket en transit stocké:", newTicketRef.key);
+            return { id: newTicketRef.key, ...ticket };
+        }
+
+        // Fonction pour supprimer un ticket en transit
+        async function removeTicketFromTransit(ticketId) {
+            const transitRef = ref(db, `TicketsTransit/${ticketId}`);
+            await remove(transitRef);
+            console.log("Ticket en transit supprimé:", ticketId);
+        }
+
+        // Fonction pour synchroniser et réserver un ticket
+        async function synchronizeAndReserveTicket(category) {
+            try {
+                const ticketsTotalRef = ref(db, `TicketsTotal/${category}`);
+                const snapshot = await get(ticketsTotalRef);
+                const ticketData = snapshot.val();
+
+                if (!ticketData || ticketData.utilisateur.length === 0) {
+                    return null;
+                }
+
+                const reservedTicket = {
+                    user: ticketData.utilisateur[0],
+                    password: ticketData.motDePasse[0],
+                    price: ticketData.prix[0]
+                };
+
+                const updatedTicketData = {
+                    ...ticketData,
+                    utilisateur: ticketData.utilisateur.slice(1),
+                    motDePasse: ticketData.motDePasse.slice(1),
+                    prix: ticketData.prix.slice(1)
+                };
+
+                await set(ticketsTotalRef, updatedTicketData);
+                return reservedTicket;
+            } catch (error) {
+                console.error("Erreur lors de la synchronisation et réservation du ticket:", error);
+                throw error;
             }
         }
+
+        // Fonction pour restaurer un ticket si le paiement échoue
+        async function restoreTicket(category, ticket) {
+            const ticketsTotalRef = ref(db, `TicketsTotal/${category}`);
+            const snapshot = await get(ticketsTotalRef);
+            const ticketData = snapshot.val() || { utilisateur: [], motDePasse: [], prix: [] };
+
+            ticketData.utilisateur.unshift(ticket.user);
+            ticketData.motDePasse.unshift(ticket.password);
+            ticketData.prix.unshift(ticket.price);
+
+            await set(ticketsTotalRef, ticketData);
+        }
+
+        // Fonction pour vérifier si l'utilisateur peut obtenir un ticket gratuit
+        function canGetFreeTicket() {
+            const lastFreeTicket = localStorage.getItem('lastFreeTicket');
+            if (!lastFreeTicket) return true;
+
+            const lastTicketDate = new Date(parseInt(lastFreeTicket));
+            const now = new Date();
+            const diffDays = Math.floor((now - lastTicketDate) / (1000 * 60 * 60 * 24));
+
+            return diffDays >= 7;
+        }
+
+        // Fonction initPayment modifiée
+        window.initPayment = async function(category, amount, lienPaiement) {
+            let ticketEnTransit = null;
+            try {
+                if (category.toLowerCase().includes('ticket cadeau')) {
+                    if (!canGetFreeTicket()) {
+                        showNotification(
+                            "Non disponible",
+                            "Vous devez attendre 7 jours entre chaque ticket gratuit.",
+                            false
+                        );
+                        return;
+                    }
+
+                    const reservedTicket = await synchronizeAndReserveTicket(category);
+                    localStorage.setItem('lastFreeTicket', Date.now().toString());
+                    showNotification(
+                        "Ticket cadeau",
+                        "Félicitations ! Vous avez reçu un ticket gratuit.",
+                        true
+                    );
+                    displayTicket(reservedTicket, category);
+                    await storeTicketVendu(reservedTicket);
+                    return;
+                }
+
+                ticketEnTransit = await storeTicketEnTransit(category);
+                const description = `${category}; ${ticketEnTransit.user} de ${ticketEnTransit.price} FCFA`;
+
+                var fedaPayInstance = FedaPay.init({
+                    public_key: 'pk_live_duW7O0671cGpH3lGl8BBTUFm',
+                    transaction: {
+                        amount: amount,
+                        description: description
+                    },
+                    customer: {
+                        email: 'client@example.com'
+                    },
+                    onComplete: async function(response) {
+                        if (response.reason === FedaPay.DIALOG_DISMISSED) {
+                            showNotification("Paiement annulé", "Le paiement a été annulé.");
+                            await restoreTicket(category, ticketEnTransit);
+                            await removeTicketFromTransit(ticketEnTransit.id);
+                        } else if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
+                            const successDescription = `✅ Paiement validé pour:\nPseudo: ${ticketEnTransit.user}\nMot de passe: ${ticketEnTransit.password}\nCatégorie: ${category}\nPrix: ${ticketEnTransit.price} FCFA\nMerci pour votre achat! 🎉`;
+                            showNotification("Paiement réussi", successDescription);
+                            displayTicket(ticketEnTransit, category);
+                            await storeTicketVendu(ticketEnTransit);
+                        }
+                    }
+                });
+                fedaPayInstance.open();
+            } catch (error) {
+                console.error("Erreur lors de l'initialisation du paiement:", error);
+                showNotification("Erreur", "Une erreur est survenue. Veuillez réessayer plus tard.");
+                if (ticketEnTransit) {
+                    await restoreTicket(category, ticketEnTransit);
+                    await removeTicketFromTransit(ticketEnTransit.id);
+                }
+            }
+        };
 
         function showTariffsTable() {
             const tariffsTable = document.querySelector('.rates-section table');
@@ -571,97 +747,57 @@ footer {
                 const price = data.prix[0];
                 const lienPaiement = data.lienPaiement;
                 const row = table.insertRow();
+                const buttonText = category.toLowerCase().includes('ticket cadeau') ? 'Obtenir' : 'Payer';
+                
                 row.innerHTML = `
                     <td>${category}</td>
                     <td>${price}</td>
-                    <td><button onclick="initPayment('${category}', ${price}, '${lienPaiement}')">Payer</button></td>
+                    <td><button onclick="initPayment('${category}', ${price}, '${lienPaiement}')">${buttonText}</button></td>
                 `;
             }
 
             showTariffsTable();
         }
 
-        window.initPayment = function(category, amount, lienPaiement) {
-            var fedaPayInstance = FedaPay.init({
-                public_key: 'pk_live_TfSz212W0xSMKK7oPEogkFmp',
-                transaction: {
-                    amount: amount,
-                    description: `Achat de ticket ${category}`
-                },
-                customer: {
-                    email: 'client@example.com'
-                },
-                onComplete: function(response) {
-                    if (response.reason === FedaPay.DIALOG_DISMISSED) {
-                        showNotification("Paiement annulé", "Le paiement a été annulé.");
-                    } else if (response.reason === FedaPay.CHECKOUT_COMPLETED) {
-                        showNotification("Paiement réussi", "Récupération du ticket...");
-                        getTicket(category);
-                    }
-                }
-            });
-            fedaPayInstance.open();
-        };
+        // Fonction pour afficher la notification avec les boutons
+function showTicketNotification(ticket) {
+    const notification = document.getElementById('notification');
+    const notificationTitle = document.getElementById('notification-title');
+    const notificationMessage = document.getElementById('notification-message');
 
-        async function getTicket(category) {
-            const ticketsRef = ref(db, `TicketsTotal/${category}`);
-            const snapshot = await get(ticketsRef);
-            if (snapshot.exists()) {
-                const data = snapshot.val();
-                const motDePasse = data.motDePasse[0];
-                const utilisateur = data.utilisateur[0];
-                const prix = data.prix[0];
-                const ticket = {motDePasse, utilisateur, prix};
-                
-                displayTicket(ticket, category);
-                
-                await storeTicketVendu(ticket);
-                
-                await updateDatabase(category, data);
-            } else {
-                showNotification("Erreur", "Plus de tickets disponibles pour cette catégorie.");
-            }
-        }
+    notificationTitle.textContent = 'Votre ticket';
+    notificationMessage.innerHTML = `
+        <div class="ticket-info">
+            <p>Nom d'utilisateur: ${ticket.user}</p>
+            <p>Mot de passe: ${ticket.password}</p>
+            <p>Prix: ${ticket.price} F</p>
+        </div>
+    `;
 
-        async function storeTicketVendu(ticket) {
-            const ticketsVendusRef = ref(db, 'TicketsVendus');
-            await push(ticketsVendusRef, {
-                password: ticket.motDePasse,
-                price: ticket.prix,
-                user: ticket.utilisateur
-            });
-            console.log("Ticket vendu stocké avec succès");
-        }
+        // Supprimer les boutons existants s'il y en a
+        const existingButtons = notification.querySelectorAll('.login-button, .delete-button');
+    existingButtons.forEach(button => button.remove());
 
-        async function updateDatabase(category, data) {
-            const updatedData = {
-                lienPaiement: data.lienPaiement,
-                motDePasse: data.motDePasse.slice(1),
-                prix: data.prix.slice(1),
-                utilisateur: data.utilisateur.slice(1)
-            };
+    // Création du bouton de connexion
+    const loginButton = document.createElement('button');
+    loginButton.className = 'login-button';
+    loginButton.textContent = 'Connexion';
+    loginButton.addEventListener('click', () => {
+        autoLogin(ticket.user, ticket.password);
+    });
 
-            await set(ref(db, `TicketsTotal/${category}`), updatedData);
+    // Création du bouton de suppression
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'delete-button';
+    deleteButton.textContent = 'Supprimer';
+    deleteButton.addEventListener('click', deleteTicket);
 
-            console.log("Database updated successfully");
-            await syncTickets();
-        }
+    // Ajout des boutons à la notification
+    notification.appendChild(loginButton);
+    notification.appendChild(deleteButton);
 
-        function displayTicket(ticket, category) {
-            storeTicketLocally({
-                ticketName: category,
-                user: ticket.utilisateur,
-                password: ticket.motDePasse,
-                price: ticket.prix
-            });
-            showNotification("Ticket acheté",
-                `Nom d'utilisateur: ${ticket.utilisateur}\n` +
-                `Mot de passe: ${ticket.motDePasse}\n` +
-                `Prix: ${ticket.prix} F`,
-                true
-            );
-            updateButtonText();
-        }
+    notification.style.display = 'block';
+}
 
         function showNotification(title, message, isTicketPurchase = false) {
             const notification = document.getElementById('notification');
@@ -697,36 +833,200 @@ footer {
             document.getElementById('notification').style.display = 'none';
         }
 
-        function autoLogin(username, password) {
-            document.login.username.value = username;
-            document.login.password.value = password;
-            document.login.submit();
-        }
+// Fonction pour effectuer la connexion automatique
+function autoLogin(username, password) {
+    document.login.username.value = username;
+    document.login.password.value = password;
+    document.login.submit();
+}
 
-        function deleteTicket() {
-            localStorage.removeItem('storedTicket');
-            showNotification("Ticket supprimé", "Votre ticket a été supprimé avec succès.");
-            updateButtonText();
-        }
+// Fonction pour supprimer le ticket
+function deleteTicket() {
+    localStorage.removeItem('storedTicket');
+    showNotification("Ticket supprimé", "Votre ticket a été supprimé avec succès.");
+    updateButtonText();
+}
 
-        window.addEventListener('load', () => {
-            updateButtonText();
-            const payButton = document.querySelector('.nav-button.animate-pay');
-            payButton.addEventListener('click', () => {
-                const storedTicket = localStorage.getItem('storedTicket');
-                if (storedTicket) {
-                    const ticket = JSON.parse(storedTicket);
-                    showNotification('Votre ticket', 
-                        `Nom d'utilisateur: ${ticket.user}\n` +
-                        `Mot de passe: ${ticket.password}\n` +
-                        `Prix: ${ticket.price} F`
-                    );
-                } else {
-                    document.querySelector('.rates-section').scrollIntoView({ behavior: 'smooth' });
-                }
+// Modification de l'événement de clic sur le bouton "Payer un ticket"
+window.addEventListener('load', () => {
+    updateButtonText();
+    const payButton = document.querySelector('.nav-button.animate-pay');
+    payButton.addEventListener('click', () => {
+        const storedTicket = localStorage.getItem('storedTicket');
+        if (storedTicket) {
+            const ticket = JSON.parse(storedTicket);
+            showTicketNotification(ticket);
+        } else {
+            document.querySelector('.rates-section').scrollIntoView({ behavior: 'smooth' });
+        }
+    });
+});
+
+document.querySelector('.clickable-overlay').addEventListener('click', function(e) {
+    e.preventDefault();
+    window.open('https://eduquemoi.netlify.app/login/index.html', '_blank');
+});
+
+// Mise à jour du texte du bouton
+function updateButtonText() {
+    const payButton = document.querySelector('.nav-button.animate-pay');
+    const storedTicket = localStorage.getItem('storedTicket');
+
+    if (storedTicket) {
+        payButton.textContent = 'Voir mon ticket';
+    } else {
+        payButton.textContent = 'Payer un ticket';
+    }
+}
+
+        // Fonction pour stocker un ticket vendu (suite)
+        async function storeTicketVendu(ticket) {
+            const ticketsVendusRef = ref(db, 'TicketsVendus');
+            await push(ticketsVendusRef, {
+                password: ticket.password,
+                price: ticket.price,
+                user: ticket.user
             });
+            console.log("Ticket vendu stocké avec succès");
+        }
+
+        // Fonction pour mettre à jour la base de données après la vente d'un ticket
+        async function updateDatabase(category, data) {
+            const updatedData = {
+                lienPaiement: data.lienPaiement,
+                motDePasse: data.motDePasse.slice(1),
+                prix: data.prix.slice(1),
+                utilisateur: data.utilisateur.slice(1)
+            };
+
+            await set(ref(db, `TicketsTotal/${category}`), updatedData);
+
+            console.log("Database updated successfully");
+            await syncTickets();
+        }
+
+        // Fonction pour afficher un ticket acheté
+        function displayTicket(ticket, category) {
+            storeTicketLocally({
+                ticketName: category,
+                user: ticket.user,
+                password: ticket.password,
+                price: ticket.price
+            });
+            showNotification("Ticket acheté",
+                `Nom d'utilisateur: ${ticket.user}\n` +
+                `Mot de passe: ${ticket.password}\n` +
+                `Prix: ${ticket.price} F`,
+                true
+            );
+            updateButtonText();
+        }
+
+        // Fonction pour stocker un ticket localement
+        function storeTicketLocally(ticketData) {
+            localStorage.setItem('storedTicket', JSON.stringify(ticketData));
+        }
+
+        // --- Code pour la lecture du QR Code ---
+        const scanQRCodeButton = document.getElementById('scanQRCodeButton');
+        const cameraFeed = document.getElementById('cameraFeed');
+        const qrCanvas = document.getElementById('qrCanvas');
+        const qrCanvasContext = qrCanvas.getContext('2d');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        let scanStream = null;
+
+        // --- Fonction pour démarrer la caméra ---
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then((stream) => {
+                    cameraFeed.srcObject = stream;
+                    cameraFeed.style.display = 'block';
+                    scanStream = stream;
+                    cameraFeed.play();
+                    requestAnimationFrame(scanQRCode);
+                })
+                .catch((error) => {
+                    console.error('Erreur lors de l\'accès à la caméra:', error);
+                    alert('Erreur lors de l\'accès à la caméra. Veuillez vérifier les autorisations.');
+                });
+        }
+
+        // --- Fonction pour arrêter la caméra ---
+        function stopCamera() {
+            if (scanStream) {
+                scanStream.getTracks().forEach(track => track.stop());
+                cameraFeed.style.display = 'none';
+                scanStream = null;
+            }
+        }
+
+        // --- Écouteur d'événement pour le bouton de scan ---
+        scanQRCodeButton.addEventListener('click', () => {
+            if (scanStream) {
+                // Si la caméra est déjà active, l'arrêter
+                stopCamera();
+                scanQRCodeButton.textContent = 'Scanner le QR Code';
+            } else {
+                // Sinon, démarrer la caméra
+                startCamera();
+                scanQRCodeButton.textContent = 'Arrêter le scan';
+            }
         });
 
+        // --- Fonction pour scanner le QR code ---
+        function scanQRCode() {
+            if (cameraFeed.readyState === cameraFeed.HAVE_ENOUGH_DATA) {
+                qrCanvas.height = cameraFeed.videoHeight;
+                qrCanvas.width = cameraFeed.videoWidth;
+                qrCanvasContext.drawImage(cameraFeed, 0, 0, qrCanvas.width, qrCanvas.height);
+                const imageData = qrCanvasContext.getImageData(0, 0, qrCanvas.width, qrCanvas.height);
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: 'dontInvert',
+                });
+
+                if (code) {
+                    // QR Code détecté
+                    console.log('QR Code détecté:', code.data);
+                    processQRCodeData(code.data);
+                    stopCamera();
+                    scanQRCodeButton.textContent = 'Scanner le QR Code'; // Réinitialiser le texte du bouton
+                } else {
+                    requestAnimationFrame(scanQRCode);
+                }
+            } else {
+                requestAnimationFrame(scanQRCode);
+            }
+        }
+
+        // --- Fonction pour traiter les données du QR code ---
+        function processQRCodeData(data) {
+            const credentials = parseQRCodeData(data);
+            if (credentials) {
+                usernameInput.value = credentials.username;
+                passwordInput.value = credentials.password;
+                alert('Identifiants récupérés avec succès!');
+                // Optionnel : Soumettre automatiquement le formulaire
+                // document.login.submit();
+            } else {
+                alert('QR Code invalide.');
+            }
+        }
+
+        // --- Fonction pour analyser les données du QR code ---
+        function parseQRCodeData(data) {
+            const parts = data.split(';');
+            const usernamePart = parts.find(part => part.startsWith('username:'));
+            const passwordPart = parts.find(part => part.startsWith('password:'));
+
+            if (usernamePart && passwordPart) {
+                return {
+                    username: usernamePart.split(':')[1],
+                    password: passwordPart.split(':')[1]
+                };
+            }
+            return null;
+        }
     </script>
 </head>
 <body>
@@ -737,22 +1037,26 @@ footer {
             <img class="header-image img1" src="img/img1.jpg" alt="Image de fond">
             <img class="header-image img2" src="img/img2.jpg" alt="Image de fond">
             <nav>
-                <button class="nav-button">+229 60374877</button>
+                <button class="nav-button">+229 97138906</button>
                 <button class="nav-button animate-pay">Payer un ticket</button>
             </nav>
         </div>
     </header>
 
     <main class="container">
+
         <section class="login-section">
             <h2>Connexion</h2>
             <form name="login" action="$(link-login-only)" method="post" $(if chap-id) onSubmit="return doLogin()" $(endif)>
                 <input type="hidden" name="dst" value="$(link-orig)" />
                 <input type="hidden" name="popup" value="true" />
-                <input type="text" name="username" placeholder="Nom d'utilisateur" value="$(username)" required>
-                <input type="password" name="password" placeholder="Mot de passe" required>
+                <input type="text" name="username" id="username" placeholder="Nom d'utilisateur" value="$(username)" required>
+                <input type="password" name="password" id="password" placeholder="Mot de passe" required>
+                <button type="button" id="scanQRCodeButton">Scanner le QR Code</button>
                 <button type="submit">Se connecter</button>
             </form>
+            <video id="cameraFeed" style="display: none; width: 100%; max-width: 500px;"></video>
+            <canvas id="qrCanvas" style="display: none;"></canvas>
             <p class="info $(if error)alert$(endif)">
                 $(if error == "")Veuillez vous connecter pour utiliser le service hotspot Internet $(if trial == 'yes')<br />Essai gratuit disponible, <a href="$(link-login-only)?dst=$(link-orig-esc)&username=T-$(mac-esc)">cliquez ici</a>.$(endif)
                 $(endif)
@@ -761,40 +1065,37 @@ footer {
         </section>
 
         <section class="rates-section">
-            <h2>Tarifs</h2>
-            <div>
-                MTN Bénin est retiré temporairement des methodes de paiement pour des raisons d'instabilité connexion.
-            </div>
-            <div class="loading-message">Chargement des tarifs...</div>
+            <h2>Acheter un ticket par mobile money</h2>
+            <div class="loading-message">Chargement des tickets...</div>
             <table style="display: none;"></table>
         </section>
-
-        <section class="products-section">
-            <div class="loading-message">              
-                <h2>Discuter avec l'IA</h2>
-                <iframe src="https://eduquemoi.netlify.app/" width="100%" height="500px" frameborder="0"></iframe>
-            </div>
+        <section class="locations-section">
+            <h2>Ticket payé non reçus ?</h2>
+            <ul>
+                <li>Récupérer les ID du ticket en contactant le +229 97138906</li>
+            </ul>
         </section>
 
         <section class="locations-section">
             <h2>Nos sites de connexion</h2>
             <ul>
-                <li>Cyber Campus Arafat</li>
-                <li>Cyber Campus Université</li>
-                <li>Cyber Campus Rose croix</li>
-                <li>Cyber Campus Banikanni 1</li>
-                <li>Cyber Campus Banikanni 2</li>
-                <li>Cyber Campus Marché Tchakitibam</li>
+                <li>SIC Technologie Wansirou, à coté de la station JNP</li>
+                <li>SIC Technologie Wansirou, GIFT OF GOD</li>
             </ul>
         </section>
 
         <section class="products-section">
             <h2>Nos produits</h2>
             <ul>
-                <li>Maintenance réseau</li>
-                <li>Installation Wi-Fi Zone</li>
-                <li>Maintenance informatique</li>
-                <li>Creation de Site web et Application mobile</li>
+                <li>Vente et installation de systeme de video surveillance</li>
+                <li>Photocopie impression et saisie (Couleur et noir) </li>
+                <li>Impression couleur et noir</li>
+                <li>Photo d'identité en 2 min</li>
+                <li>Photo complete en 2 min</li>
+                <li>Formation en informatique</li>
+                <li>Installation des GPS pour retrouver les engins meme en cas de vole</li>
+                <li>Services en ligne (CIP, IFU, Passeport, Carte biometrique...)</li>
+                <li>Abonnement et vente de decodeur CANAL+</li>
             </ul>
         </section>
 

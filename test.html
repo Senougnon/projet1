@@ -5,16 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion Cyber Campus</title>
     <style>
-        /* ... (Votre CSS ici) ... */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
-
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Poppins', sans-serif;
         }
-
+        
         body {
             background: linear-gradient(135deg, #970158, #00026e, #000000);
             min-height: 100vh;
@@ -23,425 +22,430 @@
             color: #ffffff;
             overflow-x: hidden;
         }
-
+        
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        header {
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 20px 0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header-image {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: -1;
-        }
-
-        .img1 {
-            animation: slide1 10s linear infinite;
-        }
-
-        .img2 {
-            animation: slide2 10s linear infinite;
-        }
-
-        .logo {
-            font-size: 2.5em;
-            color: white;
-            text-align: center;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-            position: relative;
-            z-index: 2;
-        }
-
-        .logo::before {
-            content: '';
-            font-size: 0.8em;
-            margin-right: 10px;
-            animation: rotate 5s linear infinite;
-            display: inline-block;
-        }
-
-        @keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .moon {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 2em;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        .nav-button {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .nav-button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.5s, height 0.5s;
-        }
-
-        .nav-button:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
-        @keyframes buttonPulse {
-            0% { background-color: #fdbb2d; color: #1a2a6c; }
-            50% { background-color: #1a2a6c; color: #fdbb2d; }
-            100% { background-color: #fdbb2d; color: #1a2a6c; }
-        }
-
-        .nav-button.animate-pay {
-            animation: buttonPulse 3s ease-in-out infinite;
-        }
-
-        @keyframes textChange {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
-        }
-
-        .nav-button.animate-pay {
-            animation: textChange 0.5s ease-in-out, buttonPulse 3s ease-in-out infinite;
-        }
-
-        main {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            margin-top: 40px;
-            position: relative;
-        }
-
-        .login-section, .rates-section, .locations-section, .products-section {
-            background-color: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-
-        .login-section:hover, .rates-section:hover, .locations-section:hover, .products-section:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .login-section {
-            flex-basis: 100%;
-        }
-
-        .rates-section, .locations-section, .products-section {
-            flex-basis: calc(33.333% - 20px);
-        }
-
-        h2 {
-            color: white;
-            margin-bottom: 15px;
-            position: relative;
-            display: inline-block;
-        }
-
-        h2::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background-color: #fdbb2d;
-            transition: width 0.3s;
-        }
-
-        .login-section:hover h2::after,
-        .rates-section:hover h2::after,
-        .locations-section:hover h2::after,
-        .products-section:hover h2::after {
-            width: 100%;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-        }
-
-        input {
-            margin-bottom: 10px;
-            padding: 10px;
-            border: none;
-            border-radius: 25px;
-            background-color: rgb(253, 242, 221);
-            color: white;
-            transition: background-color 0.3s;
-        }
-
-        input:focus {
-            background-color: rgba(255, 255, 255, 0.3);
-            outline: none;
-        }
-
-        button {
-            background-color: #fdbb2d;
-            color: #1a2a6c;
-            border: none;
-            padding: 10px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-        }
-
-        button:hover {
-            background-color: #1a2a6c;
-            color: #fdbb2d;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            color: white;
-        }
-
-        th, td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        ul {
-            list-style-type: none;
-        }
-
-        li {
-            margin-bottom: 5px;
-            position: relative;
-            padding-left: 20px;
-        }
-
-        li::before {
-            content: '➤';
-            position: absolute;
-            left: 0;
-            color: #fdbb2d;
-        }
-
-        .animated-text-container {
-            overflow: hidden;
-            height: 50px;
-        }
-
-        .animated-text {
-            animation: scrollText 10s linear infinite;
-        }
-
-        @keyframes scrollText {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-50px); }
-        }
-
-        footer {
-            margin-top: auto;
-            text-align: center;
-            padding: 20px;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-
-        @keyframes slide1 {
-            0% { transform: translateX(0); }
-            50% { transform: translateX(-100%); }
-            100% { transform: translateX(0); }
-        }
-
-        @keyframes slide2 {
-            0% { transform: translateX(100%); }
-            50% { transform: translateX(0); }
-            100% { transform: translateX(100%); }
-        }
-
-        @media (max-width: 768px) {
-            .rates-section, .locations-section, .products-section {
-                flex-basis: 100%;
-            }
-        }
-
-        .notification {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            padding: 30px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-            display: none;
-            color: #1a2a6c;
-            text-align: center;
-        }
-
-        .notification h2 {
-            color: #1a2a6c;
-            margin-bottom: 20px;
-        }
-
-        .notification p {
-            margin-bottom: 15px;
-        }
-
-        .close-icon {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-            font-size: 20px;
-        }
-
-        #ticket-select {
-            margin-bottom: 20px;
-        }
-
-        #nomTicket {
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        #paymentFrame {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-        }
-
-        #paymentFrame > div {
-            position: relative;
-            width: 80%;
-            height: 80%;
-            margin: 5% auto;
-            background-color: white;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        #closePaymentFrame {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 1001;
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #1a2a6c;
-        }
-
-        #paymentIframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .delete-button {
-            background-color: #f44336; 
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-            margin: 10px;
-        }
-
-        .delete-button:hover {
-            background-color: #d32f2f; 
-        }
-
-        .notification.error { 
-            background-color: #fdd; 
-            border: 1px solid #faa; 
-            color: #f00; 
-        }
-
-        .notification .ticket-info {
-           
-            margin-bottom: 15px;
-            text-align: left; 
-        }
-
-        .notification .ticket-info p {
-            margin-bottom: 5px; 
-        }
-
-        .notification .login-button,
-        .notification .delete-button {
-            display: inline-block; 
-            margin: 0 10px; 
-        }
-
-        .notification .login-button {
-            background-color: #fdbb2d; 
-            color: #1a2a6c;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-        }
-
-        .notification .login-button:hover {
-            background-color: #1a2a6c;
-            color: #fdbb2d;
-        }
-
-    </style>
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+                
+                header {
+                    background-color: rgba(0, 0, 0, 0.5);
+                    padding: 20px 0;
+                    position: relative;
+                    overflow: hidden;
+                }
+                
+                .header-image {
+                    width: 100%;
+                    height: 300px;
+                    object-fit: cover;
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    z-index: -1;
+                }
+                
+                .img1 {
+                    animation: slide1 10s linear infinite;
+                }
+                
+                .img2 {
+                    animation: slide2 10s linear infinite;
+                }
+                
+                .logo {
+                    font-size: 2.5em;
+                    color: white;
+                    text-align: center;
+                    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+                    position: relative;
+                    z-index: 2;
+                }
+                
+                .logo::before {
+                    content: '';
+                    font-size: 0.8em;
+                    margin-right: 10px;
+                    animation: rotate 5s linear infinite;
+                    display: inline-block;
+                }
+                
+                @keyframes rotate {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                
+                .moon {
+                    position: absolute;
+                    top: 20px;
+                    right: 20px;
+                    font-size: 2em;
+                    animation: float 3s ease-in-out infinite;
+                }
+                
+                @keyframes float {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-10px); }
+                }
+                
+                nav {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: 20px;
+                }
+                
+                .nav-button {
+                    background-color: rgba(255, 255, 255, 0.2);
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 25px;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    position: relative;
+                    overflow: hidden;
+                }
+                
+                .nav-button::before {
+                    content: '';
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 0;
+                    height: 0;
+                    background-color: rgba(255, 255, 255, 0.1);
+                    border-radius: 50%;
+                    transform: translate(-50%, -50%);
+                    transition: width 0.5s, height 0.5s;
+                }
+                
+                .nav-button:hover::before {
+                    width: 300px;
+                    height: 300px;
+                }
+                
+                @keyframes buttonPulse {
+                    0% { background-color: #fdbb2d; color: #1a2a6c; }
+                    50% { background-color: #1a2a6c; color: #fdbb2d; }
+                    100% { background-color: #fdbb2d; color: #1a2a6c; }
+                }
+                
+                @keyframes textChange {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0; }
+                }
+                
+                .nav-button.animate-pay {
+                    animation: textChange 0.5s ease-in-out, buttonPulse 3s ease-in-out infinite;
+                }
+                
+                main {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: space-between;
+                    margin-top: 40px;
+                    position: relative;
+                }
+                
+                .login-section, .rates-section, .locations-section, .products-section {
+                    background-color: rgba(255, 255, 255, 0.1);
+                    backdrop-filter: blur(10px);
+                    border-radius: 10px;
+                    padding: 20px;
+                    margin-bottom: 20px;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    transition: transform 0.3s, box-shadow 0.3s;
+                }
+                
+                .login-section:hover, .rates-section:hover, .locations-section:hover, .products-section:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+                }
+                
+                .login-section {
+                    flex-basis: 100%;
+                }
+                
+                .rates-section, .locations-section, .products-section {
+                    flex-basis: calc(33.333% - 20px);
+                }
+                
+                h2 {
+                    color: white;
+                    margin-bottom: 15px;
+                    position: relative;
+                    display: inline-block;
+                }
+                
+                h2::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -5px;
+                    left: 0;
+                    width: 0;
+                    height: 2px;
+                    background-color: #fdbb2d;
+                    transition: width 0.3s;
+                }
+                
+                .login-section:hover h2::after,
+                .rates-section:hover h2::after,
+                .locations-section:hover h2::after,
+                .products-section:hover h2::after {
+                    width: 100%;
+                }
+                
+                form {
+                    display: flex;
+                    flex-direction: column;
+                }
+                
+                input {
+                    margin-bottom: 10px;
+                    padding: 10px;
+                    border: none;
+                    border-radius: 25px;
+                    background-color: rgb(253, 242, 221);
+                    color: white;
+                    transition: background-color 0.3s;
+                }
+                
+                input:focus {
+                    background-color: rgba(255, 255, 255, 0.3);
+                    outline: none;
+                }
+                
+                button {
+                    background-color: #fdbb2d;
+                    color: #1a2a6c;
+                    border: none;
+                    padding: 10px;
+                    border-radius: 25px;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    font-weight: bold;
+                }
+                
+                button:hover {
+                    background-color: #1a2a6c;
+                    color: #fdbb2d;
+                }
+                
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    color: white;
+                }
+                
+                th, td {
+                    padding: 8px;
+                    text-align: left;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                }
+                
+                ul {
+                    list-style-type: none;
+                }
+                
+                li {
+                    margin-bottom: 5px;
+                    position: relative;
+                    padding-left: 20px;
+                }
+                
+                li::before {
+                    content: '➤';
+                    position: absolute;
+                    left: 0;
+                    color: #fdbb2d;
+                }
+                
+                .animated-text-container {
+                    overflow: hidden;
+                    height: 50px;
+                }
+                
+                .animated-text {
+                    animation: scrollText 10s linear infinite;
+                }
+                
+                @keyframes scrollText {
+                    0%, 100% { transform: translateY(0); }
+                    50% { transform: translateY(-50px); }
+                }
+                
+                footer {
+                    margin-top: auto;
+                    text-align: center;
+                    padding: 20px;
+                    background-color: rgba(0, 0, 0, 0.5);
+                }
+                
+                @keyframes slide1 {
+                    0% { transform: translateX(0); }
+                    50% { transform: translateX(-100%); }
+                    100% { transform: translateX(0); }
+                }
+                
+                @keyframes slide2 {
+                    0% { transform: translateX(100%); }
+                    50% { transform: translateX(0); }
+                    100% { transform: translateX(100%); }
+                }
+                
+                @media (max-width: 768px) {
+                    .rates-section, .locations-section, .products-section {
+                        flex-basis: 100%;
+                    }
+                }
+                
+                .notification {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(255, 255, 255, 0.9);
+                    border-radius: 10px;
+                    padding: 30px;
+                    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+                    z-index: 1000;
+                    display: none;
+                    color: #1a2a6c;
+                    text-align: center;
+                }
+                
+                .notification h2 {
+                    color: #1a2a6c;
+                    margin-bottom: 20px;
+                }
+                
+                .notification p {
+                    margin-bottom: 15px;
+                }
+                
+                .close-icon {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    cursor: pointer;
+                    font-size: 20px;
+                }
+                
+                #ticket-select {
+                    margin-bottom: 20px;
+                }
+                
+                #nomTicket {
+                    width: 100%;
+                    padding: 10px;
+                    border-radius: 5px;
+                    border: 1px solid #ccc;
+                }
+                
+                #paymentFrame {
+                    display: none;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.8);
+                    z-index: 1000;
+                }
+                
+                #paymentFrame > div {
+                    position: relative;
+                    width: 80%;
+                    height: 80%;
+                    margin: 5% auto;
+                    background-color: white;
+                    border-radius: 10px;
+                    overflow: hidden;
+                }
+                
+                #closePaymentFrame {
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    z-index: 1001;
+                    background: none;
+                    border: none;
+                    font-size: 24px;
+                    cursor: pointer;
+                    color: #1a2a6c;
+                }
+                
+                #paymentIframe {
+                    width: 100%;
+                    height: 100%;
+                    border: none;
+                }
+                
+                .delete-button {
+                    background-color: #f44336; /* Rouge pour un bouton de suppression */
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 25px;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    font-weight: bold;
+                    margin: 10px;
+                }
+                
+                .delete-button:hover {
+                    background-color: #d32f2f; /* Rouge foncé au survol */
+                }
+                
+                .notification.error { /* Style spécifique pour les notifications d'erreur */
+                    background-color: #fdd; /* Couleur de fond légèrement rouge */
+                    border: 1px solid #faa; /* Bordure rouge */
+                    color: #f00; /* Texte en rouge */
+                }
+                
+                .notification .ticket-info {
+                    /* Style pour la section d'information du ticket */
+                    margin-bottom: 15px;
+                    text-align: left; /* Alignement à gauche pour une meilleure lisibilité */
+                }
+                
+                .notification .ticket-info p {
+                    margin-bottom: 5px; /* Espacement entre les lignes */
+                }
+                
+                .notification .login-button,
+                .notification .delete-button {
+                    display: inline-block; /* Affichage en ligne pour les boutons */
+                    margin: 0 10px; /* Espacement entre les boutons */
+                }
+                
+                .notification .login-button {
+                    background-color: #fdbb2d; /* Style pour le bouton Connexion */
+                    color: #1a2a6c;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 25px;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    font-weight: bold;
+                }
+                
+                .notification .login-button:hover {
+                    background-color: #1a2a6c;
+                    color: #fdbb2d;
+                }
+                .scan-section {
+                    background-color: rgba(255, 255, 255, 0.1);
+                    backdrop-filter: blur(10px);
+                    border-radius: 10px;
+                    padding: 20px;
+                    margin-bottom: 20px;
+                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    transition: transform 0.3s, box-shadow 0.3s;
+                }
+        
+            </style>
 
     $(if chap-id)
     <form name="sendin" action="$(link-login-only)" method="post" style="display:none">
@@ -465,21 +469,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://unpkg.com/jsqr@latest/dist/jsQR.js"></script>
+    <script src="jsQR.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getDatabase, ref, get, set, push, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyDlpP8jqtmVqNAES51e18nXzY1a_f2YaFs",
-            authDomain: "sic-wifi-zone.firebaseapp.com",
-            databaseURL: "https://sic-wifi-zone-default-rtdb.firebaseio.com",
-            projectId: "sic-wifi-zone",
-            storageBucket: "sic-wifi-zone.firebasestorage.app",
-            messagingSenderId: "538299261046",
-            appId: "1:538299261046:web:45ba9618a8cd3cb225ff57",
-            measurementId: "G-SPJ3LG1FY5"
-        };
+  apiKey: "AIzaSyCqYu8n0ct6KcMhiEvTKO74mh824PrNXfk",
+  authDomain: "cyberdemo-a38fc.firebaseapp.com",
+  databaseURL: "https://cyberdemo-a38fc-default-rtdb.firebaseio.com",
+  projectId: "cyberdemo-a38fc",
+  storageBucket: "cyberdemo-a38fc.firebasestorage.app",
+  messagingSenderId: "560596573477",
+  appId: "1:560596573477:web:f576224af5650fc081cecc",
+  measurementId: "G-XH1RH6DYK5"
+};
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
@@ -562,6 +566,84 @@
         document.addEventListener('DOMContentLoaded', () => {
             syncTickets();
             setInterval(syncTickets, 5000);
+            // Récupérer les références des éléments
+            const openScanSectionButton = document.getElementById('openScanSection');
+            const scanSection = document.getElementById('scanSection');
+            const startScanButton = document.getElementById('startScanButton');
+            const preview = document.getElementById('preview');
+            const scanResult = document.getElementById('scanResult');
+            let videoStream = null; // Variable pour stocker le flux vidéo
+
+            // Fonction pour démarrer le scan
+            async function startScan() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    videoStream = stream;
+                    preview.srcObject = stream;
+                    preview.style.display = 'block';
+                    preview.play();
+
+                    requestAnimationFrame(tick);
+                } catch (err) {
+                    console.error("Erreur lors de l'accès à la caméra :", err);
+                }
+            }
+
+            // Fonction pour arrêter le scan
+            function stopScan() {
+                if (videoStream) {
+                    videoStream.getTracks().forEach(track => track.stop());
+                    videoStream = null;
+                }
+                preview.style.display = 'none';
+                scanResult.style.display = 'none';
+            }
+
+            // Fonction pour traiter chaque frame vidéo
+            function tick() {
+                if (preview.readyState === preview.HAVE_ENOUGH_DATA) {
+                    const canvasElement = document.createElement('canvas');
+                    const canvas = canvasElement.getContext('2d');
+                    canvasElement.height = preview.videoHeight;
+                    canvasElement.width = preview.videoWidth;
+                    canvas.drawImage(preview, 0, 0, canvasElement.width, canvasElement.height);
+                    const imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: "dontInvert",
+                    });
+
+                    if (code) {
+                        // QR code détecté
+                        console.log("QR Code détecté :", code.data);
+                        scanResult.textContent = "QR Code détecté !";
+                        scanResult.style.display = 'block';
+                        stopScan();
+
+                        // Traiter les données du QR code
+                        const ticketData = JSON.parse(code.data);
+                        document.login.username.value = ticketData.user;
+                        document.login.password.value = ticketData.password;
+
+                        // Vous pouvez également soumettre automatiquement le formulaire ici si vous le souhaitez
+                        // document.login.submit();
+                    } else {
+                        scanResult.textContent = "Scan en cours...";
+                        scanResult.style.display = 'block';
+                    }
+                }
+
+                if (videoStream) {
+                    requestAnimationFrame(tick);
+                }
+            }
+
+            // Gérer l'affichage de la section de scan
+            openScanSectionButton.addEventListener('click', () => {
+                scanSection.style.display = 'block';
+            });
+
+            // Gérer le démarrage du scan
+            startScanButton.addEventListener('click', startScan);
         });
 
         // Fonction pour stocker le ticket de connexion localement
@@ -582,8 +664,8 @@
             this.submit();
         });
 
-        // Fonction pour gérer le stockage des tickets en transit
-        async function storeTicketEnTransit(category) {
+ // Fonction pour gérer le stockage des tickets en transit
+ async function storeTicketEnTransit(category) {
             const ticket = await synchronizeAndReserveTicket(category);
             if (!ticket) {
                 throw new Error("Aucun ticket disponible pour cette catégorie.");
@@ -927,106 +1009,6 @@ function updateButtonText() {
             localStorage.setItem('storedTicket', JSON.stringify(ticketData));
         }
 
-        // --- Code pour la lecture du QR Code ---
-        const scanQRCodeButton = document.getElementById('scanQRCodeButton');
-        const cameraFeed = document.getElementById('cameraFeed');
-        const qrCanvas = document.getElementById('qrCanvas');
-        const qrCanvasContext = qrCanvas.getContext('2d');
-        const usernameInput = document.getElementById('username');
-        const passwordInput = document.getElementById('password');
-        let scanStream = null;
-
-        // --- Fonction pour démarrer la caméra ---
-        function startCamera() {
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-                .then((stream) => {
-                    cameraFeed.srcObject = stream;
-                    cameraFeed.style.display = 'block';
-                    scanStream = stream;
-                    cameraFeed.play();
-                    requestAnimationFrame(scanQRCode);
-                })
-                .catch((error) => {
-                    console.error('Erreur lors de l\'accès à la caméra:', error);
-                    alert('Erreur lors de l\'accès à la caméra. Veuillez vérifier les autorisations.');
-                });
-        }
-
-        // --- Fonction pour arrêter la caméra ---
-        function stopCamera() {
-            if (scanStream) {
-                scanStream.getTracks().forEach(track => track.stop());
-                cameraFeed.style.display = 'none';
-                scanStream = null;
-            }
-        }
-
-        // --- Écouteur d'événement pour le bouton de scan ---
-        scanQRCodeButton.addEventListener('click', () => {
-            if (scanStream) {
-                // Si la caméra est déjà active, l'arrêter
-                stopCamera();
-                scanQRCodeButton.textContent = 'Scanner le QR Code';
-            } else {
-                // Sinon, démarrer la caméra
-                startCamera();
-                scanQRCodeButton.textContent = 'Arrêter le scan';
-            }
-        });
-
-        // --- Fonction pour scanner le QR code ---
-        function scanQRCode() {
-            if (cameraFeed.readyState === cameraFeed.HAVE_ENOUGH_DATA) {
-                qrCanvas.height = cameraFeed.videoHeight;
-                qrCanvas.width = cameraFeed.videoWidth;
-                qrCanvasContext.drawImage(cameraFeed, 0, 0, qrCanvas.width, qrCanvas.height);
-                const imageData = qrCanvasContext.getImageData(0, 0, qrCanvas.width, qrCanvas.height);
-                const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                    inversionAttempts: 'dontInvert',
-                });
-
-                if (code) {
-                    // QR Code détecté
-                    console.log('QR Code détecté:', code.data);
-                    processQRCodeData(code.data);
-                    stopCamera();
-                    scanQRCodeButton.textContent = 'Scanner le QR Code'; // Réinitialiser le texte du bouton
-                } else {
-                    requestAnimationFrame(scanQRCode);
-                }
-            } else {
-                requestAnimationFrame(scanQRCode);
-            }
-        }
-
-        // --- Fonction pour traiter les données du QR code ---
-        function processQRCodeData(data) {
-            const credentials = parseQRCodeData(data);
-            if (credentials) {
-                usernameInput.value = credentials.username;
-                passwordInput.value = credentials.password;
-                alert('Identifiants récupérés avec succès!');
-                // Optionnel : Soumettre automatiquement le formulaire
-                // document.login.submit();
-            } else {
-                alert('QR Code invalide.');
-            }
-        }
-
-        // --- Fonction pour analyser les données du QR code ---
-        function parseQRCodeData(data) {
-            const parts = data.split(';');
-            const usernamePart = parts.find(part => part.startsWith('username:'));
-            const passwordPart = parts.find(part => part.startsWith('password:'));
-
-            if (usernamePart && passwordPart) {
-                return {
-                    username: usernamePart.split(':')[1],
-                    password: passwordPart.split(':')[1]
-                };
-            }
-            return null;
-        }
     </script>
 </head>
 <body>
@@ -1044,24 +1026,28 @@ function updateButtonText() {
     </header>
 
     <main class="container">
-
+        <button id="openScanSection">Scanner un QR code</button>
         <section class="login-section">
             <h2>Connexion</h2>
             <form name="login" action="$(link-login-only)" method="post" $(if chap-id) onSubmit="return doLogin()" $(endif)>
                 <input type="hidden" name="dst" value="$(link-orig)" />
                 <input type="hidden" name="popup" value="true" />
-                <input type="text" name="username" id="username" placeholder="Nom d'utilisateur" value="$(username)" required>
-                <input type="password" name="password" id="password" placeholder="Mot de passe" required>
-                <button type="button" id="scanQRCodeButton">Scanner le QR Code</button>
+                <input type="text" name="username" placeholder="Nom d'utilisateur" value="$(username)" required>
+                <input type="password" name="password" placeholder="Mot de passe" required>
                 <button type="submit">Se connecter</button>
             </form>
-            <video id="cameraFeed" style="display: none; width: 100%; max-width: 500px;"></video>
-            <canvas id="qrCanvas" style="display: none;"></canvas>
             <p class="info $(if error)alert$(endif)">
                 $(if error == "")Veuillez vous connecter pour utiliser le service hotspot Internet $(if trial == 'yes')<br />Essai gratuit disponible, <a href="$(link-login-only)?dst=$(link-orig-esc)&username=T-$(mac-esc)">cliquez ici</a>.$(endif)
                 $(endif)
                 $(if error)$(error)$(endif)
             </p>
+        </section>
+
+        <section class="scan-section" id="scanSection" style="display: none;">
+            <h2>Scanner un QR code</h2>
+            <button id="startScanButton">Démarrer le scan</button>
+            <video id="preview" width="100%" style="display: none;"></video>
+            <div id="scanResult" style="display: none;"></div>
         </section>
 
         <section class="rates-section">
@@ -1072,8 +1058,9 @@ function updateButtonText() {
         <section class="locations-section">
             <h2>Ticket payé non reçus ?</h2>
             <ul>
-                <li>Récupérer les ID du ticket en contactant le +229 97138906</li>
+                            <li>Récupérer les ID du ticket en contactant le +229 97138906</li>
             </ul>
+
         </section>
 
         <section class="locations-section">

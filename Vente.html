@@ -22,7 +22,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, #970158, #00026e, #000000);
+            background: linear-gradient(135deg,  #424242, #073018, #553a01);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -594,6 +594,57 @@
             text-align: center;
             max-width: 80%;
         }
+        .subscription-required {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .subscription-required-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .subscription-required-content h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .subscription-required-content p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .subscription-required-content button {
+            background-color: #fdbb2d;
+            color: #1a2a6c;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin: 0 10px;
+        }
+
+        .subscription-required-content button:hover {
+            background-color: #e6a727;
+        }
 
     </style>
 </head>
@@ -719,23 +770,33 @@
         <div class="anitext">PROPULSE PAR EVISIONS</div>
     </footer>
 
+    <div id="subscriptionRequiredModal" class="subscription-required" style="display: none;">
+        <div class="subscription-required-content">
+            <h2>Abonnement Requis</h2>
+            <p>Un abonnement actif est nécessaire pour accéder à cette fonctionnalité.</p>
+            <button onclick="redirectToSubscription()">S'abonner</button>
+            <button onclick="hideSubscriptionRequiredModal()">Fermer</button>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getDatabase, ref, get, set, push, remove, onChildAdded } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
     
         const firebaseConfig = {
-            apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
-            authDomain: "cyber-campus-2706f.firebaseapp.com",
-            databaseURL: "https://cyber-campus-2706f-default-rtdb.firebaseio.com",
-            projectId: "cyber-campus-2706f",
-            storageBucket: "cyber-campus-2706f.appspot.com",
-            messagingSenderId: "719410601264",
-            appId: "1:719410601264:web:44fd2e3757721866303cf5",
-            measurementId: "G-CEEFJP5LYZ"
-        };
+  apiKey: "AIzaSyB6AUBnK_7Vy2ABWI2JMo3ebG_Sljr8XlY",
+  authDomain: "cyber-campus-2706f.firebaseapp.com",
+  databaseURL: "https://cyber-campus-2706f-default-rtdb.firebaseio.com",
+  projectId: "cyber-campus-2706f",
+  storageBucket: "cyber-campus-2706f.appspot.com",
+  messagingSenderId: "719410601264",
+  appId: "1:719410601264:web:44fd2e3757721866303cf5",
+  measurementId: "G-CEEFJP5LYZ"
+};
     
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const adminRef = ref(db, 'admin/subscription');
     
         let ticketToSell = null;
         let localTickets = {};
@@ -921,7 +982,7 @@ loginForm.addEventListener('submit', async (event) => {
         window.initTicketSale = async function(category) {
             showLoader();
             try {
-                const ticketsTotalRef = ref(                db, `TicketsTotal/${category}`);
+                const ticketsTotalRef = ref(db, `TicketsTotal/${category}`);
                 const snapshot = await get(ticketsTotalRef);
     
                 if (snapshot.exists()) {
@@ -1135,22 +1196,6 @@ loginForm.addEventListener('submit', async (event) => {
             document.getElementById('notification').style.display = 'none';
         };
     
-        // Initialisation
-        document.addEventListener('DOMContentLoaded', () => {
-            showPageLoader();
-            processConnectedTickets()
-                .then(() => {
-                  fetchVendors();
-                  lucide.createIcons();
-                  hidePageLoader();
-                })
-                .catch((error) => {
-                    console.error("Erreur lors du traitement des tickets :", error);
-                    hidePageLoader();
-                    showNotification("Erreur", "Une erreur est survenue lors de l'initialisation.");
-                });
-        });
-    
         // Chargement de l'historique
         async function loadHistory() {
             showLoader();
@@ -1357,169 +1402,66 @@ loginForm.addEventListener('submit', async (event) => {
             document.getElementById('pageLoaderWrapper').style.display = 'none';
         }
 
-        async function processConnectedTickets() {
-            const pageLoaderMessage = document.getElementById('pageLoaderMessage');
-            try {
-                pageLoaderMessage.textContent = "Vérification des tickets connectés...";
-                const connectedTicketsRef = ref(db, 'TicketConnecté');
-                const snapshot = await get(connectedTicketsRef);
-                let connectedTickets = snapshot.val() || {};
 
-                // Supprimer les doublons et récupérer les informations complètes des tickets
-                const uniqueTickets = {};
-                for (const ticketId in connectedTickets) {
-                    const user = connectedTickets[ticketId].username;
-                    if (!uniqueTickets[user]) {
-                        uniqueTickets[user] = connectedTickets[ticketId];
-                    }
-                }
-                
-                pageLoaderMessage.textContent = "Traitement des tickets uniques...";
-                for (const user in uniqueTickets) {
-                    await processTicket(uniqueTickets[user]);
-                }
-                
-                pageLoaderMessage.textContent = "Nettoyage des tickets traités...";
-                // Nettoyer les tickets traités de TicketConnecté
-                for (const user in uniqueTickets) {
-                    const ticketId = Object.keys(connectedTickets).find(key => connectedTickets[key].username === user);
-                    if (ticketId) {
-                        await remove(ref(db, `TicketConnecté/${ticketId}`));
-                    }
-                }
-
-            } catch (error) {
-                console.error("Erreur lors du traitement des tickets connectés :", error);
-                showNotification("Erreur", "Une erreur est survenue lors du traitement des tickets.");
-            }
+        function showSubscriptionRequiredModal() {
+            subscriptionRequiredModal.style.display = 'flex';
         }
 
-        async function processTicket(ticket) {
-            const pageLoaderMessage = document.getElementById('pageLoaderMessage');
-            try {
-                pageLoaderMessage.textContent = `Vérification du ticket pour ${ticket.username}...`;
-
-                // Vérifier dans VendorsHistory
-                const vendorsHistoryRef = ref(db, 'VendorsHistory');
-                const vendorsHistorySnapshot = await get(vendorsHistoryRef);
-                const vendorsHistory = vendorsHistorySnapshot.val() || {};
-
-                let foundInHistory = false;
-                for (const vendorId in vendorsHistory) {
-                    const vendorHistory = vendorsHistory[vendorId];
-                    for (const saleId in vendorHistory) {
-                        if (vendorHistory[saleId].user === ticket.username) {
-                            foundInHistory = true;
-                            break;
-                        }
-                    }
-                    if (foundInHistory) break;
-                }
-
-                if (!foundInHistory) {
-                    pageLoaderMessage.textContent = `Traitement du ticket ${ticket.username}...`;
-
-                    // Vérifier dans TicketsTotal et TicketsTransit
-                    const ticketsTotalRef = ref(db, 'TicketsTotal');
-                    const ticketsTransitRef = ref(db, 'TicketsTransit');
-                    const totalSnapshot = await get(ticketsTotalRef);
-                    const transitSnapshot = await get(ticketsTransitRef);
-                    const totalTickets = totalSnapshot.val() || {};
-                    const transitTickets = transitSnapshot.val() || {};
-
-                    let foundTicket = null;
-                    let foundTicketRef = null;
-                    let foundInCategory = null;
-
-                    // Chercher dans TicketsTotal
-                    for (const category in totalTickets) {
-                        const ticketIndex = (totalTickets[category].utilisateur || []).indexOf(ticket.username);
-                        
-                        if (ticketIndex > -1) {
-                            foundTicket = {
-                                category: category,
-                                user: totalTickets[category].utilisateur[ticketIndex],
-                                password: totalTickets[category].motDePasse[ticketIndex],
-                                price: totalTickets[category].prix[ticketIndex],
-                                updatedData: {
-                                    ...totalTickets[category],
-                                    utilisateur: totalTickets[category].utilisateur.filter((_, index) => index !== ticketIndex),
-                                    motDePasse: totalTickets[category].motDePasse.filter((_, index) => index !== ticketIndex),
-                                    prix: totalTickets[category].prix.filter((_, index) => index !== ticketIndex)
-                                }
-                            };
-                            foundTicketRef = ref(db, `TicketsTotal/${category}`);
-                            foundInCategory = "TicketsTotal";
-                            break;
-                        }
-                    }
-
-                    // Si non trouvé dans TicketsTotal, chercher dans TicketsTransit
-                    if (!foundTicket) {
-                        for (const transitId in transitTickets) {
-                            if (transitTickets[transitId].user === ticket.username) {
-                                foundTicket = {
-                                    category: transitTickets[transitId].category,
-                                    user: transitTickets[transitId].user,
-                                    password: transitTickets[transitId].password,
-                                    price: transitTickets[transitId].price
-                                };
-                                foundTicketRef = ref(db, `TicketsTransit/${transitId}`);
-                                foundInCategory = "TicketsTransit";
-                                break;
-                            }
-                        }
-                    }
-
-                    if (foundTicket) {
-                        pageLoaderMessage.textContent = `Vente du ticket ${ticket.username}...`;
-                        await sellTicketAutomatically(foundTicket, foundTicketRef, foundInCategory);
-                    }
-                }
-            } catch (error) {
-                console.error("Erreur lors du traitement du ticket :", error);
-                showNotification("Erreur", `Erreur lors du traitement du ticket ${ticket.username}.`);
-            }
+        function hideSubscriptionRequiredModal() {
+            subscriptionRequiredModal.style.display = 'none';
         }
 
-        async function sellTicketAutomatically(ticket, ticketRef, foundInCategory) {
+        function redirectToSubscription() {
+            window.location.href = 'index.html';
+            
+        }
+        async function checkSubscriptionStatus() {
+            const pageLoaderMessage = document.getElementById('pageLoaderMessage');
+            pageLoaderMessage.textContent = "Vérification de l'abonnement...";
+
             try {
-                const automaticVendorId = "Vendeur automatique";
+                const snapshot = await get(adminRef);
+                const subscription = snapshot.val();
+                const now = new Date();
 
-                // Enregistrement de la vente dans VendorsHistory
-                const vendorHistoryRef = ref(db, `VendorsHistory/${automaticVendorId}`);
-                await push(vendorHistoryRef, {
-                    category: ticket.category,
-                    user: ticket.user,
-                    password: ticket.password,
-                    price: ticket.price,
-                    soldAt: Date.now()
-                });
-
-                // Enregistrement de la vente dans TicketsVendus
-                const ticketsVendusRef = ref(db, 'TicketsVendus');
-                await push(ticketsVendusRef, {
-                    category: ticket.category,
-                    user: ticket.user,
-                    password: ticket.password,
-                    price: ticket.price,
-                    soldAt: Date.now(),
-                    vendorId: automaticVendorId
-                });
-
-                // Suppression du ticket de la source (TicketsTotal ou TicketsTransit)
-                if(foundInCategory === "TicketsTotal"){
-                    await set(ticketRef, ticket.updatedData);
+                if (subscription && subscription.status === 'active') {
+                    const endDate = new Date(subscription.endDate);
+                    if (endDate < now) {
+                        // Abonnement expiré
+                        pageLoaderMessage.textContent = "Abonnement expiré";
+                        showSubscriptionRequiredModal();
+                        await adminRef.update({ status: 'expired' });
+                    } else {
+                        // Abonnement actif
+                        pageLoaderMessage.textContent = "Abonnement actif";
+                    }
                 } else {
-                    await remove(ticketRef);
+                    // Pas d'abonnement
+                    pageLoaderMessage.textContent = "Pas d'abonnement actif";
+                    showSubscriptionRequiredModal();
                 }
-
-                console.log(`Ticket ${ticket.user} vendu automatiquement.`);
             } catch (error) {
-                console.error("Erreur lors de la vente automatique du ticket :", error);
-                showNotification("Erreur", "Erreur lors de la vente automatique du ticket.");
+                console.error("Erreur lors de la vérification de l'abonnement :", error);
+                pageLoaderMessage.textContent = "Erreur lors de la vérification de l'abonnement";
+                showNotification("Erreur", "Erreur lors de la vérification de l'abonnement.");
             }
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+    checkSubscriptionStatus()
+        .then(() => {
+            fetchVendors();
+            lucide.createIcons();
+            hidePageLoader()
+        })
+        .catch((error) => {
+            console.error("Erreur lors de l'initialisation :", error);
+            showNotification("Erreur", "Une erreur est survenue lors de l'initialisation.");
+            hidePageLoader()
+               });
+});
+        window.redirectToSubscription = redirectToSubscription;
+        window.hideSubscriptionRequiredModal = redirectToSubscription;
     </script>
 </body>
 </html>

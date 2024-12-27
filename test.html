@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Paiement CinetPay - Guinée</title>
     <script src="https://cdn.cinetpay.com/seamless/main.js"></script>
     <style>
         .sdk {
@@ -14,38 +16,43 @@
             transform: translate(-50%, -50%);
         }
     </style>
+</head>
+<body>
+    <div class="sdk">
+        <h1>Paiement CinetPay (GNF)</h1>
+        <button onclick="checkout()">Payer 10 000 GNF</button>
+    </div>
+
     <script>
         function checkout() {
             CinetPay.setConfig({
-                apikey: '502467977676f2a7b6e6b05.18473544',//   YOUR APIKEY
-                site_id: '105884528',//YOUR_SITE_ID
-                notify_url: 'http://mondomaine.com/notify/',
+                apikey: '162374762673a38fbcda8b8.20656908', // Remplacez par votre clé API
+                site_id: '5883213', // Remplacez par votre identifiant de site
+                notify_url: 'https://votre-site.com/notify', // URL de notification
                 mode: 'PRODUCTION' // Optionnel : Définir le mode de paiement (PRODUCTION ou TEST)
             });
             CinetPay.getCheckout({
                 transaction_id: Math.floor(Math.random() * 100000000).toString(), // Identifiant de transaction unique
-                amount: 100,
-                currency: 'XOF',
-                channels: 'ALL',
-                description: 'Test de paiement',
+                amount: 10000, // Montant en GNF (multiple de 5)
+                currency: 'GNF', // Devise pour la Guinée Conakry
+                channels: 'ALL', // Tous les canaux de paiement
+                description: 'Achat sur mon site - Guinée',
                 // Informations client pour le paiement par carte bancaire
-                customer_name: "Joe",
-                customer_surname: "Down",
-                customer_email: "down@test.com",
-                customer_phone_number: "088767611",
-                customer_address: "BP 0024",
-                customer_city: "Antananarivo",
-                customer_country: "CM", // Code ISO du pays
-                customer_state: "CM", // Code ISO de l'état
-                customer_zip_code: "06510"
+                customer_name: "Doe",
+                customer_surname: "John",
+                customer_email: "john.doe@email.com",
+                customer_phone_number: "+224620123456",
+                customer_address: "Rue 123, Conakry",
+                customer_city: "Conakry",
+                customer_country: "GN", // Code ISO pour la Guinée
+                customer_state: "GN", // Meme code que le pays si pas d'etat
+                customer_zip_code: "00000" // code postal par defaut si non applicable
             });
             CinetPay.waitResponse(function(data) {
                 if (data.status == "REFUSED") {
                     alert("Votre paiement a échoué");
-                    window.location.reload();
                 } else if (data.status == "ACCEPTED") {
                     alert("Votre paiement a été effectué avec succès");
-                    window.location.reload();
                 }
             });
             CinetPay.onError(function(data) {
@@ -53,11 +60,5 @@
             });
         }
     </script>
-</head>
-<body>
-    <div class="sdk">
-        <h1>SDK SEAMLESS</h1>
-        <button onclick="checkout()">Checkout</button>
-    </div>
 </body>
 </html>

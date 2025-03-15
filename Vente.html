@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Vente Tickets Cyber Campus</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -711,7 +710,7 @@
     </div>
 
     <div class="notification" id="notification">
-        <span class="close-icon" onclick="hideNotification()">×</span>
+        <span class="close-icon" onclick="hideNotification()"><i class="fas fa-times"></i></span>
         <h3 id="notification-title">Confirmation de vente</h3>
         <div class="ticket-details" id="notification-message"></div>
         <div class="buttons" id="confirmation-buttons">
@@ -720,23 +719,23 @@
         </div>
         <div class="action-icons" id="ticket-actions" style="display: none;">
             <div class="action-icon icon-share" onclick="shareTicket()" title="Partager">
-                <i data-lucide="share-2"></i>
+                <i class="fas fa-share-alt"></i>
             </div>
             <div class="action-icon icon-pdf" onclick="exportToPDF()" title="Exporter en PDF">
-                <i data-lucide="file-text"></i>
+                <i class="fas fa-file-pdf"></i>
             </div>
         </div>
     </div>
 
     <div class="toggle-history" onclick="toggleHistory()">
-        <i data-lucide="history"></i>
+        <i class="fas fa-history"></i>
     </div>
 
     <div class="history-section" id="historySection" style="display: none;">
         <div class="history-header">
             <h2>Historique des ventes</h2>
             <button onclick="closeHistory()">
-                <i data-lucide="x"></i>
+                <i class="fas fa-times"></i>
             </button>
         </div>
 
@@ -771,8 +770,8 @@
             </div>
         </div>
         <div class="export-buttons">
-            <button onclick="printHistory()"><i data-lucide="printer"></i> Imprimer</button>
-            <button onclick="exportToPDFHistory()"><i data-lucide="file-down"></i> Exporter en PDF</button>
+            <button onclick="printHistory()"><i class="fas fa-print"></i> Imprimer</button>
+            <button onclick="exportToPDFHistory()"><i class="fas fa-file-pdf"></i> Exporter en PDF</button>
         </div>
 
         <div class="history-table">
@@ -940,7 +939,6 @@ loginForm.addEventListener('submit', async (event) => {
         await syncTickets();
         loadHistory();
         listenForNewMessages();
-        lucide.createIcons();
         hideLoader();
     } else {
         // Identifiants incorrects
@@ -1032,7 +1030,7 @@ loginForm.addEventListener('submit', async (event) => {
                             prix: data.prix.slice(1)
                         }
                     };
-                    console.log("Ticket to sell prepared:", ticketToSell); // Log here in initTicketSale
+
                     showConfirmation(ticketToSell);
                     hideLoader();
                 }
@@ -1065,7 +1063,6 @@ loginForm.addEventListener('submit', async (event) => {
         // Fonction pour procéder à la vente après confirmation
         window.proceedWithSale = async function() {
             showLoader();
-            console.log("proceedWithSale called. ticketToSell:", ticketToSell); // Log at the start of proceedWithSale
             if (!ticketToSell) {
                 showNotification("Erreur", "Aucun ticket à vendre");
                 hideLoader();
@@ -1075,20 +1072,10 @@ loginForm.addEventListener('submit', async (event) => {
             try {
                 // Mettre à jour la base de données
                 const ticketsTotalRef = ref(db, `TicketsTotal/${ticketToSell.category}`);
-                console.log("Updating TicketsTotal:", ticketsTotalRef.toString(), "with data:", ticketToSell.updatedData); // Log before set
                 await set(ticketsTotalRef, ticketToSell.updatedData);
-                console.log("TicketsTotal updated successfully."); // Log after set
 
                 // Ajouter aux tickets vendus
                 const ticketsVendusRef = ref(db, 'TicketsVendus');
-                console.log("Pushing to TicketsVendus:", ticketsVendusRef.toString(), "with data:", {
-                    category: ticketToSell.category,
-                    user: ticketToSell.user,
-                    password: ticketToSell.password,
-                    price: ticketToSell.price,
-                    soldAt: Date.now(),
-                    vendorId: currentVendorId
-                }); // Log before push to TicketsVendus
                 await push(ticketsVendusRef, {
                     category: ticketToSell.category,
                     user: ticketToSell.user,
@@ -1097,17 +1084,9 @@ loginForm.addEventListener('submit', async (event) => {
                     soldAt: Date.now(),
                     vendorId: currentVendorId
                 });
-                console.log("TicketsVendus updated successfully."); // Log after push to TicketsVendus
 
                 // Ajouter à l'historique du vendeur
                 const vendorHistoryRef = ref(db, `VendorsHistory/${currentVendorId}`);
-                console.log("Pushing to VendorsHistory:", vendorHistoryRef.toString(), "with data:", {
-                    category: ticketToSell.category,
-                    user: ticketToSell.user,
-                    password: ticketToSell.password,
-                    price: ticketToSell.price,
-                    soldAt: Date.now()
-                }); // Log before push to VendorsHistory
                 await push(vendorHistoryRef, {
                     category: ticketToSell.category,
                     user: ticketToSell.user,
@@ -1115,23 +1094,15 @@ loginForm.addEventListener('submit', async (event) => {
                     price: ticketToSell.price,
                     soldAt: Date.now()
                 });
-                console.log("VendorsHistory updated successfully."); // Log after push to VendorsHistory
-
 
                 // Afficher les détails du ticket vendu
-                console.log("Calling showTicketDetails with ticket:", ticketToSell); // Log before showTicketDetails
                 showTicketDetails(ticketToSell);
                 await syncTickets();
                 hideLoader();
             } catch (error) {
-                hideLoader();
-                console.error("Erreur lors de la vente:", error); // Log error in catch block
-                showTicketDetails(ticketToSell);
-                await syncTickets();
-                
-                hideLoader();
+                console.error("Erreur lors de la vente:", error);
                 showNotification("Erreur", "Impossible de finaliser la vente");
-                
+                hideLoader();
             }
 
             ticketToSell = null;
@@ -1155,7 +1126,6 @@ loginForm.addEventListener('submit', async (event) => {
             confirmationButtons.style.display = 'none';
             ticketActions.style.display = 'flex';
             notification.style.display = 'block';
-            lucide.createIcons();
         }
         // Afficher la confirmation de vente
         function showSaleConfirmation(ticket) {
@@ -1180,7 +1150,6 @@ loginForm.addEventListener('submit', async (event) => {
             `;
 
             notification.style.display = 'block';
-            lucide.createIcons();
         }
 
         // Confirmation de la vente
@@ -1363,7 +1332,7 @@ loginForm.addEventListener('submit', async (event) => {
                         <td>${sale.category}</td>
                         <td>${sale.user}</td>
                         <td>${sale.price} FCFA</td>
-                        <td><i class="fa-solid fa-arrow-right"></i></td>
+                        <td><i class="fas fa-arrow-right"></i></td>
                     </tr>
                 `).join('');
         }
@@ -1383,9 +1352,6 @@ loginForm.addEventListener('submit', async (event) => {
                     hideLoader();
                 }
             }catch (error){
-
-                hideLoader();
-                showTicketDetails(sale);
                 console.error("Erreur lors de la récupération du ticket:", error);
                 showNotification("Erreur", "Impossible de récupérer les détails du ticket");
                 hideLoader();
@@ -1593,8 +1559,6 @@ loginForm.addEventListener('submit', async (event) => {
                     } else {
                         // Abonnement actif
                         pageLoaderMessage.textContent = "Abonnement actif";
-                        hidePageLoader()
-
                     }
                 } else {
                     // Pas d'abonnement
@@ -1609,7 +1573,7 @@ loginForm.addEventListener('submit', async (event) => {
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-
+            showPageLoader();
             await initializeDatabase(); // Initialize database first
             checkSubscriptionStatus()
                 .then(async () => {
@@ -1617,7 +1581,6 @@ loginForm.addEventListener('submit', async (event) => {
                     await syncTickets();
                     loadHistory();
                     listenForNewMessages();
-                    lucide.createIcons();
                     hidePageLoader()
                 })
                 .catch((error) => {
@@ -1628,7 +1591,6 @@ loginForm.addEventListener('submit', async (event) => {
         });
         window.redirectToSubscription = redirectToSubscription;
         window.hideSubscriptionRequiredModal = redirectToSubscription;
-
     </script>
 </body>
 </html>
